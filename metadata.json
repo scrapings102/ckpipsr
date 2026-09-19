@@ -1,0 +1,8 @@
+{
+  "name": "CKPIPSR",
+  "description": "Official website for C.K. Pithawala Institute of Pharmaceutical Science and Research (CKPIPSR), Surat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
