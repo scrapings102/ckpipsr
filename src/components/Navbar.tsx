@@ -3150,11 +3150,11 @@ export default function Navbar({
               ? { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
               : { duration: 0.1, ease: 'easeIn' }
           }
-          className={`${isSubPage ? 'relative mx-auto w-full' : 'fixed left-1/2 -translate-x-1/2 w-[98%] max-w-[1720px]'} z-50 ${menuOpen || ckpMenuLayer ? (isSubPage ? '' : 'max-lg:top-4 sm:max-lg:top-5 max-lg:z-[70]') : ''} ${isSubPage
+          className={`${isSubPage ? 'relative mx-auto w-full' : 'fixed left-1/2 -translate-x-1/2 w-[98%] max-w-[1720px]'} z-50 ${menuOpen || ckpMenuLayer ? (isSubPage ? '' : 'max-lg:top-3 sm:max-lg:top-4 max-lg:z-[70]') : ''} ${isSubPage
             ? ''
             : isScrolled
-              ? 'top-4 sm:top-5 lg:top-6'
-              : 'top-5 sm:top-6 lg:top-20 xl:top-24 min-[1361px]:top-[92px]'
+              ? 'top-3 sm:top-4 lg:top-5'
+              : 'top-4 sm:top-5 lg:top-14 xl:top-16 min-[1361px]:top-[68px]'
             }`}
         >
           <div className='w-full rounded-[26px] sm:rounded-[32px] bg-transparent flex flex-col relative overflow-visible'>
