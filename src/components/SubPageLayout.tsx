@@ -327,8 +327,8 @@ export default function SubPageLayout({
       </div>
 
       {/* ── MAIN CONTENT CONTAINER ── */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12 lg:py-16">
-        <main className="w-full bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 md:p-10 lg:p-12 min-h-[500px] shadow-sm overflow-visible relative">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-12 lg:py-16">
+        <main className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-8 md:p-10 lg:p-12 min-h-[380px] sm:min-h-[500px] shadow-sm overflow-visible relative">
           <AnimatePresence mode="wait">
             <motion.div
               ref={containerRef}

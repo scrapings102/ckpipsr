@@ -1275,7 +1275,7 @@
    where CET's does, and the extra height becomes room for the name below. */
 @media (min-width: 1361px) {
   .ckp-nav:not(.is-scrolled) {
-    --ckp-logo: 104px;
+    --ckp-logo: 84px;
   }
 }
 
@@ -1331,8 +1331,69 @@
 }
 
 /* ============================================================
-   RESPONSIVE LOGO & BRAND ALIGNMENT FIX (SCROLLED & UNSCROLLED)
+   RESPONSIVE LOGO & BRAND ALIGNMENT FIX (ALL VIEWPORTS & 1024px)
    ============================================================ */
+
+/* Base fallback for logo size and crest rise when not scrolled */
+.ckp-nav:not(.is-scrolled) {
+  --ckp-logo: 72px;
+  --ckp-crest-rise: 44px;
+}
+
+@media (min-width: 1361px) {
+  .ckp-nav:not(.is-scrolled) {
+    --ckp-logo: 84px;
+    --ckp-crest-rise: 58px;
+  }
+}
+
+/* 1024px to 1360px Viewports (Tablets / Laptops) */
+@media (min-width: 1024px) and (max-width: 1360px) {
+  .ckp-nav {
+    --ckp-brand-w: auto;
+  }
+
+  .ckp-nav:not(.is-scrolled) {
+    --ckp-logo: 66px;
+    --ckp-crest-rise: 38px;
+  }
+
+  .ckp-bar__inner {
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0 16px;
+    gap: 8px;
+  }
+
+  .ckp-brand {
+    padding: 0 6px;
+    max-width: 240px;
+    grid-column: 2;
+    align-self: flex-start;
+  }
+
+  .ckp-brand__name {
+    font-size: 11px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .ckp-brand__sub {
+    font-size: 7.5px;
+    line-height: 1.1;
+    max-width: 190px;
+    white-space: nowrap;
+    margin-top: 1px;
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+  }
+}
+
+/* Scrolled state responsive logo & brand alignment */
+.ckp-nav.is-scrolled {
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.6) !important;
+  --ckp-crest-rise: 0px !important;
+}
 
 .ckp-nav.is-scrolled .ckp-brand {
   display: flex !important;
@@ -1340,11 +1401,12 @@
   align-items: center !important;
   justify-content: center !important;
   align-self: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
   height: 100% !important;
-  width: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
 }
 
 .ckp-nav.is-scrolled .ckp-brand__crest {
@@ -1352,13 +1414,15 @@
   margin-bottom: 0 !important;
   align-self: center !important;
   flex-shrink: 0 !important;
+  width: var(--ckp-logo) !important;
+  height: var(--ckp-logo) !important;
 }
 
 .ckp-nav.is-scrolled .ckp-brand__name {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   align-self: center !important;
-  font-size: 13px !important;
+  font-size: 12.5px !important;
   line-height: 1 !important;
   display: flex !important;
   align-items: center !important;
