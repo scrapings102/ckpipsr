@@ -1087,24 +1087,42 @@
   line-height: 1.2;
 }
 .ckp-menu {
-  gap: clamp(24px, 1.9vw, 46px);
+  gap: clamp(10px, 1.4vw, 32px);
 }
 @media (min-width: 1440px) {
   .ckp-menu {
-    gap: min(2.4vw, 46px);
+    gap: min(1.8vw, 36px);
   }
 }
 .ckp-bar__side {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: clamp(8px, 0.8vw, 14px);
+  min-width: 0;
+}
+.ckp-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+.ckp-menu--right {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-right: clamp(6px, 1vw, 16px);
+  overflow: hidden;
 }
 .ckp-menu > * {
-  flex: none;
+  flex: 0 0 auto;
 }
 
-/* Below 1360px eight long names cannot fit readably beside the crest and the
+/* Below 1280px screen width, eight long names cannot fit readably beside the crest and the
    two buttons, so the bar keeps the brand, Apply Now and Menu — every section
    is one tap away in the menu. Same for the inside-page strip. */
-@media (max-width: 1359px) {
+@media (max-width: 1279px) {
   .ckp-menu {
     display: none;
   }
