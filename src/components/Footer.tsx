@@ -1,208 +1,203 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MapPin, Phone, Mail, ArrowUpRight } from 'lucide-react';
 import CkpcmcLogo from './CkpcmcLogo';
-import { MapPin, Phone, Mail, ShieldCheck, Award } from 'lucide-react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import GreekFacade from './GreekFacade';
+import './ckpipsr-footer.css';
+import { courseHref, useCourses, visibleCourses } from '../hooks/useCourses';
+
+/**
+ * CKPIPSR footer — "Until we meet on campus".
+ *
+ * The same footer as CET and CMC (the change log's "standardize the footer
+ * across all colleges"): a warm ivory field with a handwritten farewell and a
+ * marker underline over a classical facade engraving — on the homepage only —
+ * then the site navigation. In IPSR's green and gold, with IPSR's own links.
+ *
+ * Every link from IPSR's previous footer is carried over (programs still come
+ * from the admin panel), and homepage anchors use the same Lenis-aware scroll.
+ */
+
+type Item = { label: string; to: string };
+
+const INSTITUTE: Item[] = [
+  { label: 'Profile', to: '/about/profile' },
+  { label: 'Vision & Mission', to: '/about/vision-mission' },
+  { label: 'The Founder', to: '/about/founder' },
+  { label: 'Navyug Vidyabhavan Trust', to: '/about/trust' },
+  { label: 'PO and PEOs', to: '/about/po-peos' },
+  { label: 'Campus Map & Directions', to: '/about/campus-map' },
+];
+
+const GOVERNANCE: Item[] = [
+  { label: 'Governing Body', to: '/about/governing-body' },
+  { label: 'The Principal', to: '/about/principal' },
+  { label: 'Deans & Faculty In-charges', to: '/about/deans-faculty' },
+  { label: 'Faculty', to: '/academics/faculties' },
+  { label: 'IQAC', to: '/about/iqac' },
+  { label: 'Contact Us', to: '/about/contact-us' },
+];
+
+const STUDENT_HUB: Item[] = [
+  { label: 'Gazette & Circulars', to: '/#university-gazette' },
+  { label: 'Pharma Blogs', to: '/#pharma-blogs' },
+  { label: 'The College Newsletter', to: '/#college-newsletter' },
+  { label: 'Research Labs & Herbal Garden', to: '/#campus-life' },
+  { label: 'Admissions FAQs', to: '/#admissions' },
+];
+
+const LINK_CLS =
+  'block text-[13px] leading-snug text-[#3d4f40] hover:text-[#1C592F] transition-colors';
 
 export default function Footer() {
   const navigate = useNavigate();
+  // the programs column lists the courses switched on in the admin panel
+  const { content: coursesContent } = useCourses();
+  const PROGRAMS: Item[] = visibleCourses(coursesContent).map((course) => ({
+    label: course.card.fullName.includes(course.navLabel) ? course.card.fullName : `${course.card.fullName} (${course.navLabel})`,
+    to: courseHref(course.id),
+  }));
   const location = useLocation();
+  const isHome = location.pathname === '/';
+  const ref = useRef<HTMLElement | null>(null);
 
-  const scrollToId = (id: string) => {
-    let normalizedId = id;
-    if (normalizedId === 'staff') normalizedId = 'faculty';
-    if (normalizedId === 'activities' || normalizedId === 'news' || normalizedId === 'events') normalizedId = 'university-gazette';
-    if (normalizedId === 'blogs') normalizedId = 'blogs-magazine';
+  // Rewrites itself every time the footer comes into view, including when
+  // the user scrolls away and back — not just the first time.
+  const [seen, setSeen] = useState(false);
 
-    if (location.pathname !== '/') {
-      navigate('/', { state: { scrollTo: normalizedId } });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (!('IntersectionObserver' in window)) {
+      setSeen(true);
       return;
     }
+    const io = new IntersectionObserver(([entry]) => setSeen(entry.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
-    const el = document.getElementById(normalizedId);
-    if (el) {
-      if ((window as any).lenis) {
-        (window as any).lenis.start();
-        (window as any).lenis.scrollTo(el, { offset: -80, duration: 1.2 });
-      } else {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
+  // The previous footer's handler, unchanged: homepage anchors go through
+  // Lenis when it is running, and via router state from other pages.
+  const handleAnchor = (path: string) => {
+    const id = path.replace('/#', '');
+    if (location.pathname !== '/') {
+      navigate('/', { state: { scrollTo: id } });
+      return;
+    }
+    const el = document.getElementById(id);
+    if (!el) return;
+    const lenis = (window as any).lenis;
+    if (lenis) {
+      lenis.start();
+      lenis.scrollTo(el, { offset: -80, duration: 1.2 });
+    } else {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
+  const renderItem = (item: Item) =>
+    item.to.startsWith('/#') ? (
+      <button type="button" onClick={() => handleAnchor(item.to)} className={`${LINK_CLS} text-left cursor-pointer`}>
+        {item.label}
+      </button>
+    ) : (
+      <Link to={item.to} className={LINK_CLS}>{item.label}</Link>
+    );
+
+  const column = (title: string, items: Item[]) => (
+    <div>
+      <h3 className="ckpf-h">{title}</h3>
+      <ul className="space-y-2.5">
+        {items.map((it) => <li key={it.to}>{renderItem(it)}</li>)}
+      </ul>
+    </div>
+  );
+
   return (
-    <footer id="footer" className="bg-[#ffffff] text-[#123005] pt-16 pb-12 relative overflow-hidden border-t-2 border-[#123005]/20">
-      {/* Background Soft Glows */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#123005]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#123005]/5 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
-        
-        {/* Top Institutional Identity Banner */}
-        <div className="pb-12 border-b border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-4 select-none">
-            <div className="w-16 h-16 rounded-2xl bg-white p-2 shadow-sm border border-slate-200 shrink-0 flex items-center justify-center">
-              <CkpcmcLogo className="w-full h-full" showText={false} />
-            </div>
-            <div>
-              <h3 className="font-serif font-bold text-xl sm:text-2xl text-[#123005] leading-tight">
-                C.K. Pithawalla Institute
-              </h3>
-              <p className="font-mono text-[10.5px] text-[#1E4D0B] uppercase tracking-[0.2em] font-bold mt-0.5">
-                Pharmaceutical Science and Research (CKPIPSR)
+    <footer id="footer" ref={ref} className={`ckpf relative w-full overflow-hidden bg-white${isHome ? '' : ' ckpf-inner'} text-[#122415]`}>
+      {/* ───────── FAREWELL + FACADE ───────── */}
+      {/* The farewell and the facade belong to the homepage only; inside pages
+          go straight to the links. */}
+      {isHome && (
+        <div className="ckpf-sky relative">
+          <div className="relative mx-auto max-w-[1580px] px-6 pt-12 text-center sm:px-10 lg:px-16 lg:pt-16">
+            <div className={`ckpf-write ${seen ? 'is-written' : ''}`}>
+              <p className="ckpf-script" aria-label="Until we meet on campus">
+                Until we meet <br className="sm:hidden" />on campus
               </p>
+              {/* hand-drawn marker squiggle; draws in after the writing finishes */}
+              <svg className="ckpf-underline" viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path pathLength={1} d="M 2 10 C 14 3 22 3 30 9 C 38 15 46 14 54 7 C 60 2 66 4 70 10 C 76 17 86 14 98 9" />
+              </svg>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-white border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-mono text-slate-700 shadow-2xs">
-              <ShieldCheck size={16} className="text-emerald-600" />
-              <span className="font-semibold">GTU Affiliated | PCI Approved</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-mono text-slate-700 shadow-2xs">
-              <Award size={16} className="text-[#1E4D0B]" />
-              <span className="font-semibold">Est. 2005</span>
-            </div>
-          </div>
+          <GreekFacade drawn={seen} />
         </div>
+      )}
 
-        {/* Main Footer Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 py-12 border-b border-slate-200/80">
-          
-          {/* Column 1: Academic Programs */}
-          <div className="space-y-4 text-left">
-            <h4 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#1E4D0B] font-bold">
-              Pharmacy Programs
-            </h4>
-            <ul className="space-y-2.5 text-xs text-slate-600 font-sans font-light">
-              <li>
-                <a href="/academics/courses-offered-b-pharm" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Bachelor of Pharmacy (B.Pharm)
-                </a>
-              </li>
-              <li>
-                <a href="/academics/courses-offered-m-pharm" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Master of Pharmacy (M.Pharm)
-                </a>
-              </li>
-              <li>
-                <a href="/academics/courses-offered-d-pharm" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Diploma in Pharmacy (D.Pharm)
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 2: Institutional Overview */}
-          <div className="space-y-4 text-left">
-            <h4 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#1E4D0B] font-bold">
-              Institutional
-            </h4>
-            <ul className="space-y-2.5 text-xs text-slate-600 font-sans font-light">
-              <li>
-                <button onClick={() => scrollToId('about')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> About CKPIPSR
-                </button>
-              </li>
-              <li>
-                <Link to="/about/vision-mission" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Vision &amp; Mission
-                </Link>
-              </li>
-              <li>
-                <Link to="/about/trust" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Navyug Vidyabhavan Trust
-                </Link>
-              </li>
-              <li>
-                <Link to="/about/principal" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Principal's Desk
-                </Link>
-              </li>
-              <li>
-                <Link to="/about/campus-map" className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Campus Map &amp; Directions
-                </Link>
-              </li>
-              <li>
-                <button onClick={() => scrollToId('faculty')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Research Faculty
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Student Hub & Portals */}
-          <div className="space-y-4 text-left">
-            <h4 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#1E4D0B] font-bold">
-              Student Hub
-            </h4>
-            <ul className="space-y-2.5 text-xs text-slate-600 font-sans font-light">
-              <li>
-                <button onClick={() => scrollToId('university-gazette')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Gazette &amp; Circulars
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToId('pharma-blogs')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Pharma Blogs
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToId('college-newsletter')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> The College Newsletter
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToId('campus-life')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Research Labs &amp; Herbal Garden
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToId('admissions')} className="hover:text-[#1E4D0B] transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <span className="text-[#1E4D0B] font-bold">›</span> Admissions FAQs
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4: Contact Coordinates */}
-          <div className="space-y-4 text-left">
-            <h4 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#1E4D0B] font-bold">
-              Campus Coordinates
-            </h4>
-            <ul className="space-y-3 text-xs text-slate-600 font-sans font-light">
-              <li className="flex items-start gap-2.5">
-                <MapPin size={16} className="text-[#1E4D0B] shrink-0 mt-0.5" />
+      {/* ───────── LINKS ───────── */}
+      <div className="bg-white">
+        <div className="mx-auto grid max-w-[1580px] grid-cols-2 gap-x-6 gap-y-9 px-6 pb-12 pt-10 sm:px-10 lg:grid-cols-[1.35fr_1fr_1fr_1fr_1fr] lg:gap-8 lg:px-16">
+          {/* identity + contact — spans both columns on mobile */}
+          <div className="col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-3.5">
+              {/* the college seal — ringed in the site accent */}
+              <span
+                className="ckpf-seal flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-1"
+                style={{ boxShadow: '0 0 0 2px #1C592F, 0 6px 16px -8px rgba(0,0,0,.35)' }}
+              >
+                <CkpcmcLogo className="h-full w-full" showText={false} />
+              </span>
+              <div>
+                <p className="font-sans text-[15px] font-extrabold tracking-wide text-[#123a1a]">C. K. PITHAWALLA</p>
+                <p className="mt-0.5 font-sans text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#1C592F]">
+                  Institute of Pharmaceutical Science &amp; Research
+                </p>
+              </div>
+            </div>
+            <ul className="mt-5 space-y-3 text-[13px] text-[#4d5f50]">
+              <li className="flex gap-2.5">
+                <MapPin size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
                 <span>Near Malvan Mandir, Dumas Road, Via Magdalla Port, Surat, Gujarat 395007</span>
               </li>
-              <li className="flex items-center gap-2.5">
-                <Phone size={16} className="text-[#1E4D0B] shrink-0" />
-                <span className="font-mono font-semibold text-[#123005]">+91 261 272 8282</span>
+              <li className="flex items-start gap-2.5">
+                <Phone size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
+                <span>
+                  <a href="tel:+912612728282" className="hover:text-[#1C592F] transition-colors">+91 261 272 8282</a>
+                </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Mail size={16} className="text-[#1E4D0B] shrink-0" />
-                <a href="mailto:info@ckpipsr.ac.in" className="font-mono font-semibold text-[#1E4D0B] hover:underline">
-                  info@ckpipsr.ac.in
-                </a>
+                <Mail size={14} className="shrink-0 text-[#2c7a47]" aria-hidden="true" />
+                <a href="mailto:info@ckpipsr.ac.in" className="hover:text-[#1C592F] transition-colors">info@ckpipsr.ac.in</a>
               </li>
             </ul>
           </div>
 
+          {column('Pharmacy Programs', PROGRAMS)}
+          {column('Institute', INSTITUTE)}
+          {column('Governance', GOVERNANCE)}
+          {column('Student Hub', STUDENT_HUB)}
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-sans font-light">
-          <p className="text-center sm:text-left">
-            &copy; {new Date().getFullYear()} C.K. Pithawala Institute of Pharmaceutical Science and Research (CKPIPSR). Managed by Navyug Vidyabhavan Trust.
-          </p>
-
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-[#123005] transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-[#123005] transition-colors">Terms of Service</a>
-            <a href="https://ckpipsr.ac.in/" target="_blank" rel="noopener noreferrer" className="hover:text-[#123005] transition-colors">GTU Portal</a>
+        {/* bottom bar */}
+        <div className="mx-auto max-w-[1580px] px-6 sm:px-10 lg:px-16">
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-[#dfe7dc] py-6 text-center sm:flex-row sm:text-left">
+            <p className="text-[10.5px] uppercase tracking-[0.16em] text-[#7f8f82]">
+              © {new Date().getFullYear()} C. K. Pithawalla Institute of Pharmaceutical Science &amp; Research
+            </p>
+            <a
+              href="https://www.gtu.ac.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/v inline-flex items-center gap-1 text-[10.5px] uppercase tracking-[0.16em] text-[#7f8f82] hover:text-[#1C592F] transition-colors"
+            >
+              GTU Portal
+              <ArrowUpRight size={12} className="opacity-60 group-hover/v:opacity-100" aria-hidden="true" />
+            </a>
           </div>
         </div>
-
       </div>
     </footer>
   );

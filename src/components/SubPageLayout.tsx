@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import SEO from './SEO';
@@ -28,7 +28,7 @@ const CATEGORY_NAMES: Record<string, string> = {
   courses: 'Academics',
   committees: 'Cells',
   cells: 'Cells',
-  iqac: 'IQAC',
+  iqac: 'Accreditation & Ranking',
   staff: 'Academics',
   'campus-life': 'Academics',
   'student-corner': 'Students Corner',
@@ -45,7 +45,7 @@ const CATEGORY_TO_MENU_KEY: Record<string, string> = {
   courses: 'Academics',
   committees: 'Cells',
   cells: 'Cells',
-  iqac: 'IQAC',
+  iqac: 'Accreditation & Ranking',
   staff: 'Academics',
   'campus-life': 'Academics',
   'student-corner': 'Students Corner',
@@ -82,6 +82,7 @@ const PAGE_IMAGES: Record<string, string> = {
   'The Trust': '/images/hero/66e151f0d6a90.webp',
   "Principal's Message": '/images/hero/66e1522d09fc0.webp',
   'Principal': '/images/hero/66e1522d09fc0.webp',
+  'The Principal': '/images/hero/66e1522d09fc0.webp',
   'Campus Map': '/images/hero/college_campus.jpg',
 
   // Courses
@@ -150,6 +151,7 @@ const PAGE_IMAGES: Record<string, string> = {
   'Media Appreciation': '/images/hero/646efc827452b.webp',
   'Timetables': '/images/hero/66e154b724ef6.webp',
   'Courses': '/images/hero/students_learning.jpg',
+  'Course Syllabus': '/images/hero/students_learning.jpg',
   'Scholorships': '/images/hero/646efc827452b.webp',
   'Educational Videos': '/images/hero/students_learning.jpg',
   'Hobby Club': '/images/hero/66e154b724ef6 (1).webp',
@@ -227,8 +229,20 @@ export default function SubPageLayout({
     window.dispatchEvent(new CustomEvent('openMenuCategory', { detail: { category: menuCategoryKey } }));
   };
 
+  // Back, as on CET and CMC: on desktop it goes home; on phones — where the menu
+  // is the way around — it reopens the menu at this page's section.
+  const [isPhone, setIsPhone] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setIsPhone(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   const handleBackButtonClick = () => {
-    window.dispatchEvent(new CustomEvent('openMenuCategory', { detail: { category: menuCategoryKey } }));
+    if (isPhone) {
+      window.dispatchEvent(new CustomEvent('openMenuCategory', { detail: { category: menuCategoryKey } }));
+    } else {
+      navigate('/');
+    }
   };
 
   return (
@@ -249,14 +263,15 @@ export default function SubPageLayout({
               onClick={() => navigate('/')}
               className="flex items-center gap-1 text-white/70 hover:text-[#D4AF37] transition-colors shrink-0 cursor-pointer"
               title="Home"
+              aria-label="Home"
             >
               <Home size={12} className="text-[#D4AF37]" />
-              <span className="hidden xs:inline">HOME</span>
+              <span className="hidden sm:inline">HOME</span>
             </button>
             <span className="text-white/30 shrink-0">/</span>
             <button
               onClick={handleOpenMenuCategory}
-              className="text-[#D4AF37] font-bold uppercase shrink-0 truncate max-w-[90px] sm:max-w-[160px] hover:underline cursor-pointer"
+              className="text-[#D4AF37] font-bold uppercase shrink-0 truncate max-w-[90px] sm:max-w-[160px] md:max-w-none hover:underline cursor-pointer"
               title={`Open ${categoryDisplayName} in Menu`}
             >
               {categoryDisplayName}
@@ -265,17 +280,17 @@ export default function SubPageLayout({
             <span className="text-white font-bold uppercase truncate max-w-[110px] sm:max-w-[220px] md:max-w-none">{activeItemLabel}</span>
           </div>
 
-          {/* Right Menu Button */}
+          {/* Menu button — phones and tablets only, as on CET and CMC: on desktop
+              the header strip right above already has MENU */}
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('openMainMenu'))}
-            className="group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-[#123a1a] hover:bg-[#1a4f23] text-[#D4AF37] border border-[#D4AF37]/50 shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all duration-300 active:scale-95 cursor-pointer shrink-0"
-            aria-label="Open Navigation Menu"
-            title="Open Menu"
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('ckp:menu-toggle'))}
+            aria-label="Open menu"
+            className="lg:hidden ml-3 -mr-1 -my-1.5 text-[#D4AF37] shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-white/70 hover:text-white active:scale-95 transition"
           >
-            <Menu size={13} className="stroke-[2.5] text-[#D4AF37] group-hover:rotate-90 transition-transform duration-300" />
-            <span className="font-mono text-[10px] sm:text-xs font-bold tracking-widest text-white group-hover:text-[#D4AF37] transition-colors">
-              MENU
-            </span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
         </div>
       </div>
@@ -300,7 +315,7 @@ export default function SubPageLayout({
           <span className="font-mono text-[10px] md:text-xs tracking-[0.2em] text-[#D4AF37] uppercase font-bold mb-3 block animate-pulse">
             {categoryDisplayName}
           </span>
-          <h1 className="font-serif font-bold text-3xl sm:text-4xl md:text-5xl text-white leading-tight tracking-tight mb-4">
+          <h1 className="font-serif font-semibold text-3xl sm:text-4xl md:text-5xl text-white leading-tight tracking-tight mb-4">
             {title}
           </h1>
           {subtitle && (
@@ -326,14 +341,14 @@ export default function SubPageLayout({
             >
               {/* Back Link above subpage content */}
               {!hideDefaultBackBar && (
-                <div className="mb-10 flex flex-wrap items-center justify-between border-b border-slate-100 pb-6 gap-4">
+                <div className="mb-8 flex flex-wrap items-center justify-between border-b border-slate-100 pb-4 gap-4">
                   <button
                     onClick={handleBackButtonClick}
-                    className="inline-flex items-center gap-2.5 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-[#123a1a] text-[#D4AF37] hover:bg-[#1a4a25] transition-all duration-300 font-bold text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] shadow-xl shadow-emerald-900/10 group active:scale-95 cursor-pointer"
-                    title="Back to Home Page"
+                    className="group flex items-center gap-2 font-sans font-bold text-xs uppercase tracking-widest text-[#B8933E] hover:text-[#123a1a] transition-colors cursor-pointer"
+                    title={isPhone ? `Back to ${categoryDisplayName}` : 'Back to Home'}
                   >
-                    <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-                    <span>Back to Home</span>
+                    <ArrowLeft size={14} className="stroke-[3] transition-transform group-hover:-translate-x-1" />
+                    <span>{isPhone ? `Back to ${categoryDisplayName}` : 'Back to Home'}</span>
                   </button>
                   <button
                     onClick={handleOpenMenuCategory}
@@ -353,4 +368,3 @@ export default function SubPageLayout({
     </div>
   );
 }
-

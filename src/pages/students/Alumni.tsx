@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   GraduationCap, 
@@ -36,6 +36,7 @@ import {
   UserCheck
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useAlumniContent } from "../../hooks/useAlumniContent";
 
 export default function Alumni() {
   const [activeTab, setActiveTab] = useState<"about" | "rules" | "managing" | "executive" | "registration">("about");
@@ -46,8 +47,8 @@ export default function Alumni() {
     email: "",
     phone: "",
     gender: "Male",
-    degree: "B.Pharm",
-    passingYear: "2023",
+    degree: "",
+    passingYear: "",
     enrollmentNo: "",
     currentDesignation: "",
     companyName: "",
@@ -60,268 +61,39 @@ export default function Alumni() {
 
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
-  // Verbatim Objectives from User Screenshot
-  const objectives = [
-    "To promote and provide services for its alumni, especially encouraging their continuing growth, personally and professionally, and a spirit of fraternity among alumni.",
-    "To assist in placement of students.",
-    "To create awareness about institute and its alumni.",
-    "To collect/publish useful information to members of CKPIPSRAA.",
-    "To recognize the distinguished services of its alumni through awards.",
-    "To collect and maintain funds for development.",
-    "To foster a spirit of loyalty in the Alumni to both for GTU and the graduating Institute.",
-    "To strengthen the ties between alumni, the community, and the organization, where the alumni may be working.",
-    "To help alumni in their need.",
-    "To organize cultural and social activities, to set up facilities, which can help bring together the alumni and the CKPIPSR community."
-  ];
+  const content = useAlumniContent();
+  const { about, rules, managing, executive, registration } = content;
+  const objectives = about.objectives.items;
+  const aimsAndObjectives = rules.aims.items;
+  const membershipRules = rules.membership;
+  const managingCommitteeRoles = rules.structure.roles;
+  const managingCommitteePowers = rules.meetings.powers;
+  const agmDuties = rules.agm.duties;
+  const managingCommittee = managing.members;
+  const executiveMembers = executive.members;
 
-  // Comprehensive Constitution, Rules & Regulations from Official CKPIPSRAA Charter
-  const aimsAndObjectives = [
-    "To start, promote and maintain interaction amongst alumni as well as between the alumni and present students of CKPIPSR, Surat for their mutual benefit.",
-    "To encourage and appeal the alumni to take active interest in the activities leading to the progress of the institute",
-    "To generate and organize the funds for the benefit of the students which may be partially utilized for scholarship to the needy and deserving students, book banks, loans and co-curricular activities",
-    "To invest and maintain accounts of the funds of the CKPIPSRAA.",
-    "To organize the social welfare activities for the benefit of the society as a part of nation building.",
-    "To motivate the alumni and students by recognizing and awarding for their outstanding contribution/performance in (i) research, (ii) technical events, (iii) sports, and (iv) social services.",
-    "To organize get-together of all members to provide the common platform for interaction and sharing of the expertise, experience and views of the members leading to mutual development.",
-    "To take up all those activities which are directly or indirectly helping the students in their (i) training and placement, (ii) entrepreneurial skill development and (iii) higher studies in India and abroad",
-    "To take-up all other lawful activities leading to the attainment of the above stated objectives and/or beneficial to the institute, its students and its alumni"
-  ];
-
-  const membershipRules = {
-    eligibility: [
-      "Any past student of CKPIPSR, Surat",
-      "All the students of CKPIPSR, Surat passing their final semester examination"
-    ],
-    fees: [
-      "For the official life membership of the CKPIPSRAA, eligible candidates are required to submit duly filled membership form to the member secretary along with the one time life membership fees of; Rupees 1000/- for the current and past students.",
-      "From the New Entrants to the institute, Rs. 1000/- will be collected towards the alumni association fees by CKPIPSRAA. After passing the final year examinations, student will automatically become life member of the CKPIPSR, on submission of the registration form."
-    ],
-    rights: [
-      "Members and are entitled to receive all announcements and news letters related to the CKPIPSRAA activities.",
-      "Members are entitled to receive annual e-magazine of institute.",
-      "Members are entitled to attend and participate in the get-togethers organized by CKPIPSRAA.",
-      "Members are entitled to take an advantage of any schemes and programs administered by CKPIPSRAA.",
-      "With the wide spread and easy access of the Internet, website for the CKPIPSR should be updated to include CKPIPSRAA portal and all the announcement and publication on CKPIPSRAA portal shall be considered as official circulation amongst all the members of CKPIPSRAA."
-    ]
-  };
-
-  const managingCommitteeRoles = [
-    {
-      role: "Chairman",
-      responsibility: "Trust’s Chairman’s Representative will be the ex-officio Chairman of the CKPIPSRAA. The chairman will be responsible for policy formation in consultation with other members of the Managing Committee."
-    },
-    {
-      role: "President",
-      responsibility: "President is responsible for implementation of all the policy matters of the CKPIPSRAA. President will also act as an administrator, coordinator and supervisor for the activities and programs of CKPIPSRAA. Specifically, President will act as a facilitator for the Member Secretary for smooth conductance of the Managing Committee activities."
-    },
-    {
-      role: "Vice President",
-      responsibility: "Chairman shall appoint Distinguished Alumnus as a Vice President in consultation with other members of the Managing Committee. Vice President will not have any administrative responsibility but he will act as a consultant for CKPIPSRAA. Vice President Term will be of three-years at a time."
-    },
-    {
-      role: "Member Secretary",
-      responsibility: "Secretary shall perform the following statutory duties:",
-      duties: [
-        "Register the eligible candidates for CKPIPSRAA",
-        "Maintain the records of registration forms",
-        "Maintain and update the registration records",
-        "To maintain administrative control over the CKPIPSRAA office",
-        "To correspond with stakeholders on behalf of CKPIPSRAA",
-        "To issue the notice of all the managing committee meeting along with agenda on time (at least 15 days before the schedule of meeting)",
-        "To keep the prepare, circulate and maintain the minutes of all the meetings of managing committee of CKPIPSRAA",
-        "To act as a medium of communication between the members and office bearers of the managing committee",
-        "To look after the maintenance and updating of web portal of CKPIPSRAA for which he will be provided the manpower from the concern department"
-      ]
-    },
-    {
-      role: "Treasurer",
-      responsibility: "Treasurer shall prepare the books of accounts of CKPIPSRAA at the end of the every financial year and present the same to the Managing Committee. Treasurer will manage for collection of all the dues and issue of out standings on behalf of CKPIPSRAA. In addition, he will act as a liaison officer with bankers and auditors on behalf of CKPIPSRAA."
-    },
-    {
-      role: "Student Representative",
-      responsibility: "Student representative will have a vote in the activities of managing committee. Student representative is responsible for the wide spread of the objective of the CKPIPSRAA amongst the new entrants. As a General Secretary of the student council of the institute, he shall act a initiator and leader for planning of the various activities in line with the objectives of CKPIPSRAA and in communication with the Chairman, President and Member Secretary of the CKPIPSRAA. Student Representative shall take active participation in formation of students’ organizing committees for the various activities of CKPIPSRAA and also act as a motivator for these committees."
-    },
-    {
-      role: "General Body",
-      responsibility: "General body shall consist of all the members of the association as defined in clause 4."
+  // The years the form offers, newest first.
+  const passingYears = useMemo(() => {
+    const years: string[] = [];
+    for (let year = registration.years.to; year >= registration.years.from; year -= 1) {
+      years.push(String(year));
     }
-  ];
+    return years;
+  }, [registration.years.from, registration.years.to]);
 
-  const managingCommitteePowers = [
-    "Member secretary shall call Managing Committee meeting at least two times every year.",
-    "Managing committee shall prepare activity plan for the every year well in advance",
-    "Managing committee shall allocate the budget for the activities mentioned in the planned",
-    "Authorized signatories of the Managing Committee shall carryout financial transactions with banks or any other statutory bodies",
-    "Any member of the managing committee in power is authorized to make new members based on the clause 4",
-    "Managing committee shall frame sub committees for any specific programs or project from time to time",
-    "Managing committee may discontinue any member from CKPIPSRAA if found doing the activities against the interest or prestige of the CKPIPSRAA or institute",
-    "Managing committee has a power to modify or remove any rules specified in this document or to frame new rules from time to time, if found appropriate for effective working of CKPIPSRAA",
-    "Managing committee has a power to take up the purchase/contracting procedures as well as to decide and pay the fees for the services rendered by the person or organizations within the rules of the institution."
-  ];
-
-  const agmDuties = [
-    "To present and review the report of the managing committee",
-    "To elect the vice president for the term of three years",
-    "Approve the previous year’s account",
-    "Introducing and adopting office bearers",
-    "To take up any other matters included in notice of the meeting"
-  ];
-
-  // Managing Committee Members
-  const managingCommittee = [
-    {
-      role: "Chairman",
-      name: "Shri Rahulbhai Pithawalla",
-      designation: "Trustee, Navyug Vidyabhavan Trust",
-      image: "https://ckpipsr.ac.in/images/trustees/rahul-a-p.jpg",
-      category: "Trust Management"
-    },
-    {
-      role: "President",
-      name: "Dr. Dhiren P Shah",
-      designation: "Principal, CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-      category: "Institutional Head"
-    },
-    {
-      role: "Member Secretary",
-      name: "Dr. Bhumika Desai",
-      designation: "Assoc. Prof., CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a6308854a00a.webp",
-      category: "Secretariat"
-    },
-    {
-      role: "Vice President",
-      name: "Bansari Patel",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
-      category: "Alumni Leadership"
-    },
-    {
-      role: "Treasurer",
-      name: "Mr. Paresh G Shah",
-      designation: "Senior Clerk",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
-      category: "Administration & Finance"
-    },
-    {
-      role: "Ex-Officio Member",
-      name: "Dr. Vinod Ramani",
-      designation: "Assoc. Prof., CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-      category: "Academic Faculty"
-    },
-    {
-      role: "Faculty Coordinators",
-      name: "Mrs. Kajal Solanki",
-      designation: "Asst. Prof. CKPIPSR",
-      image: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&q=80&w=400",
-      category: "Faculty Coordination"
-    },
-    {
-      role: "Faculty Coordinators",
-      name: "Mrs. Tarkeshwari Ahire",
-      designation: "Asst. Prof. CKPIPSR",
-      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400",
-      category: "Faculty Coordination"
-    },
-    {
-      role: "Representative from student Council",
-      name: "Mitali Patel",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-      category: "Student Council Rep"
-    },
-    {
-      role: "Representative from student Council",
-      name: "Madhu Hardik",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
-      category: "Student Council Rep"
-    },
-    {
-      role: "Representative from student Council",
-      name: "Jayswal Vibha",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400",
-      category: "Student Council Rep"
-    }
-  ];
-
-  // Executive Committee Members
-  const executiveMembers = [
-    {
-      role: "President",
-      name: "Dr. Dhiren P Shah",
-      designation: "Principal, CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-      category: "Institutional Head"
-    },
-    {
-      role: "Vice President",
-      name: "Feral Modi",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
-      category: "Alumni Leadership"
-    },
-    {
-      role: "Secretary",
-      name: "Manish Solanki",
-      designation: "Alumni, CKPIPSR,",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
-      category: "Alumni Secretariat"
-    },
-    {
-      role: "Treasurer",
-      name: "Hiren Thakkar",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
-      category: "Finance & Accounts"
-    },
-    {
-      role: "Program Committee",
-      name: "Jaya Indave",
-      designation: "Alumni, CKPIPSR",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400",
-      category: "Programs & Events"
-    },
-    {
-      role: "Campaigning Committee",
-      name: "Dipayan Tarafder",
-      designation: "Asst. Prof. CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d678047de6f.webp",
-      category: "Campaigning & Outreach"
-    },
-    {
-      role: "Alumni Talk series Committee",
-      name: "Ms. Shivangi Shrivastav",
-      designation: "Asst. Prof. CKPIPSR",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-      category: "Talk Series & Webinars"
-    },
-    {
-      role: "Alumni Talk series Committee",
-      name: "Mrs. Shweta Vaghela",
-      designation: "Asst. Prof. CKPIPSR",
-      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400",
-      category: "Talk Series & Webinars"
-    },
-    {
-      role: "Alumni membership and networking drive",
-      name: "Dr. Bhumika Desai",
-      designation: "Assoc. Prof., CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a6308854a00a.webp",
-      category: "Membership & Networking"
-    },
-    {
-      role: "Fund Raising Committee",
-      name: "Dr. Vinod Ramani",
-      designation: "Assoc. Prof., CKPIPSR",
-      image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-      category: "Fund Raising"
-    }
-  ];
+  // The two dropdowns start on the first thing the panel offers, once it has
+  // arrived. Leaving them empty would post a blank degree.
+  useEffect(() => {
+    setFormData((prev) => {
+      const degree = prev.degree || registration.degrees[0] || "";
+      const passingYear = prev.passingYear || passingYears[0] || "";
+      return degree === prev.degree && passingYear === prev.passingYear
+        ? prev
+        : { ...prev, degree, passingYear };
+    });
+  }, [registration.degrees, passingYears]);
 
   const handleInterestToggle = (interest: string) => {
     setFormData(prev => {
@@ -334,19 +106,48 @@ export default function Alumni() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormSubmitting(true);
-    setTimeout(() => {
-      setFormSubmitting(false);
+    setFormError("");
+    try {
+      const res = await fetch("/api/alumni/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          registration: {
+            fullName: formData.fullName,
+            email: formData.email,
+            phone: formData.phone,
+            degree: formData.degree,
+            passingYear: formData.passingYear,
+            enrollmentNo: formData.enrollmentNo,
+            designation: formData.currentDesignation,
+            company: formData.companyName,
+            workCity: formData.workCity,
+            interests: formData.interests,
+            message: formData.message,
+          },
+        }),
+      });
+      const body = await res.json().catch(() => null);
+      if (!res.ok) {
+        // 429 is the one-a-day limit; its message already says how long to wait.
+        setFormError(body?.error ?? "That did not go through. Please try again.");
+        return;
+      }
       setFormSubmitted(true);
-    }, 800);
+    } catch {
+      setFormError("We could not reach the server. Please check your connection and try again.");
+    } finally {
+      setFormSubmitting(false);
+    }
   };
 
   return (
     <SubPageLayout
-      title="Alumni"
-      subtitle="Connecting Graduates, Mentoring Future Pharmacists & Celebrating Global Achievements"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="students-corner"
       activeItemLabel="Alumni"
     >
@@ -355,11 +156,11 @@ export default function Alumni() {
         {/* ── TOP HORIZONTAL NAV TABS (Matching User's Reference Layout) ── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-1.5 flex flex-wrap items-center justify-center gap-1 sm:gap-2">
           {[
-            { id: "about", label: "About Alumni", icon: GraduationCap },
-            { id: "rules", label: "Rules & Regulations", icon: ShieldCheck },
-            { id: "managing", label: "Managing Committee", icon: Users },
-            { id: "executive", label: "Executive Committee", icon: Layers },
-            { id: "registration", label: "Registration", icon: FileText },
+            { id: "about", label: content.tabs.about, icon: GraduationCap },
+            { id: "rules", label: content.tabs.rules, icon: ShieldCheck },
+            { id: "managing", label: content.tabs.managing, icon: Users },
+            { id: "executive", label: content.tabs.executive, icon: Layers },
+            { id: "registration", label: content.tabs.registration, icon: FileText },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -407,10 +208,10 @@ export default function Alumni() {
                     <div className="space-y-3">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100/70 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-semibold">
                         <Globe size={13} />
-                        <span>Global Ambassador Network</span>
+                        <span>{about.badge}</span>
                       </div>
                       <p className="text-slate-800 text-base sm:text-lg font-serif font-semibold leading-snug">
-                        Alumni are ambassadors of the Institute in the society and industry scattered over the world.
+                        {about.lead}
                       </p>
                     </div>
 
@@ -420,7 +221,7 @@ export default function Alumni() {
                         “
                       </div>
                       <p className="text-slate-700 text-sm leading-relaxed italic font-serif">
-                        "CKPIPSR aims to serve the needs of its alumni by helping them advance in their careers through working for satisfying their needs for knowledge inputs and through networking, to develop synergistic plans to support the institutions for achieving their mission, and to enable the institutes to add value to all its stake holders through the membership of CKPIPSR."
+                        {about.quote}
                       </p>
                     </div>
 
@@ -428,25 +229,25 @@ export default function Alumni() {
                     <div className="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100 text-slate-800 text-sm leading-relaxed space-y-2">
                       <div className="flex items-center gap-2 font-serif font-bold text-[#1a5d2e]">
                         <Target size={16} />
-                        <span>Purpose of Establishment</span>
+                        <span>{about.purpose.title}</span>
                       </div>
                       <p className="text-slate-700 text-xs sm:text-[13.5px] leading-relaxed">
-                        The purpose of establishing this Association is to help our alumni and to get the best out of creating network of all alumni.
+                        {about.purpose.body}
                       </p>
                     </div>
                   </div>
 
                   {/* Highlights Bar */}
-                  <div className="pt-4 border-t border-slate-200/70 grid grid-cols-2 gap-3 text-center">
-                    <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <div className="text-xl font-bold font-mono text-[#1a5d2e]">1500+</div>
-                      <div className="text-[11px] text-slate-500 font-sans">Graduated Pharmacists</div>
+                  {about.highlights.length > 0 && (
+                    <div className="pt-4 border-t border-slate-200/70 grid grid-cols-2 gap-3 text-center">
+                      {about.highlights.map((highlight, hIdx) => (
+                        <div key={hIdx} className="p-3 bg-white rounded-xl border border-slate-200">
+                          <div className="text-xl font-bold font-mono text-[#1a5d2e]">{highlight.value}</div>
+                          <div className="text-[11px] text-slate-500 font-sans">{highlight.label}</div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <div className="text-xl font-bold font-mono text-[#1a5d2e]">100%</div>
-                      <div className="text-[11px] text-slate-500 font-sans">Placement Guidance</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Right Column: Verbatim 10 Objectives */}
@@ -454,14 +255,14 @@ export default function Alumni() {
                   <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div>
                       <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                        CKPIPSRAA Charter
+                        {about.objectives.kicker}
                       </span>
                       <h3 className="text-2xl font-serif font-bold text-slate-900">
-                        Objectives
+                        {about.objectives.heading}
                       </h3>
                     </div>
                     <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-mono text-xs font-semibold">
-                      10 Key Goals
+                      {about.objectives.countLabel}
                     </span>
                   </div>
 
@@ -491,13 +292,13 @@ export default function Alumni() {
               <div className="space-y-2 text-center md:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1a5d2e]/10 text-[#1a5d2e] text-xs font-mono font-bold">
                   <Sparkles size={13} />
-                  <span>Join The Alumni Community</span>
+                  <span>{about.cta.badge}</span>
                 </div>
                 <h4 className="text-xl font-serif font-bold text-slate-900">
-                  Are You a CKPIPSR Graduate?
+                  {about.cta.title}
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-xl font-sans">
-                  Register with the C. K. Pithawalla Institute of Pharmaceutical Science and Research Alumni Association to stay connected with your batchmates, receive the e-bulletin, and mentor junior students.
+                  {about.cta.body}
                 </p>
               </div>
 
@@ -505,7 +306,7 @@ export default function Alumni() {
                 onClick={() => setActiveTab("registration")}
                 className="px-6 py-3 rounded-xl bg-[#1a5d2e] text-white font-serif font-bold text-sm hover:bg-[#123a1a] transition-all shadow-md hover:shadow-lg flex items-center gap-2 shrink-0 group"
               >
-                <span>Register as Alumni</span>
+                <span>{about.cta.buttonLabel}</span>
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -530,16 +331,16 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Official Institutional Constitution & Bye-Laws
+                      {rules.kicker}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                      Rules & Regulations of CKPIPSRAA
+                      {rules.heading}
                     </h3>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] font-mono text-xs font-semibold">
                   <FileText size={14} />
-                  <span>Governing Charter</span>
+                  <span>{rules.badge}</span>
                 </div>
               </div>
 
@@ -548,26 +349,26 @@ export default function Alumni() {
                 <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
                     <Landmark size={15} />
-                    <span>1. Official Name</span>
+                    <span>{rules.name.kicker}</span>
                   </div>
                   <h4 className="text-base font-serif font-bold text-slate-900">
-                    Association Nomenclature
+                    {rules.name.title}
                   </h4>
                   <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed font-sans">
-                    The association shall be named as <strong className="text-slate-900 font-semibold">“C. K. Pithawalla Institute of Pharmaceutical Science and research Alumni Association”</strong>, hereafter referred to as <strong className="text-[#1a5d2e] font-mono">“CKPIPSRAA”</strong>.
+                    {rules.name.body}
                   </p>
                 </div>
 
                 <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
                     <MapPin size={15} />
-                    <span>2. Registered Office</span>
+                    <span>{rules.office.kicker}</span>
                   </div>
                   <h4 className="text-base font-serif font-bold text-slate-900">
-                    Location & Secretariat
+                    {rules.office.title}
                   </h4>
                   <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed font-sans">
-                    Office of the CKPIPSRAA shall be located at <strong className="text-slate-900 font-semibold">C.K.Pithawalla Institute of Pharmaceutical Science & Research, Surat</strong>.
+                    {rules.office.body}
                   </p>
                 </div>
               </div>
@@ -581,10 +382,10 @@ export default function Alumni() {
                 </div>
                 <div>
                   <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                    Clause 3
+                    {rules.aims.kicker}
                   </span>
                   <h3 className="text-xl font-serif font-bold text-slate-900">
-                    The Aims and Objectives
+                    {rules.aims.heading}
                   </h3>
                 </div>
               </div>
@@ -615,15 +416,15 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Clause 4
+                      {rules.membership.kicker}
                     </span>
                     <h3 className="text-xl font-serif font-bold text-slate-900">
-                      Membership Framework
+                      {rules.membership.heading}
                     </h3>
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-mono text-xs font-bold">
-                  ₹1,000/- One-Time Life Fee
+                  {rules.membership.feeBadge}
                 </span>
               </div>
 
@@ -633,10 +434,10 @@ export default function Alumni() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-[#1a5d2e] font-serif font-bold text-base">
                       <GraduationCap size={18} />
-                      <h4>Eligibility</h4>
+                      <h4>{membershipRules.eligibility.title}</h4>
                     </div>
                     <ul className="space-y-2.5">
-                      {membershipRules.eligibility.map((item, i) => (
+                      {membershipRules.eligibility.items.map((item, i) => (
                         <li key={i} className="text-xs sm:text-[13px] text-slate-700 font-sans flex items-start gap-2">
                           <CheckCircle2 size={15} className="text-[#1a5d2e] shrink-0 mt-0.5" />
                           <span>{item}</span>
@@ -645,7 +446,7 @@ export default function Alumni() {
                     </ul>
                   </div>
                   <div className="pt-3 border-t border-slate-200/70 text-[11.5px] font-mono text-slate-500">
-                    Open to all CKPIPSR degree & diploma alumni.
+                    {membershipRules.eligibility.note}
                   </div>
                 </div>
 
@@ -654,15 +455,14 @@ export default function Alumni() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-[#1a5d2e] font-serif font-bold text-base">
                       <Coins size={18} />
-                      <h4>Fees Structure</h4>
+                      <h4>{membershipRules.fees.title}</h4>
                     </div>
                     <div className="space-y-3 text-xs sm:text-[13px] text-slate-700 font-sans leading-relaxed">
-                      <p className="p-3 bg-white rounded-xl border border-slate-200/90">
-                        {membershipRules.fees[0]}
-                      </p>
-                      <p className="p-3 bg-white rounded-xl border border-slate-200/90">
-                        {membershipRules.fees[1]}
-                      </p>
+                      {membershipRules.fees.items.map((fee, fIdx) => (
+                        <p key={fIdx} className="p-3 bg-white rounded-xl border border-slate-200/90">
+                          {fee}
+                        </p>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -672,10 +472,10 @@ export default function Alumni() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-[#1a5d2e] font-serif font-bold text-base">
                       <Award size={18} />
-                      <h4>Member Rights</h4>
+                      <h4>{membershipRules.rights.title}</h4>
                     </div>
                     <ul className="space-y-2 text-xs sm:text-[12.5px] text-slate-700 font-sans leading-relaxed">
-                      {membershipRules.rights.map((right, rIdx) => (
+                      {membershipRules.rights.items.map((right, rIdx) => (
                         <li key={rIdx} className="flex items-start gap-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#1a5d2e] shrink-0 mt-1.5" />
                           <span>{right}</span>
@@ -695,16 +495,16 @@ export default function Alumni() {
                 </div>
                 <div>
                   <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                    Clause 5
+                    {rules.structure.kicker}
                   </span>
                   <h3 className="text-xl font-serif font-bold text-slate-900">
-                    Organization Structure of the Managing Committee
+                    {rules.structure.heading}
                   </h3>
                 </div>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-600 font-sans italic">
-                The method of election/selection of the office bearers and their responsibilities are defined in the following sub sections:
+                {rules.structure.intro}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -730,7 +530,7 @@ export default function Alumni() {
                       {item.responsibility}
                     </p>
 
-                    {item.duties && (
+                    {item.duties.length > 0 && (
                       <div className="pt-3 border-t border-emerald-100 space-y-2">
                         <div className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
                           Statutory Secretarial Duties:
@@ -760,25 +560,25 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Clause 6
+                      {rules.agm.kicker}
                     </span>
                     <h3 className="text-lg sm:text-xl font-serif font-bold text-slate-900">
-                      Annual General Meeting (AGM)
+                      {rules.agm.heading}
                     </h3>
                   </div>
                 </div>
 
                 <div className="space-y-3 text-xs sm:text-[13px] text-slate-700 font-sans leading-relaxed">
                   <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100 font-medium text-slate-800">
-                    Annual general meeting of the general body of CKPIPSRAA shall be called <strong>on or before 30th June</strong> of every year by member secretary.
+                    {rules.agm.highlight}
                   </div>
                   <p className="px-1">
-                    Member present will constitute the quorum and there will not be restriction on minimum/maximum number of members for the quorum.
+                    {rules.agm.body}
                   </p>
                   
                   <div className="pt-2 space-y-2">
                     <div className="font-mono text-xs font-bold text-[#1a5d2e] uppercase">
-                      Meeting shall statutorily consider the following:
+                      {rules.agm.dutiesTitle}
                     </div>
                     <ul className="space-y-1.5">
                       {agmDuties.map((d, di) => (
@@ -801,27 +601,27 @@ export default function Alumni() {
                     </div>
                     <div>
                       <span className="text-xs font-mono font-bold text-amber-800 uppercase tracking-wider">
-                        Clause 7
+                        {rules.extraordinary.kicker}
                       </span>
                       <h3 className="text-lg sm:text-xl font-serif font-bold text-slate-900">
-                        Extra ordinary Meeting
+                        {rules.extraordinary.heading}
                       </h3>
                     </div>
                   </div>
 
                   <div className="p-5 rounded-2xl bg-amber-50/40 border border-amber-200/70 text-xs sm:text-[13.5px] text-slate-800 font-sans leading-relaxed space-y-3">
                     <p>
-                      Member secretary of CKPIPSRAA shall call an extra ordinary meeting upon receipt of request from the president of CKPIPSRAA or from <strong>at least 10 percent of the members</strong> of the CKPIPSRAA.
+                      {rules.extraordinary.body}
                     </p>
                     <p className="p-3 bg-white rounded-xl border border-amber-200/80 font-medium">
-                      Such a meeting shall be called <strong>within 45 days</strong> from the date of receipt of such a request and shall discuss only for agenda stated in the request. However, any other agenda may be taken up with the permission of the chairperson of the meeting.
+                      {rules.extraordinary.highlight}
                     </p>
                   </div>
                 </div>
 
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 flex items-center gap-2">
                   <Clock size={15} className="text-[#1a5d2e]" />
-                  <span>Notice Timelines: Minimum 15 days written notification for meetings</span>
+                  <span>{rules.extraordinary.note}</span>
                 </div>
               </div>
             </div>
@@ -835,15 +635,15 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Clause 8
+                      {rules.meetings.kicker}
                     </span>
                     <h3 className="text-xl font-serif font-bold text-slate-900">
-                      Managing Committee Meetings & Executive Powers
+                      {rules.meetings.heading}
                     </h3>
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-emerald-50 text-[#1a5d2e] font-mono text-xs font-bold border border-emerald-200">
-                  Minimum 2 Meetings / Year
+                  {rules.meetings.badge}
                 </span>
               </div>
 
@@ -864,88 +664,51 @@ export default function Alumni() {
               </div>
             </div>
 
-            {/* 9. Infrastructure, 10. Accounts, 11. Chairperson & 12. Winding-up Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 9. Infrastructure */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-3">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  <Building size={16} />
-                  <span>Clause 9: Infrastructure</span>
-                </div>
-                <h4 className="text-base font-serif font-bold text-slate-900">
-                  Institutional Facilities & Secretariat
-                </h4>
-                <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-sans bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
-                  Managing committee will request the management of C. K. Pithawalla Institute of Pharmaceutical Science and Research for providing the office space with necessary facilities for communication and record storage and space for meeting for administering the CKPIPSRAA.
-                </p>
+            {/* Clauses 9 to 12: the small cards at the foot of the charter */}
+            {rules.clauses.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {rules.clauses.map((clause, cIdx) => {
+                  const amber = clause.tone === "amber";
+                  return (
+                    <div
+                      key={cIdx}
+                      className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-3"
+                    >
+                      <div
+                        className={`flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider ${
+                          amber ? "text-amber-800" : "text-[#1a5d2e]"
+                        }`}
+                      >
+                        {amber ? <Scale size={16} /> : <Building size={16} />}
+                        <span>{clause.kicker}</span>
+                      </div>
+                      <h4 className="text-base font-serif font-bold text-slate-900">
+                        {clause.title}
+                      </h4>
+                      <div
+                        className={`text-xs sm:text-[13px] text-slate-700 leading-relaxed font-sans p-4 rounded-2xl border space-y-2 ${
+                          amber ? "bg-amber-50/40 border-amber-200/60" : "bg-slate-50/70 border-slate-100"
+                        }`}
+                      >
+                        {clause.paragraphs.map((paragraph, pIdx) => (
+                          <p key={pIdx}>
+                            {clause.paragraphs.length > 1 ? `• ${paragraph}` : paragraph}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              {/* 10. Accounts */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-3">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  <Receipt size={16} />
-                  <span>Clause 10: Accounts</span>
-                </div>
-                <h4 className="text-base font-serif font-bold text-slate-900">
-                  Bank Account & Financial Auditing
-                </h4>
-                <div className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-sans bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-2">
-                  <p>
-                    • Separate account should be open-up in any nationalized bank and maintained in the name of <strong className="text-slate-900">"C. K. Pithawalla Institute of Pharmaceutical Science and research Alumni Association"</strong>.
-                  </p>
-                  <p>
-                    • All the financial transaction shall be carryout as per the institute norms.
-                  </p>
-                  <p>
-                    • Treasurer shall maintain the book of accounts of CKPIPSRAA and shall present the same to the managing committee at the end of each financial year for its approval.
-                  </p>
-                  <p>
-                    • The managing committee is responsible for the books of accounts of the CKPIPSRAA, in case of any query, dispute or legal matters, managing committee members are jointly responsible.
-                  </p>
-                </div>
-              </div>
-
-              {/* 11. Chairperson at Meeting */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-3">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  <Users size={16} />
-                  <span>Clause 11: Chairperson at Meeting</span>
-                </div>
-                <h4 className="text-base font-serif font-bold text-slate-900">
-                  Meeting Presiding Authority & Decision Making
-                </h4>
-                <div className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-sans bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-2">
-                  <p>
-                    • President of CKPIPSRAA or his or her nominee shall act as a chairperson at all the meetings of the CKPIPSRAA.
-                  </p>
-                  <p>
-                    • All the decision in the AGM/Special Meeting should be taken by the simple majority of the members present in the meeting. In case of tie, President will have casting vote.
-                  </p>
-                </div>
-              </div>
-
-              {/* 12. Winding-up of CKPIPSRAA */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-3">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-800 uppercase tracking-wider">
-                  <Scale size={16} />
-                  <span>Clause 12: Winding-up of CKPIPSRAA</span>
-                </div>
-                <h4 className="text-base font-serif font-bold text-slate-900">
-                  Asset Transfer & Dissolution
-                </h4>
-                <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-sans bg-amber-50/40 p-4 rounded-2xl border border-amber-200/60">
-                  In case of the winding-up of the CKPIPSRAA upon decision of the Chairman of CKPIPSRAA, any surplus fund or properties after meeting all the liabilities of the CKPIPSRAA shall be automatically comes under the ownership of the <strong className="text-slate-900">C. K. Pithawalla Institute of Pharmaceutical Science and Research, Surat</strong> to be utilized for the objectives inline with the objectives of the CKPIPSRAA.
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Official Footer Banner */}
             <div className="bg-[#fbf9f4] border border-[#d4af37]/40 rounded-2xl p-5 flex items-center justify-between flex-wrap gap-4 text-xs font-mono text-slate-700">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-[#1a5d2e]" />
-                <span>CKPIPSRAA Registered Bye-Laws • Navyug Vidyabhavan Trust</span>
+                <span>{rules.footer.left}</span>
               </div>
-              <span className="font-bold text-[#1a5d2e]">Registered Secretariat: Surat, Gujarat, India</span>
+              <span className="font-bold text-[#1a5d2e]">{rules.footer.right}</span>
             </div>
           </motion.div>
         )}
@@ -967,16 +730,16 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Institutional Governance & Office Bearers
+                      {managing.kicker}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                      CKPIPSRAA Managing Committee
+                      {managing.heading}
                     </h3>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] font-mono text-xs font-semibold">
                   <UserCheck size={14} />
-                  <span>11 Committee Members</span>
+                  <span>{managing.countLabel}</span>
                 </div>
               </div>
 
@@ -1027,9 +790,9 @@ export default function Alumni() {
             <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-5 flex items-center justify-between flex-wrap gap-4 text-xs font-mono text-slate-700">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-[#1a5d2e]" />
-                <span>Executive Managing Body formed as per Clause 5 of CKPIPSRAA Constitution</span>
+                <span>{managing.footer.left}</span>
               </div>
-              <span className="font-bold text-[#1a5d2e]">Secretariat: alumni@ckpipsr.ac.in</span>
+              <span className="font-bold text-[#1a5d2e]">{managing.footer.right}</span>
             </div>
           </motion.div>
         )}
@@ -1051,16 +814,16 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Operational Body & Portfolio Committees
+                      {executive.kicker}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                      Alumni Executive Committee
+                      {executive.heading}
                     </h3>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] font-mono text-xs font-semibold">
                   <UserCheck size={14} />
-                  <span>10 Executive Members</span>
+                  <span>{executive.countLabel}</span>
                 </div>
               </div>
 
@@ -1111,9 +874,9 @@ export default function Alumni() {
             <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-5 flex items-center justify-between flex-wrap gap-4 text-xs font-mono text-slate-700">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-[#1a5d2e]" />
-                <span>Executive Operations & Event Wings • CKPIPSRAA</span>
+                <span>{executive.footer.left}</span>
               </div>
-              <span className="font-bold text-[#1a5d2e]">Contact: alumni@ckpipsr.ac.in</span>
+              <span className="font-bold text-[#1a5d2e]">{executive.footer.right}</span>
             </div>
           </motion.div>
         )}
@@ -1135,16 +898,18 @@ export default function Alumni() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      CKPIPSRAA Directory
+                      {registration.kicker}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                      Alumni Membership Registration
+                      {registration.heading}
                     </h3>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#1a5d2e] text-xs font-mono font-bold">
-                  Free Lifetime
-                </span>
+                {registration.badge && (
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#1a5d2e] text-xs font-mono font-bold">
+                    {registration.badge}
+                  </span>
+                )}
               </div>
 
               {formSubmitted ? (
@@ -1153,21 +918,24 @@ export default function Alumni() {
                     <CheckCircle2 size={32} />
                   </div>
                   <h4 className="font-serif font-bold text-2xl text-slate-900">
-                    Registration Submitted!
+                    {registration.success.title}
                   </h4>
                   <p className="text-sm text-slate-600 font-sans leading-relaxed">
-                    Thank you, <strong className="text-slate-900">{formData.fullName}</strong>. Your alumni record has been registered with the CKPIPSR Alumni Association (CKPIPSRAA). We will contact you regarding upcoming alumni reunions, bulletins, and mentorship drives.
+                    Thank you, <strong className="text-slate-900">{formData.fullName}</strong>. {registration.success.body}
                   </p>
                   <button
                     onClick={() => {
                       setFormSubmitted(false);
+                      setFormError("");
+                      // Blank: the dropdowns fill themselves from the panel's
+                      // lists again, as they did the first time.
                       setFormData({
                         fullName: "",
                         email: "",
                         phone: "",
                         gender: "Male",
-                        degree: "B.Pharm",
-                        passingYear: "2023",
+                        degree: "",
+                        passingYear: "",
                         enrollmentNo: "",
                         currentDesignation: "",
                         companyName: "",
@@ -1180,15 +948,24 @@ export default function Alumni() {
                     }}
                     className="mt-4 px-6 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-mono font-bold hover:bg-slate-50 transition-all"
                   >
-                    Submit Another Entry
+                    {registration.success.again}
                   </button>
+                </div>
+              ) : !registration.open ? (
+                <div className="p-8 sm:p-12 text-center rounded-2xl bg-slate-50 border border-slate-200 space-y-3 max-w-lg mx-auto">
+                  <div className="w-14 h-14 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center mx-auto">
+                    <AlertCircle size={28} />
+                  </div>
+                  <p className="text-sm text-slate-700 font-sans leading-relaxed">
+                    {registration.closedMessage}
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Personal & Academic Information */}
                   <div className="space-y-4">
                     <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                      <span>1. Personal & Academic Details</span>
+                      <span>{registration.sections.personal}</span>
                       <div className="flex-1 h-px bg-slate-100" />
                     </h4>
 
@@ -1244,11 +1021,11 @@ export default function Alumni() {
                           onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         >
-                          <option value="B.Pharm">Bachelor of Pharmacy (B.Pharm)</option>
-                          <option value="M.Pharm - Pharmaceutics">M.Pharm (Pharmaceutics)</option>
-                          <option value="M.Pharm - Pharmacology">M.Pharm (Pharmacology)</option>
-                          <option value="M.Pharm - QA">M.Pharm (Quality Assurance)</option>
-                          <option value="D.Pharm">Diploma in Pharmacy (D.Pharm)</option>
+                          {registration.degrees.map((degree) => (
+                            <option key={degree} value={degree}>
+                              {degree}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -1261,8 +1038,8 @@ export default function Alumni() {
                           onChange={(e) => setFormData({ ...formData, passingYear: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         >
-                          {Array.from({ length: 20 }, (_, i) => 2026 - i).map((yr) => (
-                            <option key={yr} value={yr.toString()}>
+                          {passingYears.map((yr) => (
+                            <option key={yr} value={yr}>
                               {yr}
                             </option>
                           ))}
@@ -1287,7 +1064,7 @@ export default function Alumni() {
                   {/* Professional Information */}
                   <div className="space-y-4">
                     <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                      <span>2. Current Professional Status</span>
+                      <span>{registration.sections.professional}</span>
                       <div className="flex-1 h-px bg-slate-100" />
                     </h4>
 
@@ -1339,19 +1116,12 @@ export default function Alumni() {
                   {/* Contribution & Engagement */}
                   <div className="space-y-4">
                     <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                      <span>3. How Would You Like to Contribute to CKPIPSR?</span>
+                      <span>{registration.sections.contribution}</span>
                       <div className="flex-1 h-px bg-slate-100" />
                     </h4>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {[
-                        "Conducting Expert Talks & Webinars",
-                        "Mentoring Final Year Students",
-                        "Campus Placement & Internship Referrals",
-                        "Industry Visits & Industrial Projects",
-                        "GPAT / Higher Study Guidance",
-                        "Sponsoring Student Awards & Scholarships"
-                      ].map((item) => {
+                      {registration.interests.map((item) => {
                         const isChecked = formData.interests.includes(item);
                         return (
                           <button
@@ -1376,6 +1146,14 @@ export default function Alumni() {
                     </div>
                   </div>
 
+                  {/* What went wrong, including the one-a-day limit */}
+                  {formError && (
+                    <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-sans flex items-start gap-2.5">
+                      <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                      <span>{formError}</span>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
                     <button
@@ -1388,7 +1166,7 @@ export default function Alumni() {
                       ) : (
                         <>
                           <Send size={16} />
-                          <span>Submit Alumni Registration</span>
+                          <span>{registration.submitLabel}</span>
                         </>
                       )}
                     </button>

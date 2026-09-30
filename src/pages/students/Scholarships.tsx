@@ -7,167 +7,13 @@ import {
   Copy,
   Check,
   Info,
-  GraduationCap,
-  Building2,
-  Calendar,
-  Users,
-  Coins,
-  ChevronDown,
-  RotateCcw,
-  TrendingUp
+  RotateCcw
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-import { SCHOLARSHIP_AWARDED_STUDENTS_DATA, AwardedStudent } from "../../data/scholarshipAwardedData";
-
-export interface ScholarshipOrg {
-  id: string;
-  organization: string;
-  name: string;
-  website: string;
-  category: "State Govt" | "Central Govt" | "Foundation / Corporate" | "Women / Girls";
-  eligibility: string;
-  degreeApplicable: string;
-}
-
-const SCHOLARSHIP_ORGS_DATA: ScholarshipOrg[] = [
-  {
-    id: "org-1",
-    organization: "Digital Gujarat,Government of Gujarat",
-    name: "Post Matric Scholarship for SC/ST/SEBC/OBC",
-    website: "https://www.digitalgujarat.gov.in/loginapp/CitizenLogin.aspx",
-    category: "State Govt",
-    eligibility: "SC, ST, SEBC, OBC domicile students of Gujarat",
-    degreeApplicable: "D.Pharm / B.Pharm / M.Pharm"
-  },
-  {
-    id: "org-2",
-    organization: "Education Department, Gujarat State.",
-    name: "MYSY (Mukhyamantri Yuva Svavlamban Yojna)",
-    website: "https://mysy.guj.nic.in/",
-    category: "State Govt",
-    eligibility: "Securing >=80 percentile in 12th Sci / Diploma with family income <= ₹6.00 Lakh",
-    degreeApplicable: "D.Pharm / B.Pharm"
-  },
-  {
-    id: "org-3",
-    organization: "Glow & Lovely Careers",
-    name: "Glow & Lovely Foundation Scholarships (Girls)",
-    website: "https://www.glowandlovelycareers.in/en/scholarship-for-women",
-    category: "Women / Girls",
-    eligibility: "Female students pursuing higher education across recognized colleges",
-    degreeApplicable: "B.Pharm / Graduation"
-  },
-  {
-    id: "org-4",
-    organization: "L’Oréal India",
-    name: "L’oréal India for Young Women in Science Scholarships (Girls)",
-    website: "https://www.buddy4study.com/article/loreal-india-for-young-women-in-science-scholarship",
-    category: "Women / Girls",
-    eligibility: "Meritorious young women entering Science/Pharma higher education",
-    degreeApplicable: "B.Pharm (First Year)"
-  },
-  {
-    id: "org-5",
-    organization: "AICTE",
-    name: "Pragati & Saksham Scholarship (Girls)",
-    website: "https://www.aicte-pragati-saksham-gov.in/",
-    category: "Central Govt",
-    eligibility: "Girls / Specially-abled students admitted to AICTE approved technical programs",
-    degreeApplicable: "D.Pharm / B.Pharm"
-  },
-  {
-    id: "org-6",
-    organization: "AICTE",
-    name: "GPAT Scholarship for Masters",
-    website: "https://www.aicte-india.org/schemes/students-development-schemes/PG-Scholarship-Scheme",
-    category: "Central Govt",
-    eligibility: "GPAT qualified students admitted to AICTE approved M.Pharm degree",
-    degreeApplicable: "M.Pharm (All Specializations)"
-  },
-  {
-    id: "org-7",
-    organization: "ONGC Foundation",
-    name: "ONGC Foundation Scholarship Scheme for OBC Category Students",
-    website: "https://ongcscholar.org/#/fellowshipScheme",
-    category: "Foundation / Corporate",
-    eligibility: "Meritorious OBC category full-time students with income criteria",
-    degreeApplicable: "B.Pharm / Professional Degree"
-  },
-  {
-    id: "org-8",
-    organization: "Ministry of Social Justice & Empowerment, Govt. of India",
-    name: "NSP Top Class Education Scheme for SC Students",
-    website: "https://www.buddy4study.com/scholarship/top-class-education-scheme-for-sc-students",
-    category: "Central Govt",
-    eligibility: "SC category students meeting National Scholarship Portal (NSP) guidelines",
-    degreeApplicable: "B.Pharm / M.Pharm"
-  },
-  {
-    id: "org-9",
-    organization: "Ministry of Education, Govt. of India",
-    name: "Central Sector Scheme of Scholarship for College and University Students",
-    website: "https://www.education.gov.in/hi/scholarships-education-loan-0-hi",
-    category: "Central Govt",
-    eligibility: "Top 20th percentile students in 10+2 board examinations",
-    degreeApplicable: "Graduation / B.Pharm"
-  },
-  {
-    id: "org-10",
-    organization: "North South Foundation, India chapter",
-    name: "NSF Scholarship",
-    website: "https://northsouth.org/public/IndiaScholarships/Scholarships",
-    category: "Foundation / Corporate",
-    eligibility: "Financially challenged meritorious students entering professional degrees",
-    degreeApplicable: "B.Pharm"
-  },
-  {
-    id: "org-11",
-    organization: "Reliance Foundation",
-    name: "Dhirubhai Ambani Scholarship",
-    website: "https://das.reliancefoundation.org/",
-    category: "Foundation / Corporate",
-    eligibility: "CBSE / State board meritorious rankers & physically challenged scholars",
-    degreeApplicable: "Undergraduate Degrees"
-  },
-  {
-    id: "org-12",
-    organization: "Vidyadhan India",
-    name: "Vidyadhan Scholarship",
-    website: "https://www.vidyadhan.org/web/index.php",
-    category: "Foundation / Corporate",
-    eligibility: "Meritorious students from economically backward families",
-    degreeApplicable: "D.Pharm / B.Pharm"
-  },
-  {
-    id: "org-13",
-    organization: "HDFC Bank, India",
-    name: "HDFC Scholarship",
-    website: "https://www.buddy4study.com/page/hdfc-bank-parivartans-ecs-scholarship",
-    category: "Foundation / Corporate",
-    eligibility: "Merit-cum-means assistance under HDFC Parivartan ECS initiative",
-    degreeApplicable: "Professional & Degree Courses"
-  },
-  {
-    id: "org-14",
-    organization: "UGC",
-    name: "Post Graduate Indira Gandhi Scholarship for Single Girl Child",
-    website: "https://www.ugc.ac.in/oldpdf/xiplanpdf/revisedig_sgc_guideline24aug09.pdf",
-    category: "Central Govt",
-    eligibility: "Single girl child enrolled in non-professional/professional master degrees",
-    degreeApplicable: "Postgraduate Studies / M.Pharm"
-  },
-  {
-    id: "org-15",
-    organization: "Sitaram Jindal Foundation",
-    name: "Sitaram Jindal Foundation Scholarship",
-    website: "https://www.sitaramjindalfoundation.org/scholarships-for-students-in-bangalore.php",
-    category: "Foundation / Corporate",
-    eligibility: "Students pursuing general or professional degrees across India",
-    degreeApplicable: "Diploma / Degree Pharmacy"
-  }
-];
+import { useScholarshipsContent } from "../../hooks/useScholarshipsContent";
 
 export default function Scholarships() {
+  const content = useScholarshipsContent();
   const [activeTab, setActiveTab] = useState<"organizations" | "awarded">("organizations");
 
   // Organizations Tab State
@@ -181,6 +27,9 @@ export default function Scholarships() {
   const [selectedScheme, setSelectedScheme] = useState<string>("ALL");
   const [selectedClass, setSelectedClass] = useState<string>("ALL");
 
+  const orgs = content.organizations;
+  const awarded = content.awarded;
+
   const copyUrl = (id: string, url: string) => {
     navigator.clipboard.writeText(url);
     setCopiedId(id);
@@ -188,7 +37,7 @@ export default function Scholarships() {
   };
 
   const filteredOrgs = useMemo(() => {
-    return SCHOLARSHIP_ORGS_DATA.filter((org) => {
+    return orgs.items.filter((org) => {
       const matchesCat = selectedCategory === "ALL" || org.category === selectedCategory;
       const q = searchQuery.toLowerCase();
       const matchesSearch =
@@ -200,26 +49,10 @@ export default function Scholarships() {
 
       return matchesCat && matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
-
-  // Unique lists for Awarded filters
-  const academicYears = useMemo(() => {
-    const years = Array.from(new Set(SCHOLARSHIP_AWARDED_STUDENTS_DATA.map((s) => s.academicYear)));
-    return years;
-  }, []);
-
-  const schemeOptions = useMemo(() => {
-    const schemes = Array.from(new Set(SCHOLARSHIP_AWARDED_STUDENTS_DATA.map((s) => s.category)));
-    return schemes;
-  }, []);
-
-  const classOptions = useMemo(() => {
-    const classes = Array.from(new Set(SCHOLARSHIP_AWARDED_STUDENTS_DATA.map((s) => s.classLevel.trim())));
-    return classes;
-  }, []);
+  }, [orgs.items, searchQuery, selectedCategory]);
 
   const filteredAwardedStudents = useMemo(() => {
-    return SCHOLARSHIP_AWARDED_STUDENTS_DATA.filter((item) => {
+    return awarded.items.filter((item) => {
       const matchesYear = selectedYear === "ALL" || item.academicYear === selectedYear;
       const matchesScheme = selectedScheme === "ALL" || item.category === selectedScheme;
       const matchesClass = selectedClass === "ALL" || item.classLevel.trim() === selectedClass;
@@ -236,17 +69,25 @@ export default function Scholarships() {
 
       return matchesYear && matchesScheme && matchesClass && matchesSearch;
     });
-  }, [awardedSearch, selectedYear, selectedScheme, selectedClass]);
+  }, [awarded.items, awardedSearch, selectedYear, selectedScheme, selectedClass]);
 
-  // Compute summary stats for the awarded data
+  // What the filters currently add up to. The registry's own total arrives
+  // already worked out; this one moves with the filters.
   const totalAmountFiltered = useMemo(() => {
     return filteredAwardedStudents.reduce((acc, curr) => acc + curr.amount, 0);
   }, [filteredAwardedStudents]);
 
+  const resetAwardedFilters = () => {
+    setAwardedSearch("");
+    setSelectedYear("ALL");
+    setSelectedScheme("ALL");
+    setSelectedClass("ALL");
+  };
+
   return (
     <SubPageLayout
-      title="Scholarships"
-      subtitle="Comprehensive portal links, government welfare schemes, and institutional scholarship awards."
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="students-corner"
       activeItemLabel="Scholorships"
     >
@@ -262,7 +103,7 @@ export default function Scholarships() {
                 : "text-slate-500 hover:text-slate-800"
                 }`}
             >
-              <span>Scholarship Organizations</span>
+              <span>{content.tabs.organizations}</span>
               {activeTab === "organizations" && (
                 <motion.div
                   layoutId="activeTabUnderline"
@@ -281,9 +122,10 @@ export default function Scholarships() {
                 }`}
             >
               <div className="flex items-center gap-2">
-                <span>Scholarship Awarded</span>
+                <span>{content.tabs.awarded}</span>
+                {/* Counted from the register, never typed beside it. */}
                 <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-[#1a5d2e] text-[11px] font-mono font-bold">
-                  {SCHOLARSHIP_AWARDED_STUDENTS_DATA.length}
+                  {content.awardedCount}
                 </span>
               </div>
               {activeTab === "awarded" && (
@@ -308,7 +150,7 @@ export default function Scholarships() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search organization or scheme (e.g. MYSY, Digital Gujarat, AICTE)..."
+                  placeholder={orgs.searchPlaceholder}
                   className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-800 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all"
                 />
               </div>
@@ -316,9 +158,10 @@ export default function Scholarships() {
               <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                 <span className="text-xs font-mono font-bold text-slate-400 uppercase mr-1 flex items-center gap-1">
                   <Filter size={12} />
-                  <span>Filter:</span>
+                  <span>{orgs.filterLabel}</span>
                 </span>
-                {["ALL", "State Govt", "Central Govt", "Women / Girls", "Foundation / Corporate"].map((cat) => (
+                {/* The chips are the filters the panel keeps, plus the one that clears them. */}
+                {["ALL", ...orgs.categories].map((cat) => (
                   <button
                     key={cat}
                     type="button"
@@ -328,7 +171,7 @@ export default function Scholarships() {
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                   >
-                    {cat === "ALL" ? "All Schemes" : cat}
+                    {cat === "ALL" ? orgs.allLabel : cat}
                   </button>
                 ))}
               </div>
@@ -367,9 +210,11 @@ export default function Scholarships() {
                           <div className="text-slate-800 font-medium leading-relaxed">
                             {org.name}
                           </div>
-                          <div className="text-[11px] text-slate-500 font-sans mt-1">
-                            Applicable for: <span className="font-medium text-slate-700">{org.degreeApplicable}</span>
-                          </div>
+                          {org.degreeApplicable && (
+                            <div className="text-[11px] text-slate-500 font-sans mt-1">
+                              Applicable for: <span className="font-medium text-slate-700">{org.degreeApplicable}</span>
+                            </div>
+                          )}
                         </td>
 
                         {/* Website URL */}
@@ -405,7 +250,7 @@ export default function Scholarships() {
                     {filteredOrgs.length === 0 && (
                       <tr>
                         <td colSpan={3} className="text-center py-12 text-slate-500 text-sm">
-                          No scholarship organization found matching &quot;{searchQuery}&quot;.
+                          {orgs.emptyMessage.replaceAll("{query}", searchQuery)}
                         </td>
                       </tr>
                     )}
@@ -415,48 +260,38 @@ export default function Scholarships() {
             </div>
 
             {/* ── HELPFUL NOTICE & INSTRUCTIONS ── */}
-            <div className="rounded-2xl bg-[#fbf9f4] border border-[#d4af37]/30 p-5 sm:p-6 space-y-4">
-              <div className="flex items-center gap-3 border-b border-[#d4af37]/20 pb-3">
-                <div className="w-8 h-8 rounded-lg bg-[#1a5d2e] text-[#d4af37] flex items-center justify-center shrink-0">
-                  <Info size={18} />
+            {(orgs.notice.heading || orgs.notice.cards.length > 0) && (
+              <div className="rounded-2xl bg-[#fbf9f4] border border-[#d4af37]/30 p-5 sm:p-6 space-y-4">
+                <div className="flex items-center gap-3 border-b border-[#d4af37]/20 pb-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#1a5d2e] text-[#d4af37] flex items-center justify-center shrink-0">
+                    <Info size={18} />
+                  </div>
+                  <div>
+                    <h4 className="font-serif font-bold text-base text-slate-900">
+                      {orgs.notice.heading}
+                    </h4>
+                    <p className="text-xs text-slate-600 font-sans">
+                      {orgs.notice.blurb}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-serif font-bold text-base text-slate-900">
-                    Application Instructions & Institutional Support
-                  </h4>
-                  <p className="text-xs text-slate-600 font-sans">
-                    Essential documents and verification steps for student scholarship applications.
-                  </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-600">
+                  {orgs.notice.cards.map((card, index) => (
+                    <div key={index} className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1">
+                      <div className="font-bold text-slate-800 font-mono text-[11px] text-[#1a5d2e]">
+                        • {card.title}
+                      </div>
+                      <p>{card.body}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-600">
-                <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1">
-                  <div className="font-bold text-slate-800 font-mono text-[11px] text-[#1a5d2e]">
-                    • MANDATORY DOCUMENTS
-                  </div>
-                  <p>Aadhaar Card, Gujarat Domicile Certificate, Income Certificate, Caste Certificate, Previous Marksheets, and College Fee Receipts.</p>
-                </div>
-
-                <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1">
-                  <div className="font-bold text-slate-800 font-mono text-[11px] text-[#1a5d2e]">
-                    • BANK ACCOUNT SEEDING
-                  </div>
-                  <p>The student&apos;s bank savings account must be in their own name and actively Aadhaar-seeded / NPCI mapped for direct DBT credit.</p>
-                </div>
-
-                <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1">
-                  <div className="font-bold text-slate-800 font-mono text-[11px] text-[#1a5d2e]">
-                    • COLLEGE SCHOLARSHIP DESK
-                  </div>
-                  <p>Students must submit hard copies of online applications along with original documents to the college administration office for principal endorsement.</p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         )}
 
-        {/* ── TAB 2: SCHOLARSHIP AWARDED SECTION (FULL VERBATIM DATASET) ── */}
+        {/* ── TAB 2: SCHOLARSHIP AWARDED SECTION ── */}
         {activeTab === "awarded" && (
           <div className="space-y-6">
             {/* Top Overview KPI Card */}
@@ -468,24 +303,27 @@ export default function Scholarships() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[#D4AF37] text-xs font-mono font-bold uppercase tracking-wider">
-                        Official Disbursal Records
+                        {awarded.kicker}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono">
-                        2014-15 to 2021-22
-                      </span>
+                      {/* The span of the register, worked out from the years in it. */}
+                      {awarded.range && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono">
+                          {awarded.range}
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white">
-                      Scholarship Awarded Student Registry
+                      {awarded.heading}
                     </h3>
                     <p className="text-white/80 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                      Complete institutional registry of verified scholarship grants disbursed to meritorious and eligible students across government, state, and foundation schemes.
+                      {awarded.blurb}
                     </p>
                   </div>
                 </div>
 
                 {/* Quick Academic Years Pills */}
                 <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono text-white/60 mr-1">Filter Academic Year:</span>
+                  <span className="text-xs font-mono text-white/60 mr-1">{awarded.yearFilterLabel}</span>
                   <button
                     type="button"
                     onClick={() => setSelectedYear("ALL")}
@@ -494,24 +332,21 @@ export default function Scholarships() {
                       : "bg-white/10 text-white/80 hover:bg-white/20"
                       }`}
                   >
-                    All Years ({SCHOLARSHIP_AWARDED_STUDENTS_DATA.length})
+                    {awarded.allYearsLabel.replaceAll("{count}", String(content.awardedCount))}
                   </button>
-                  {academicYears.map((yr) => {
-                    const count = SCHOLARSHIP_AWARDED_STUDENTS_DATA.filter((s) => s.academicYear === yr).length;
-                    return (
-                      <button
-                        key={yr}
-                        type="button"
-                        onClick={() => setSelectedYear(yr)}
-                        className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${selectedYear === yr
-                          ? "bg-[#D4AF37] text-slate-950 shadow-xs"
-                          : "bg-white/10 text-white/80 hover:bg-white/20"
-                          }`}
-                      >
-                        {yr} ({count})
-                      </button>
-                    );
-                  })}
+                  {awarded.years.map((yr) => (
+                    <button
+                      key={yr.value}
+                      type="button"
+                      onClick={() => setSelectedYear(yr.value)}
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${selectedYear === yr.value
+                        ? "bg-[#D4AF37] text-slate-950 shadow-xs"
+                        : "bg-white/10 text-white/80 hover:bg-white/20"
+                        }`}
+                    >
+                      {yr.value} ({yr.count})
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -526,7 +361,7 @@ export default function Scholarships() {
                     type="text"
                     value={awardedSearch}
                     onChange={(e) => setAwardedSearch(e.target.value)}
-                    placeholder="Search student, scheme, class, or agency..."
+                    placeholder={awarded.searchPlaceholder}
                     className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-800 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all"
                   />
                 </div>
@@ -539,10 +374,12 @@ export default function Scholarships() {
                     aria-label="Filter by scholarship scheme"
                     className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all cursor-pointer"
                   >
-                    <option value="ALL">All Scholarship Schemes ({schemeOptions.length})</option>
-                    {schemeOptions.map((sch) => (
-                      <option key={sch} value={sch}>
-                        {sch}
+                    <option value="ALL">
+                      {awarded.allSchemesLabel.replaceAll("{count}", String(awarded.schemes.length))}
+                    </option>
+                    {awarded.schemes.map((sch) => (
+                      <option key={sch.value} value={sch.value}>
+                        {sch.value}
                       </option>
                     ))}
                   </select>
@@ -556,10 +393,10 @@ export default function Scholarships() {
                     aria-label="Filter by class level"
                     className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all cursor-pointer"
                   >
-                    <option value="ALL">All Classes (F.Y., S.Y., T.Y., Final)</option>
-                    {classOptions.map((cls) => (
-                      <option key={cls} value={cls}>
-                        {cls}
+                    <option value="ALL">{awarded.allClassesLabel}</option>
+                    {awarded.classes.map((cls) => (
+                      <option key={cls.value} value={cls.value}>
+                        {cls.value}
                       </option>
                     ))}
                   </select>
@@ -569,12 +406,7 @@ export default function Scholarships() {
                 <div className="md:col-span-1 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => {
-                      setAwardedSearch("");
-                      setSelectedYear("ALL");
-                      setSelectedScheme("ALL");
-                      setSelectedClass("ALL");
-                    }}
+                    onClick={resetAwardedFilters}
                     title="Reset Filters"
                     className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer w-full flex items-center justify-center"
                   >
@@ -586,13 +418,15 @@ export default function Scholarships() {
               {/* Status Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-slate-500 pt-2 border-t border-slate-100 gap-2">
                 <div>
-                  Showing <strong className="text-slate-900">{filteredAwardedStudents.length}</strong> of{" "}
-                  <strong>{SCHOLARSHIP_AWARDED_STUDENTS_DATA.length}</strong> records
+                  {awarded.showingLabel
+                    .replaceAll("{count}", String(filteredAwardedStudents.length))
+                    .replaceAll("{total}", String(content.awardedCount))}
                   {selectedYear !== "ALL" && <span> • Year: <strong className="text-[#1a5d2e]">{selectedYear}</strong></span>}
                   {selectedScheme !== "ALL" && <span> • Scheme: <strong className="text-[#1a5d2e]">{selectedScheme}</strong></span>}
                 </div>
                 <div>
-                  Filtered Disbursal Sum: <strong className="text-[#1a5d2e] font-bold">₹{totalAmountFiltered.toLocaleString("en-IN")}</strong>
+                  {awarded.sumLabel}{" "}
+                  <strong className="text-[#1a5d2e] font-bold">₹{totalAmountFiltered.toLocaleString("en-IN")}</strong>
                 </div>
               </div>
             </div>
@@ -613,7 +447,7 @@ export default function Scholarships() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs sm:text-[13px] font-sans">
                     {filteredAwardedStudents.map((item, index) => {
-                      const isHighAmount = item.amount >= 50000;
+                      const isHighAmount = item.amount >= awarded.highAmountFrom;
                       return (
                         <tr
                           key={item.id}
@@ -648,7 +482,7 @@ export default function Scholarships() {
                             </div>
                           </td>
 
-                          {/* Amount */}
+                          {/* Amount, formatted by the API */}
                           <td className="py-3.5 px-4 sm:px-5 align-top text-right">
                             <span
                               className={`font-mono font-bold text-xs sm:text-[13px] px-2 py-0.5 rounded ${isHighAmount
@@ -656,7 +490,7 @@ export default function Scholarships() {
                                 : "bg-slate-100 text-slate-800"
                                 }`}
                             >
-                              ₹{item.amount.toLocaleString("en-IN")}
+                              {item.amountFormatted}
                             </span>
                           </td>
 
@@ -673,18 +507,13 @@ export default function Scholarships() {
                     {filteredAwardedStudents.length === 0 && (
                       <tr>
                         <td colSpan={6} className="text-center py-16 text-slate-500 text-sm">
-                          <p className="font-medium">No student records found matching your filters.</p>
+                          <p className="font-medium">{awarded.emptyMessage}</p>
                           <button
                             type="button"
-                            onClick={() => {
-                              setAwardedSearch("");
-                              setSelectedYear("ALL");
-                              setSelectedScheme("ALL");
-                              setSelectedClass("ALL");
-                            }}
+                            onClick={resetAwardedFilters}
                             className="mt-2 text-xs font-mono font-bold text-[#1a5d2e] hover:underline cursor-pointer"
                           >
-                            Reset all filters
+                            {awarded.resetLabel}
                           </button>
                         </td>
                       </tr>

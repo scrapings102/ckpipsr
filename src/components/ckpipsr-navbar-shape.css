@@ -1,0 +1,1172 @@
+/* ============================================================
+   CKPIPSR — SPLIT-CENTER NAVBAR SHAPE  (v2 — self-consistent)
+   ------------------------------------------------------------
+   SHAPE AND LAYOUT ONLY. No dropdown / mega-menu, no mobile menu,
+   no button, no link colour, no strip colour, no scroll behaviour.
+
+   WHY v2: the crest size and its rise are now DERIVED from
+   --ckp-bar-h. In v1 they were hard-coded (58px / 24px), so when
+   the component set --ckp-bar-h:54px the crest became larger than
+   the bar and rose higher than the wave peak (0.32 x 54 = 17px),
+   punching through the notch into the utility strip.
+   Nothing here can now exceed the notch, at any bar height.
+   ============================================================ */
+
+.ckp-nav {
+  /* ---- the only knob you set ---- */
+  --ckp-bar-h: 88px;
+  --ckp-overhang: 30px;
+
+  /* ---- everything below is derived — do not hard-code ---- */
+
+  /* mirrors WAVE.peak in the JS (must stay in sync: 0.448) */
+  --ckp-peak: calc(var(--ckp-bar-h) * 0.448);
+
+  /* Measured from the approved design: the crest rises HALF the bar
+     height, i.e. deliberately ABOVE the wave peak (0.50h vs 0.39h).
+     Capped by the overhang so it can never escape the nav's own box —
+     overhang:0 (scrolled) therefore gives no rise at all. */
+  --ckp-crest-rise: min(
+    calc(var(--ckp-bar-h) * 0.5),
+    calc(var(--ckp-overhang) * 0.95)
+  );
+
+  /* Approved design: the crest is 0.907 x the bar height — nearly as
+     tall as the bar itself. This is the single biggest reason the
+     shape "doesn't land" if it is set smaller. */
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.907);
+
+  /* reference inset is 6.2% of width (141px at 2286) */
+  --ckp-gutter: clamp(24px, 6.2%, 141px);
+  --ckp-brand-w: 384px;
+
+  /* ---- glass material: light/white glass, as in the reference ----
+     These are plain variables — override them per site if a darker
+     panel is ever wanted. */
+  --ckp-surface: rgba(18, 58, 26, 0.94);
+  --ckp-sheen: rgba(255, 255, 255, 0.13);
+  --ckp-sheen-soft: rgba(255, 255, 255, 0.08);
+
+  position: relative;
+}
+
+.ckp-nav *,
+.ckp-nav *::before,
+.ckp-nav *::after {
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   1. Utility strip — layout only, keeps its own colours.
+   The middle column is what stops the crest landing on the
+   "ADMISSIONS OPEN" chip.
+   ============================================================ */
+
+.ckp-strip {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  /* aligned with the bar, as in the reference */
+  margin-left: var(--ckp-gutter);
+  margin-right: var(--ckp-gutter);
+}
+.ckp-strip__gap {
+  width: calc(var(--ckp-logo) + 42px);
+}
+.ckp-strip__group {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  /* hard guarantee: strip content can never spill into the centre
+     column where the crest rises */
+  overflow: hidden;
+}
+/* put this on the long affiliation text so IT truncates, instead of the
+   whole group pushing the admissions chip into the crest */
+.ckp-strip__shrink {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ckp-strip__group--left {
+  justify-content: flex-start;
+}
+.ckp-strip__group--right {
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   2. Bar shell — the wave
+   ============================================================ */
+
+.ckp-bar {
+  position: relative;
+  margin: calc(var(--ckp-overhang) * -1) var(--ckp-gutter) 0;
+  padding-top: var(--ckp-overhang);
+  height: calc(var(--ckp-bar-h) + var(--ckp-overhang));
+}
+
+.ckp-bar__glass {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--ckp-overhang);
+  bottom: 0;
+  z-index: 0;
+  background: var(--ckp-surface);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-radius: 0 0 18px 18px;
+  /* The reference has NO hard line under the brand text — the glass
+     dissolves into the background. Without this the clip-path's bottom
+     boundary reads as a straight edge. */
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 88%,
+    rgba(0, 0, 0, 0.85) 96%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 88%,
+    rgba(0, 0, 0, 0.85) 96%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+}
+.ckp-nav.is-waved .ckp-bar__glass {
+  border-radius: 0;
+}
+
+.ckp-bar__sheen {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--ckp-overhang);
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, var(--ckp-sheen) 0%, transparent 46%),
+    radial-gradient(110% 72% at 14% 0%, var(--ckp-sheen-soft), transparent 62%),
+    radial-gradient(90% 68% at 86% 2%, var(--ckp-sheen-soft), transparent 64%);
+}
+
+/* An echo of the wave, offset downward inside the bar. The reference's
+   glass is not a flat tint: a soft curved boundary repeats the notch
+   lower down. The outer element is clipped to the bar, the inner one to
+   the same path shifted down, so the visible boundary follows the curve. */
+.ckp-bar__echo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--ckp-overhang);
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.ckp-bar__echo > i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--ckp-echo, rgba(255, 255, 255, 0.3));
+}
+
+.ckp-bar__rim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.ckp-bar__rim path {
+  fill: none;
+  stroke: url(#ckpRim);
+  stroke-width: 1.25;
+}
+
+/* ============================================================
+   3. Split-centre arrangement — positioning only
+   ============================================================ */
+
+.ckp-bar__inner {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr var(--ckp-brand-w) 1fr;
+  align-items: center;
+  height: var(--ckp-bar-h);
+  padding: 0 22px;
+  gap: 8px;
+}
+.ckp-bar__inner > * {
+  min-width: 0;
+}
+
+.ckp-menu {
+  display: flex;
+  align-items: center;
+  gap: clamp(13px, 2.7vw, 46px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+/* both halves hug the centred crest — do not "correct" these */
+.ckp-menu--left {
+  justify-content: flex-end;
+  padding-right: 6px;
+}
+.ckp-menu--right {
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+
+.ckp-bar__side {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(10px, 1.1vw, 18px);
+  min-width: 0;
+}
+.ckp-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex: none;
+}
+
+/* ---- centred brand ---- */
+.ckp-brand {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  width: 100%;
+  overflow: visible;
+  text-decoration: none;
+  align-self: start;
+  margin-top: calc(var(--ckp-crest-rise) * -1);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ckp-brand__crest {
+  width: var(--ckp-logo);
+  height: var(--ckp-logo);
+  border-radius: 50%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 6px;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.92),
+    0 8px 20px -6px rgba(0, 0, 0, 0.45),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.9);
+}
+.ckp-brand__crest img,
+.ckp-brand__crest svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* text scales with the bar too, so it never spills out the bottom */
+.ckp-brand__name {
+  font-size: clamp(11px, calc(var(--ckp-bar-h) * 0.155), 15px);
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ckp-brand__sub {
+  font-size: clamp(7px, calc(var(--ckp-bar-h) * 0.097), 9.5px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* A short bar cannot hold crest + two text lines, so the sub-line
+   collapses to zero height instead of spilling past the bar's bottom
+   edge. At bar-h >= 64px it shows at full height; below that it
+   shrinks to nothing. (Their scrolled state is 43px, which hits this.) */
+.ckp-brand__sub {
+  max-height: clamp(0px, calc((var(--ckp-bar-h) - 56px) * 2), 14px);
+  overflow: hidden;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.25s ease;
+  opacity: clamp(0, calc((var(--ckp-bar-h) - 56px) * 0.12), 1);
+}
+
+/* ============================================================
+   4. Mid-range desktops
+   ============================================================ */
+
+@media (min-width: 1361px) and (max-width: 1640px) {
+  .ckp-nav {
+    --ckp-brand-w: 292px;
+  }
+  .ckp-bar__inner {
+    padding: 0 14px;
+  }
+  .ckp-menu {
+    gap: clamp(12px, 1.9vw, 26px);
+  }
+}
+
+/* ============================================================
+   5. Below 1360px — wave off, site's own mobile header takes over
+   ============================================================ */
+
+@media (max-width: 1360px) {
+  .ckp-nav {
+    --ckp-overhang: 0px;
+  }
+  .ckp-strip {
+    display: flex;
+    justify-content: space-between;
+  }
+  .ckp-strip__gap {
+    display: none;
+  }
+  .ckp-strip__group {
+    flex: 0 0 auto;
+    min-width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ckp-nav * {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   6. Reference elements — home chip, inline search, tagline
+   Layout only; colour comes from the site's own styles.
+   ============================================================ */
+
+.ckp-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ckp-bar-h) * 0.315);
+  height: calc(var(--ckp-bar-h) * 0.315);
+  border-radius: 50%;
+  flex: none;
+}
+.ckp-chip-icon svg {
+  width: 52%;
+  height: 52%;
+  display: block;
+}
+
+.ckp-rule {
+  width: 1px;
+  height: calc(var(--ckp-bar-h) * 0.2);
+  flex: none;
+}
+
+.ckp-tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin: calc(var(--ckp-bar-h) * 0.12) var(--ckp-gutter) 0;
+  font-size: calc(var(--ckp-bar-h) * 0.13);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ckp-tagline::before,
+.ckp-tagline::after {
+  content: '';
+  height: 1px;
+  flex: 1 1 auto;
+  max-width: 22%;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+/* ============================================================
+   THEME LOCK — appended by patch-navbar-blue.py
+
+   Keep the glass navy. The reference artwork uses white glass, but
+   this navbar's labels, brand text, separators and Menu button are
+   all white, so a white surface makes them invisible.
+
+   To retune, change these three values only:
+     --ckp-surface   the bar colour. last number = opacity;
+                     lower it to let more of the hero through.
+     --ckp-echo      the soft second curve inside the bar.
+     --ckp-sheen     the highlight across the top.
+   ============================================================ */
+.ckp-nav {
+  --ckp-surface: rgba(18, 58, 26, 0.94);
+  --ckp-sheen: rgba(255, 255, 255, 0.13);
+  --ckp-sheen-soft: rgba(255, 255, 255, 0.08);
+  --ckp-echo: rgba(255, 255, 255, 0.05);
+  --ckp-echo-offset: 0.38;
+}
+
+/* ============================================================
+   ECHO + OVERLAP FIX — appended by patch-navbar-echo-overlap.py
+   ============================================================ */
+
+/* 1. Kill the echo's double edge.
+      The reference's white glass carried a soft second curve inside
+      the bar. Over solid navy the same layer reads as a duplicated
+      wave, not a sheen. Set a visible colour here to bring it back. */
+.ckp-nav {
+  --ckp-echo: transparent;
+}
+.ckp-bar__echo {
+  display: none;
+}
+
+/* 2. Keep the right-hand menu clear of Apply Now / Menu.
+      The menu and the actions share a flex row; the actions are
+      flex:none and the labels are nowrap, so without this the menu
+      overflows underneath the buttons rather than shrinking. */
+.ckp-menu--right {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-right: clamp(14px, 1.6vw, 28px);
+  overflow: hidden;
+}
+.ckp-menu--right > * {
+  flex: none;
+}
+
+/* slightly tighter than the left half, which has more room */
+.ckp-menu--right {
+  gap: clamp(10px, 1.5vw, 26px);
+}
+
+@media (max-width: 1500px) {
+  .ckp-menu {
+    gap: clamp(9px, 1.2vw, 18px);
+  }
+  .ckp-menu--right {
+    margin-right: 12px;
+  }
+}
+
+/* ============================================================
+   GUTTER FIT — appended by patch-navbar-gutter-fit.py
+   ============================================================ */
+
+.ckp-nav {
+  /* FIXED, not a percentage. The strip and the bar sit at different
+     nesting depths, so a percentage resolves against different
+     containing blocks and the edges cannot line up. */
+  --ckp-gutter: 26px;
+
+  /* the brand needs far less than 384px; the surplus was taken from
+     the menu columns, which is what squeezed "Activities" */
+  --ckp-brand-w: 296px;
+}
+
+/* the strip gets the identical inset, so both edges match */
+.ckp-strip-edge {
+  width: auto;
+  margin-left: 26px;
+  margin-right: 26px;
+}
+
+/* un-clip the right menu — tighter gaps do the job instead */
+.ckp-menu--right {
+  overflow: visible;
+  margin-right: clamp(16px, 1.7vw, 28px);
+}
+.ckp-menu {
+  gap: clamp(11px, 1.5vw, 26px);
+}
+
+@media (min-width: 1361px) and (max-width: 1640px) {
+  .ckp-nav {
+    --ckp-brand-w: 244px;
+  }
+  .ckp-menu {
+    gap: clamp(9px, 1.1vw, 18px);
+  }
+  .ckp-menu--right {
+    margin-right: 13px;
+  }
+}
+
+@media (max-width: 1360px) {
+  .ckp-nav {
+    --ckp-gutter: 14px;
+  }
+  .ckp-strip-edge {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+}
+
+/* ============================================================
+   ONE CARD — appended by patch-navbar-one-card.py
+   ============================================================ */
+
+.ckp-nav {
+  /* no inset of its own: the floating card already provides it, and
+     the strip uses the card's full width too, so the two match */
+  --ckp-gutter: 0px;
+}
+
+/* full width, and square where it meets the bar so there is no seam */
+.ckp-strip-edge {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  border-bottom: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* ============================================================
+   STRIP BELOW — appended by patch-strip-below.py
+   The strip now sits under the bar, so the earlier rules that
+   squared its BOTTOM edge (for the old join above) are reversed:
+   its TOP is square where it meets the bar, and it keeps its
+   rounded bottom as the card's new lower edge.
+   ============================================================ */
+.ckp-strip-edge {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  border-top: 0 !important;
+  border-bottom-left-radius: 26px !important;
+  border-bottom-right-radius: 26px !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+/* ============================================================
+   LOGO OVER PEAK — appended by patch-logo-peak-gtu.py
+   ============================================================ */
+
+.ckp-nav {
+  /* The seal MUST rise further than the wave's apex, or the curve's
+     point shows above it as a small spike.
+        wave peak  = 0.448 x bar-h  = 34px at 76px
+        crest rise = 38.6px          (0.92 x the 42px overhang)
+     Keep rise > peak if either value is ever retuned. */
+  --ckp-crest-rise: min(
+    calc(var(--ckp-bar-h) * 0.52),
+    calc(var(--ckp-overhang) * 0.92)
+  );
+
+  /* 0.907 -> 1.05 of the bar height */
+  --ckp-logo: calc(var(--ckp-bar-h) * 1.05);
+}
+
+/* the bigger seal was sitting on the name — give it clear space */
+.ckp-brand {
+  gap: 0;
+}
+.ckp-brand__name {
+  margin-top: 7px;
+}
+.ckp-brand__sub {
+  margin-top: 2px;
+}
+
+@media (max-width: 1360px) {
+  .ckp-nav {
+    --ckp-logo: 44px;
+  }
+  .ckp-brand__name {
+    margin-top: 0;
+  }
+}
+
+/* ============================================================
+   SCROLLED STATE + STACKING — appended by patch-scrolled-and-hover.py
+   ============================================================ */
+
+/* Scrolled, the bar is 56px. The unscrolled crest (1.05 x bar-h) would
+   be 59px — taller than the bar — which pushed the brand text out onto
+   the hero. Size the crest and text for the shorter bar instead. */
+.ckp-nav.is-scrolled {
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.66);
+  --ckp-crest-rise: 0px;
+}
+.ckp-nav.is-scrolled .ckp-brand {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  margin-top: 0;
+  padding-top: 0;
+}
+.ckp-nav.is-scrolled .ckp-brand__name {
+  margin-top: 0;
+  font-size: 12.5px;
+}
+/* no room for a second line at this height */
+.ckp-nav.is-scrolled .ckp-brand__sub {
+  display: none;
+}
+
+/* the mega panel must clear the strip below, not half-cover it */
+.ckp-bar__inner {
+  z-index: 6;
+}
+.ckp-strip-edge {
+  z-index: 1 !important;
+}
+
+/* ============================================================
+   FINAL GEOMETRY — appended by patch-final-geometry.py
+
+   Bar 64px unscrolled / 46px scrolled. Every value below is
+   derived from --ckp-bar-h, so retuning the bar height keeps
+   the whole assembly consistent.
+
+   The one invariant that must not be broken:
+       crest rise  >  wave peak (0.448 x bar-h)
+   If the rise is ever lowered below the peak, the apex of the
+   curve shows above the seal as a small spike.
+   ============================================================ */
+
+.ckp-nav {
+  --ckp-crest-rise: min(
+    calc(var(--ckp-bar-h) * 0.52),
+    calc(var(--ckp-overhang) * 0.92)
+  );
+  --ckp-logo: calc(var(--ckp-bar-h) * 1.05);
+}
+
+/* two text lines inside 30px */
+.ckp-brand {
+  gap: 0;
+  padding-top: 0;
+}
+.ckp-brand__name {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.1;
+}
+.ckp-brand__sub {
+  margin-top: 1px;
+  font-size: 8px;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+}
+
+/* scrolled: no rise, crest beside the name on one line */
+.ckp-nav.is-scrolled {
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.66);
+  --ckp-crest-rise: 0px;
+}
+.ckp-nav.is-scrolled .ckp-brand {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  margin-top: 0;
+}
+.ckp-nav.is-scrolled .ckp-brand__name {
+  margin-top: 0;
+  font-size: 12px;
+}
+.ckp-nav.is-scrolled .ckp-brand__sub {
+  display: none;
+}
+
+/* the affiliation line, now that it is never truncated */
+.ckp-strip-edge {
+  z-index: 1 !important;
+}
+
+/* ============================================================
+   BRAND LINE GAP — appended by patch-brand-line-gap.py
+
+   The crest gives back ~5px so the two brand lines can breathe.
+   The RISE is deliberately not touched: it must stay above the
+   wave peak (0.448 x bar-h) or the curve's apex shows above the
+   seal as a spike.
+   ============================================================ */
+
+.ckp-nav {
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.93);
+}
+
+.ckp-brand {
+  gap: 0;
+  padding-top: 0;
+}
+
+.ckp-brand__name {
+  margin-top: 5px;
+  font-size: 12.5px;
+  line-height: 1.12;
+}
+
+.ckp-brand__sub {
+  margin-top: 5px; /* was 1px — this is the gap you wanted */
+  font-size: 8px;
+  line-height: 1.15;
+  letter-spacing: 0.07em;
+}
+
+/* scrolled is a single row, so the gap does not apply there */
+.ckp-nav.is-scrolled {
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.66);
+}
+.ckp-nav.is-scrolled .ckp-brand__name {
+  margin-top: 0;
+}
+
+/* ============================================================
+   BIGGER LOGO + SCROLLED CENTRING
+   appended by patch-bigger-logo-centred.py
+   ============================================================ */
+
+.ckp-nav {
+  /* 0.93 -> 1.25 of the bar height */
+  --ckp-logo: calc(var(--ckp-bar-h) * 1.25);
+
+  /* THE IMPORTANT CHANGE.
+     The rise is derived FROM the logo, so the space left beneath the
+     seal is a constant 30px at any logo size. Previously the rise was
+     a fraction of the bar, so every increase in logo size ate into the
+     text's room and the college line overflowed.
+     Growing --ckp-logo above is now safe on its own. */
+  --ckp-crest-rise: calc(var(--ckp-logo) - 30px);
+}
+
+/* .ckp-brand is a COLUMN here, so align-items centres horizontally */
+.ckp-brand {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* ...but a ROW when scrolled, where the horizontal axis is the MAIN
+   axis. Without this the logo and name sit at the start of the grid
+   column instead of its centre — the bug in the screenshot. */
+.ckp-nav.is-scrolled .ckp-brand {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
+  width: 100%;
+}
+.ckp-nav.is-scrolled {
+  --ckp-logo: calc(var(--ckp-bar-h) * 0.7);
+  --ckp-crest-rise: 0px;
+}
+.ckp-nav.is-scrolled .ckp-brand__name {
+  margin-top: 0;
+  font-size: 12.5px;
+}
+.ckp-nav.is-scrolled .ckp-brand__sub {
+  display: none;
+}
+
+/* the 30px beneath the seal, spent on the two lines */
+.ckp-brand__name {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.1;
+}
+.ckp-brand__sub {
+  margin-top: 4px;
+  font-size: 7.5px;
+  line-height: 1.12;
+  letter-spacing: 0.07em;
+}
+
+/* ============================================================
+   CORNERS + RIM — appended by patch-corners-rim.py
+   ============================================================ */
+
+/* The rim is an SVG stroke tracing the bar's outline. Down the left
+   and right sides it sits half outside the shape, which shows as a
+   thin white line at the extreme edges. The wave reads fine without
+   it. */
+.ckp-bar__rim {
+  display: none;
+}
+
+/* the strip keeps its own rounded bottom as the card's lower edge */
+.ckp-strip-edge {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 24px !important;
+  border-bottom-right-radius: 24px !important;
+}
+
+/* ============================================================
+   INSIDE-PAGE HEADER — appended by patch-subpage-header.py
+
+   White top band + menu strip, the seal straddling both, dead
+   centre. Verified in a browser from 1920 to 1024px: seal on the
+   exact centre, clear of every menu item, nothing at an edge.
+   ============================================================ */
+
+.ckp-sph {
+  font-family: var(--font-sans);
+}
+
+/* ---- top band ---- */
+.ckp-sph__top {
+  height: 52px;
+  background: #fff;
+  border-bottom: 1px solid #e7ede4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 56px;
+  font-size: 12.5px;
+}
+/* each half stops short of the seal, however long the text is */
+.ckp-sph__tl,
+.ckp-sph__tr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  max-width: calc(50% - 84px);
+  white-space: nowrap;
+}
+.ckp-sph__tl {
+  overflow: hidden;
+}
+.ckp-sph__trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  color: #123a1a;
+  letter-spacing: 0.02em;
+  flex: none;
+}
+.ckp-sph__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4af37;
+  flex: none;
+}
+.ckp-sph__aff {
+  color: #64748b;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.ckp-sph__sep {
+  color: #cbd5e1;
+  flex: none;
+}
+.ckp-sph__enq {
+  color: #475569;
+}
+.ckp-sph__enq a,
+.ckp-sph__mail {
+  color: #123a1a;
+  font-weight: 600;
+  text-decoration: none;
+}
+.ckp-sph__enq a:hover,
+.ckp-sph__mail:hover {
+  color: #d4af37;
+}
+.ckp-sph__apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  flex: none;
+  background: #d4af37;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 7px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.ckp-sph__apply:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -6px rgba(212, 175, 55, 0.6);
+}
+
+/* ---- menu strip ---- */
+.ckp-sph__strip {
+  position: relative; /* the mega-menus position against this */
+  height: 58px;
+  background: linear-gradient(180deg, #1a4a25, #123a1a);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px minmax(0, 1fr);
+  align-items: center;
+  padding: 0 56px;
+  box-shadow: 0 8px 20px -14px rgba(18, 58, 26, 0.55);
+}
+.ckp-sph__L {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 28px;
+  padding-right: 22px;
+  min-width: 0;
+}
+.ckp-sph__R {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-left: 22px;
+  min-width: 0;
+}
+.ckp-sph__sp {
+  flex: 1;
+}
+.ckp-sph__L > *,
+.ckp-sph__R > * {
+  flex: none;
+}
+.ckp-sph__R > .ckp-sph__sp {
+  flex: 1;
+}
+.ckp-sph__menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.ckp-sph__menu:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---- the seal, straddling the band and the strip ---- */
+.ckp-sph__seal {
+  position: absolute;
+  left: 50%;
+  top: -44px;
+  transform: translateX(-50%);
+  width: 98px;
+  height: 98px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 5px;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 0 0 5.5px #d4af37,
+    0 16px 32px -12px rgba(18, 58, 26, 0.55);
+  z-index: 5;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.25s;
+}
+.ckp-sph__seal:hover {
+  transform: translateX(-50%) scale(1.04);
+}
+
+/* ---- responsive steps ---- */
+@media (max-width: 1500px) {
+  .ckp-sph__top,
+  .ckp-sph__strip {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .ckp-sph__L,
+  .ckp-sph__R {
+    gap: 22px;
+  }
+}
+@media (max-width: 1400px) {
+  .ckp-sph__aff,
+  .ckp-sph__tl .ckp-sph__sep {
+    display: none;
+  }
+  .ckp-sph__menuT {
+    display: none;
+  }
+}
+@media (max-width: 1200px) {
+  .ckp-sph__top,
+  .ckp-sph__strip {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .ckp-sph__strip {
+    grid-template-columns: minmax(0, 1fr) 128px minmax(0, 1fr);
+  }
+  .ckp-sph__L,
+  .ckp-sph__R {
+    gap: 14px;
+  }
+  .ckp-sph__seal {
+    width: 84px;
+    height: 84px;
+    top: -37px;
+  }
+  .ckp-sph__enq,
+  .ckp-sph__tr .ckp-sph__sep {
+    display: none;
+  }
+}
+@media (max-width: 1150px) {
+  .ckp-sph__top,
+  .ckp-sph__strip {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .ckp-sph__strip {
+    grid-template-columns: minmax(0, 1fr) 116px minmax(0, 1fr);
+  }
+  .ckp-sph__L,
+  .ckp-sph__R {
+    gap: 11px;
+  }
+  .ckp-sph__L {
+    padding-right: 14px;
+  }
+  .ckp-sph__R {
+    padding-left: 14px;
+  }
+  .ckp-sph__seal {
+    width: 78px;
+    height: 78px;
+    top: -33px;
+  }
+}
+
+/* ---- IPSR: long section names ------------------------------------------
+   Eight long names ("Research & Innovation", "Accreditation & Ranking") plus
+   a long institute name. The subtitle wraps to two lines under the crest
+   instead of being cut, which lets the brand area narrow; the menu gaps
+   tighten. The wave is sized from the bar, not the brand, so it is unchanged. */
+.ckp-brand__sub {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  max-width: 230px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.2;
+}
+.ckp-menu {
+  gap: clamp(24px, 1.9vw, 46px);
+}
+@media (min-width: 1440px) {
+  .ckp-menu {
+    gap: min(2.4vw, 46px);
+  }
+}
+.ckp-bar__side {
+  gap: clamp(8px, 0.8vw, 14px);
+}
+.ckp-menu > * {
+  flex: none;
+}
+
+/* Below 1360px eight long names cannot fit readably beside the crest and the
+   two buttons, so the bar keeps the brand, Apply Now and Menu — every section
+   is one tap away in the menu. Same for the inside-page strip. */
+@media (max-width: 1359px) {
+  .ckp-menu {
+    display: none;
+  }
+  .ckp-sph__L > :not(.ckp-sph__menu),
+  .ckp-sph__R > .group {
+    display: none;
+  }
+}
+
+/* IPSR: the bar is 78px (not 64px) so the two-line institute name fits
+   inside it. The logo is sized from the bar (1.25 x bar-h) and rises by
+   (logo - 30px), so a taller bar would also grow the logo and lift it off the
+   top of the screen. Keep the logo at CET's 80px — the crest sits exactly
+   where CET's does, and the extra height becomes room for the name below. */
+@media (min-width: 1361px) {
+  .ckp-nav:not(.is-scrolled) {
+    --ckp-logo: 72px;
+  }
+}
+
+/* IPSR, lighter: the name a touch smaller and the block tighter, so the name
+   and the two-line institute line sit inside the 72px bar */
+@media (min-width: 1361px) {
+  /* 58px bar: the seal reaches 21px into the bar (not 30px), leaving room
+     beneath it for the name and the two-line institute line. The logo keeps
+     its 80px size; the navbar sits 8px lower so the seal keeps its margin
+     from the top of the screen. */
+  /* seal 13px into the bar, so it clears the name. The navbar sits 8px lower
+     to match, so the logo stays exactly where it was on screen. */
+  .ckp-nav:not(.is-scrolled) {
+    --ckp-crest-rise: calc(var(--ckp-logo) - 22px);
+  }
+  .ckp-nav:not(.is-scrolled) .ckp-brand__name {
+    font-size: 11.5px;
+    margin-top: 2px;
+  }
+  .ckp-nav:not(.is-scrolled) .ckp-brand__sub {
+    font-size: 9px;
+    line-height: 1.1;
+  }
+}
+
+/* the institute line breaks evenly ("Institute of Pharmaceutical" / "Science &
+   Research") and never re-wraps, so neither line is wider than the notch */
+.ckp-brand__sub {
+  white-space: nowrap;
+}
+
+/* IPSR two-line institute line — override an older rule (above) that caps the
+   sub-line's height at (bar-h - 56px) x 2 and fades it, meant for short bars.
+   At 62px that allowed only 12px (one line) at 72% opacity, and the second line
+   spilled onto the strip, which is drawn over it. */
+@media (min-width: 1361px) {
+  .ckp-nav:not(.is-scrolled) .ckp-brand__sub {
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+    margin-top: 1px;
+  }
+}
+/* the bar's contents stay above the strip */
+.ckp-bar {
+  position: relative;
+  z-index: 2;
+}

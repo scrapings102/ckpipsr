@@ -18,8 +18,46 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useModalScrollLock } from "../../hooks/useModalScrollLock";
-import { STAFF_MEMBERS, StaffMember } from "../../data/scrapedData";
-import { getFacultyDetails, FacultyDetail } from "../../data/facultyDetails";
+import { cdn } from "../../utils/image";
+import { useFacultiesContent, type FacultyMember } from "../../hooks/useFacultiesContent";
+
+/** What the profile window draws, after falling back to the card. */
+interface FacultyDetail {
+  name: string;
+  department: string;
+  designation: string;
+  qualification: string;
+  experience: string;
+  profile: string;
+  achievements: string[];
+  email: string;
+  contactNumber: string;
+}
+
+/**
+ * The window's content comes from the admin panel (member.details). A blank
+ * field there falls back to the card: its designation (the part before a
+ * comma), qualification, experience and email, and a department taken from
+ * the designation's ", Pharmaceutics" part.
+ */
+function getFacultyDetails(member: FacultyMember): FacultyDetail {
+  const d = member.details ?? ({} as Partial<FacultyMember["details"]>);
+  const [cardRole, cardDept] = (member.designation || "").split(",").map((s) => s.trim());
+  const derivedDept = cardDept
+    ? cardDept.toLowerCase().startsWith("department of") ? cardDept : `Department of ${cardDept}`
+    : "";
+  return {
+    name: member.name,
+    department: d.department || derivedDept,
+    designation: d.designation || cardRole || "",
+    qualification: d.qualification || member.qualification,
+    experience: d.experience || member.experience,
+    profile: d.profile || "",
+    achievements: Array.isArray(d.achievements) ? d.achievements : [],
+    email: d.email || member.email,
+    contactNumber: d.contactNumber || "",
+  };
+}
 
 function getFacultyInitials(name: string): string {
   const cleaned = name.replace(/^(dr|mr|mrs|ms|prof)\.?\s+/i, "");
@@ -39,7 +77,7 @@ function formatContactNumber(num?: string): string {
 
 export default function Faculties() {
   const [selectedFaculty, setSelectedFaculty] = useState<{
-    member: StaffMember;
+    member: FacultyMember;
     details: FacultyDetail;
   } | null>(null);
 
@@ -62,25 +100,19 @@ export default function Faculties() {
     };
   }, [selectedFaculty]);
 
-  const handleOpenModal = (member: StaffMember) => {
+  const handleOpenModal = (member: FacultyMember) => {
+    // The window's own fields, with the card's filling any gaps.
     const details = getFacultyDetails(member);
     setSelectedFaculty({ member, details });
   };
 
-  // Deduplicate by normalized name to guarantee each faculty member appears exactly once
-  const seenNames = new Set<string>();
-  const teachingStaff = STAFF_MEMBERS.filter((member) => {
-    if (!member.isTeaching) return false;
-    const normalized = member.name.toLowerCase().trim();
-    if (seenNames.has(normalized)) return false;
-    seenNames.add(normalized);
-    return true;
-  });
+  const content = useFacultiesContent();
+  const teachingStaff = content.members;
 
   return (
     <SubPageLayout
-      title="Our Faculties"
-      subtitle="Meet the distinguished academic guides and researchers at CKPIPSR."
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="academics"
       activeItemLabel="Faculties"
     >
@@ -90,15 +122,14 @@ export default function Faculties() {
           <div className="space-y-6 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#123a1a]/5 text-[#123a1a] text-[10px] font-bold uppercase tracking-widest border border-[#123a1a]/10">
               <Sparkles size={12} className="text-[#D4AF37]" />
-              <span>Expert Mentorship</span>
+              <span>{content.intro.badge}</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-serif font-bold text-[#0c2411] tracking-tight">
-              Our Academic Leaders
+              {content.intro.heading}
             </h2>
             <div className="h-1.5 w-24 bg-[#D4AF37] rounded-full" />
             <p className="text-slate-600 max-w-3xl text-lg leading-relaxed font-medium">
-              Our faculty members are chosen for their expertise, dedication, and research orientation. They bring a wealth 
-              of knowledge and experience from both industry and academia to provide a holistic learning experience.
+              {content.intro.body}
             </p>
             <div className="inline-flex items-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-full">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -132,7 +163,7 @@ export default function Faculties() {
                 {/* Clean Image Container with Interactive Overlay */}
                 <div className="relative aspect-[4/3.8] w-full overflow-hidden bg-slate-100">
                   <img 
-                    src={member.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=123a1a&color=D4AF37&size=512`} 
+                    src={member.image ? cdn(member.image, 800, 90) : `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=123a1a&color=D4AF37&size=512`} 
                     alt={member.name} 
                     className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                     referrerPolicy="no-referrer"
@@ -188,11 +219,11 @@ export default function Faculties() {
                       </p>
                     </div>
                     )}
-                    {member.area_of_interest && (
+                    {member.areaOfInterest && (
                       <div className="flex items-start gap-2 text-slate-500 min-w-0">
                         <Heart size={14} className="text-[#D4AF37] shrink-0 mt-0.5" />
                         <p className="leading-relaxed text-[11px] sm:text-xs italic break-words min-w-0 flex-1">
-                          {member.area_of_interest}
+                          {member.areaOfInterest}
                         </p>
                       </div>
                     )}
@@ -219,21 +250,16 @@ export default function Faculties() {
            
            <div className="relative z-10 space-y-12">
               <div className="space-y-4">
-                <h3 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight">Academic Integrity &amp; Research</h3>
+                <h3 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight">{content.research.title}</h3>
                 <p className="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
-                   Our faculty members are active researchers contributing to the global pharmaceutical 
-                   knowledge base through publications and innovative patents.
+                   {content.research.body}
                 </p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                 {[
-                   { val: "50+", label: "Scientific Publications" },
-                   { val: "10+", label: "Industrial Patents" },
-                   { val: "15+", label: "Academic Books" }
-                 ].map((stat, sIdx) => (
+                 {content.research.stats.map((stat, sIdx) => (
                    <div key={sIdx} className="bg-white/5 backdrop-blur-md px-8 py-8 rounded-[2rem] border border-white/10 group hover:bg-white/10 transition-all">
-                      <span className="block text-4xl font-serif font-bold text-[#D4AF37] mb-2">{stat.val}</span>
+                      <span className="block text-4xl font-serif font-bold text-[#D4AF37] mb-2">{stat.value}</span>
                       <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{stat.label}</span>
                    </div>
                  ))}
@@ -328,7 +354,7 @@ export default function Faculties() {
                     <div className="w-full aspect-[4/4.5] rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 relative">
                       <img
                         src={
-                          selectedFaculty.member.image_url ||
+                          selectedFaculty.member.image ||
                           `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFaculty.details.name)}&background=123a1a&color=D4AF37&size=512`
                         }
                         alt={selectedFaculty.details.name}
@@ -370,12 +396,16 @@ export default function Faculties() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-slate-500 font-normal">Email</p>
+                        {selectedFaculty.details.email ? (
                         <a
                           href={`mailto:${selectedFaculty.details.email}`}
                           className="text-xs sm:text-[13px] font-semibold text-slate-800 hover:text-[#156f3e] break-all leading-snug transition-colors block"
                         >
                           {selectedFaculty.details.email}
                         </a>
+                        ) : (
+                          <p className="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug">-</p>
+                        )}
                       </div>
                     </div>
 
@@ -433,7 +463,7 @@ export default function Faculties() {
                         <div className="min-w-0">
                           <p className="text-xs text-slate-500 font-medium">Department</p>
                           <p className="text-sm font-bold text-[#156f3e] truncate">
-                            {formatDepartment(selectedFaculty.details.department)}
+                            {formatDepartment(selectedFaculty.details.department) || "-"}
                           </p>
                         </div>
                       </div>
@@ -446,7 +476,7 @@ export default function Faculties() {
                         <div className="min-w-0">
                           <p className="text-xs text-slate-500 font-medium">Designation</p>
                           <p className="text-sm font-bold text-[#156f3e] leading-snug">
-                            {selectedFaculty.details.designation}
+                            {selectedFaculty.details.designation || "-"}
                           </p>
                         </div>
                       </div>
@@ -459,7 +489,7 @@ export default function Faculties() {
                         <div className="min-w-0">
                           <p className="text-xs text-slate-500 font-medium">Qualification</p>
                           <p className="text-sm font-bold text-[#156f3e] leading-snug">
-                            {selectedFaculty.details.qualification}
+                            {selectedFaculty.details.qualification || "-"}
                           </p>
                         </div>
                       </div>
@@ -472,7 +502,7 @@ export default function Faculties() {
                         <div className="min-w-0">
                           <p className="text-xs text-slate-500 font-medium">Experience</p>
                           <p className="text-sm font-bold text-[#156f3e] leading-snug">
-                            {selectedFaculty.details.experience}
+                            {selectedFaculty.details.experience || "-"}
                           </p>
                         </div>
                       </div>
@@ -480,6 +510,7 @@ export default function Faculties() {
                   </div>
 
                   {/* Profile Card */}
+                  {selectedFaculty.details.profile && (
                   <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs space-y-3">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
@@ -505,8 +536,10 @@ export default function Faculties() {
                       )}
                     </div>
                   </div>
+                  )}
 
                   {/* Achievements Card */}
+                  {selectedFaculty.details.achievements.length > 0 && (
                   <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs space-y-3 relative z-10">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
@@ -521,6 +554,7 @@ export default function Faculties() {
                       ))}
                     </div>
                   </div>
+                  )}
                 </div>
               </div>
             </div>

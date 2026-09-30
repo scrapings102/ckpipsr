@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useHeroContent } from "../hooks/useHeroContent";
+import { usePreloaderContent } from "../hooks/usePreloaderContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,18 +14,9 @@ interface HeroProps {
   onOpenAdmissions?: () => void;
 }
 
-const HERO_IMAGES = [
-  { src: "/images/hero/65efeaeece007.webp", position: "center 15%" },
-  { src: "/images/hero/646efc827452b.webp", position: "center 18%" },
-  { src: "/images/hero/65efea4943a49.webp", position: "center 15%" },
-  { src: "/images/hero/65efeac7d49a3.webp", position: "center 20%" },
-  { src: "/images/hero/66e151f0d6a90.webp", position: "center 12%" },
-  { src: "/images/hero/66e1522d09fc0.webp", position: "center 15%" },
-  { src: "/images/hero/66e15283951b9.webp", position: "center 12%" },
-  { src: "/images/hero/66e153e687221.webp", position: "center 12%" },
-  { src: "/images/hero/66e154b724ef6 (1).webp", position: "center 15%" },
-  { src: "/images/hero/66e154b724ef6.webp", position: "center 15%" },
-];
+// The images, tagline, timing and overlay are edited in the admin panel and
+// come from `useHeroContent`, which falls back to the values this file used to
+// hold if the API is unreachable.
 
 // Tablet and mobile band — covers all touch/mobile/tablet screens.
 const TABLET_MEDIA_QUERY = "(max-width: 1024px)";
@@ -76,6 +69,29 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
   const quoteTextRef = useRef<HTMLParagraphElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
+  const hero = useHeroContent();
+  const { images: HERO_IMAGES } = hero;
+
+  /**
+   * Which image the carousel should be showing when the loader hands over.
+   *
+   * The loader's final photo zooms to fullscreen and the hero takes its place,
+   * so the hero has to already be on that same photo or the zoom lands on one
+   * picture and the homepage shows another. Starting there — rather than always
+   * at index 0 — means any loader selection is seamless, instead of only the
+   * one that happens to end on the hero's first image.
+   *
+   * Falls back to 0 when the loader is off, or ends on an image the hero no
+   * longer has.
+   */
+  const { content: loaderContent } = usePreloaderContent();
+  const seamIndex = useMemo(() => {
+    if (!loaderContent.enabled || loaderContent.images.length === 0) return 0;
+    const last = loaderContent.images[loaderContent.images.length - 1];
+    const found = HERO_IMAGES.findIndex((image) => image.src === last);
+    return found === -1 ? 0 : found;
+  }, [loaderContent, HERO_IMAGES]);
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // If we're rendering directly on a college subpage (e.g. after a
@@ -88,19 +104,39 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
     }
   }, [isSubPage]);
 
+  // Preloading is unconditional: the images should already be in memory by the
+  // time the carousel starts, whatever the loader is doing.
   useEffect(() => {
-    // Preload all hero images into browser memory immediately for instant slide transitions
     HERO_IMAGES.forEach((imgObj) => {
       const img = new Image();
       img.src = imgObj.src;
     });
+  }, [HERO_IMAGES]);
+
+  useEffect(() => {
+    // Nothing rotates while the loader is still on screen.
+    //
+    // The hero mounts underneath the loader and used to start its timer there,
+    // so on a long or slow intro it had already advanced by the time the
+    // loader's final image zoomed to fullscreen — the zoom finished on one
+    // photo and the hero was showing another. Holding on the first frame is
+    // what makes that hand-off seamless, and the timer only has meaning once
+    // the hero is actually visible.
+    if (!loaded) {
+      setCurrentImageIndex(seamIndex);
+      return;
+    }
+
+    // Reset rather than wrap: the fetched list can be shorter than the
+    // fallback, which would otherwise leave the index past its end.
+    setCurrentImageIndex((prev) => (prev < HERO_IMAGES.length ? prev : 0));
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 6000);
+    }, hero.rotationMs);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [loaded, seamIndex, HERO_IMAGES, hero.rotationMs]);
 
   // ---------- Seamless entrance reveal when preloader exits ----------
   useEffect(() => {
@@ -194,7 +230,7 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
             key={imgObj.src}
             ref={(el) => { imagesRef.current[index] = el; }}
             src={imgObj.src}
-            alt={`Hero Background ${index + 1}`}
+            alt={imgObj.alt || `Hero Background ${index + 1}`}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out ${
               index === currentImageIndex ? "opacity-100" : "opacity-0"
             }`}
@@ -206,9 +242,12 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
           />
         ))}
         {/* Translucent overlay */}
+        {/* Inline rather than a Tailwind class: the value is editable, and an
+            interpolated class name is not in the stylesheet Tailwind builds. */}
         <div
           ref={overlayRef}
-          className="absolute inset-0 bg-black/40"
+          className="absolute inset-0"
+          style={{ backgroundColor: `rgba(0, 0, 0, ${hero.overlayOpacity / 100})` }}
         />
 
         {/* Tech Grid Overlay */}
@@ -251,7 +290,7 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
               ref={quoteTextRef}
               className="text-[9.5px] min-[360px]:text-[10.5px] sm:text-[11.5px] md:text-[13px] font-sans font-medium text-white/95 italic leading-relaxed tracking-wide text-center drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] px-1"
             >
-              "A legacy of academic and professional excellence in Surat. Inspiring and preparing the next generation of pharmacists, clinical researchers, and healthcare leaders since 2005."
+              {hero.tagline}
             </p>
           </div>
         </div>
@@ -262,7 +301,7 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
             className="flex flex-col items-center gap-1 sm:gap-1.5 pointer-events-none select-none mt-1 animate-premium-float"
           >
             <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-sans font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
-              Scroll to explore
+              {hero.scrollLabel}
             </span>
             <div className="w-[1px] h-6 sm:h-10 md:h-12 bg-gradient-to-b from-[#D4AF37] via-[#D4AF37]/60 to-transparent" />
           </div>

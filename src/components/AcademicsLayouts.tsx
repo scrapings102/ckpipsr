@@ -12,36 +12,58 @@ import {
   Target,
   ArrowRight
 } from "lucide-react";
+import type { CourseContent } from "../hooks/useCourseContent";
 import { LeafTileGallery } from "./LeafTileGallery";
 
-interface CourseDetailProps {
-  title: string;
-  fullName: string;
-  intake: string;
-  duration: string;
-  eligibility: string;
-  fees: string;
-  overview: string;
-  image: string;
+/**
+ * A course button: a real link once the admin panel gives it one, otherwise
+ * the plain button the page always had. Hrefs are checked by the API — a site
+ * path or https — and external ones open in a new tab.
+ */
+function CourseAction({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+}) {
+  if (!href) {
+    return (
+      <button type="button" className={className}>
+        {children}
+      </button>
+    );
+  }
+  const external = /^https:\/\//i.test(href);
+  return (
+    <a
+      href={href}
+      className={className}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
+      {children}
+    </a>
+  );
 }
 
-export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
-  title,
-  fullName,
-  intake,
-  duration,
-  eligibility,
-  fees,
-  overview,
-  image
-}) => {
+/** One course page, drawn from its full content. */
+export const CourseDetail: React.FC<{ course: CourseContent }> = ({ course }) => {
+  const stats = [
+    { icon: Users, label: "Annual Intake", value: course.stats.intake, color: "bg-blue-50" },
+    { icon: Clock, label: "Duration", value: course.stats.duration, color: "bg-emerald-50" },
+    { icon: Target, label: "Eligibility", value: course.stats.eligibility, color: "bg-amber-50" },
+    { icon: Zap, label: "Fees (Approx.)", value: course.stats.fees, color: "bg-purple-50" },
+  ];
+
   return (
     <div className="space-y-10">
       {/* Hero Banner */}
       <section className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[220px] sm:h-[280px] shadow-xl border-2 border-white">
-        <img 
-          src={image} 
-          alt={title} 
+        <img
+          src={course.banner.image}
+          alt={course.banner.title}
           className="w-full h-full object-cover"
           loading="lazy"
           decoding="async"
@@ -50,32 +72,28 @@ export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-[#123a1a] via-[#123a1a]/40 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-wider border border-white/30">
-            Professional Program
+            {course.banner.badge}
           </div>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-white tracking-tight">
-            {title}
+            {course.banner.title}
           </h1>
           <p className="text-slate-200 text-xs sm:text-sm font-medium max-w-2xl">
-            {fullName} — Empowering the next generation of pharmacy leaders with specialized expertise.
+            {course.banner.text}
           </p>
         </div>
       </section>
 
       {/* Quick Stats Bento */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {[
-          { icon: Users, label: "Annual Intake", value: intake, color: "bg-blue-50" },
-          { icon: Clock, label: "Duration", value: duration, color: "bg-emerald-50" },
-          { icon: Target, label: "Eligibility", value: eligibility, color: "bg-amber-50" },
-          { icon: Zap, label: "Fees (Approx.)", value: fees, color: "bg-purple-50" }
-        ].map((stat, idx) => (
+        {stats.map((stat, idx) => (
           <div key={idx} className={`${stat.color} p-4 rounded-xl border border-white shadow-sm flex flex-col gap-2 group hover:scale-[1.02] transition-transform`}>
             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[#123a1a] shadow-sm group-hover:rotate-6 transition-transform shrink-0">
               <stat.icon size={16} />
             </div>
             <div>
               <p className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider">{stat.label}</p>
-              <p className="text-xs font-bold text-slate-800 mt-0.5 leading-snug truncate">{stat.value}</p>
+              {/* Truncated to fit the tile; the full text is on hover. */}
+              <p className="text-xs font-bold text-slate-800 mt-0.5 leading-snug truncate" title={stat.value}>{stat.value}</p>
             </div>
           </div>
         ))}
@@ -92,20 +110,15 @@ export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
               </h2>
               <div className="h-1 w-14 bg-[#D4AF37] rounded-full" />
               <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
-                "{overview}"
+                "{course.overview}"
               </p>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
               <div className="space-y-2">
-                <h3 className="text-sm font-serif font-bold text-slate-800">Core Objectives</h3>
+                <h3 className="text-sm font-serif font-bold text-slate-800">{course.objectives.title}</h3>
                 <ul className="space-y-2">
-                  {[
-                    "Advanced drug development methodologies",
-                    "Pharmacological testing & validation",
-                    "Community pharmacy & patient care",
-                    "Regulatory compliance & ethics"
-                  ].map((item, iIdx) => (
+                  {course.objectives.items.map((item, iIdx) => (
                     <li key={iIdx} className="flex gap-2 items-center text-xs text-slate-600 font-medium">
                       <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                       <span>{item}</span>
@@ -114,14 +127,9 @@ export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
                 </ul>
               </div>
               <div className="space-y-2">
-                <h3 className="text-sm font-serif font-bold text-slate-800">Career Paths</h3>
+                <h3 className="text-sm font-serif font-bold text-slate-800">{course.careers.title}</h3>
                 <ul className="space-y-2">
-                  {[
-                    "Clinical Research Associate",
-                    "Quality Control Manager",
-                    "Regulatory Affairs Specialist",
-                    "Hospital Pharmacist"
-                  ].map((item, iIdx) => (
+                  {course.careers.items.map((item, iIdx) => (
                     <li key={iIdx} className="flex gap-2 items-center text-xs text-slate-600 font-medium">
                       <ArrowRight size={13} className="text-[#D4AF37] shrink-0" />
                       <span>{item}</span>
@@ -136,21 +144,25 @@ export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
             <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4AF37]/5 rounded-full blur-2xl -mr-24 -mt-24 pointer-events-none" />
             <div className="relative z-10 space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <h3 className="text-lg font-serif font-bold tracking-tight">Academic Integrity & Research</h3>
+                <h3 className="text-lg font-serif font-bold tracking-tight">{course.integrity.title}</h3>
                 <Sparkles className="text-[#D4AF37]" size={20} />
               </div>
               <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                Our curriculum is strictly aligned with Pharmacy Council of India (PCI) standards and 
-                Gujarat Technological University (GTU) guidelines, ensuring global acceptance and 
-                academic rigour.
+                {course.integrity.body}
               </p>
               <div className="flex flex-wrap gap-2.5">
-                <button className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-all shadow-md active:scale-95">
-                  Download Full Syllabus
-                </button>
-                <button className="px-5 py-2.5 rounded-xl bg-[#123a1a] text-[#D4AF37] border border-[#D4AF37]/20 font-bold text-xs hover:bg-[#1a4a25] transition-all shadow-md active:scale-95">
-                  View Academic Calendar
-                </button>
+                <CourseAction
+                  href={course.integrity.syllabusUrl}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-all shadow-md active:scale-95"
+                >
+                  {course.integrity.syllabusLabel}
+                </CourseAction>
+                <CourseAction
+                  href={course.integrity.calendarUrl}
+                  className="px-5 py-2.5 rounded-xl bg-[#123a1a] text-[#D4AF37] border border-[#D4AF37]/20 font-bold text-xs hover:bg-[#1a4a25] transition-all shadow-md active:scale-95"
+                >
+                  {course.integrity.calendarLabel}
+                </CourseAction>
               </div>
             </div>
           </section>
@@ -159,30 +171,32 @@ export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
         {/* Sidebar */}
         <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-28">
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-4">
-            <h3 className="text-base font-serif font-bold text-slate-900 tracking-tight">Fee Structure</h3>
+            <h3 className="text-base font-serif font-bold text-slate-900 tracking-tight">{course.feeCard.title}</h3>
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Yearly Tuition</span>
-                <span className="text-sm font-bold text-[#123a1a]">{fees}</span>
+              <div className="flex justify-between items-center gap-3">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{course.feeCard.label}</span>
+                <span className="text-sm font-bold text-[#123a1a] text-right">{course.stats.fees}</span>
               </div>
-              <p className="text-[9px] text-slate-400 font-medium">
-                * Fees are subject to change as per FRC / PCI / State Government guidelines.
-              </p>
+              {course.feeCard.note && (
+                <p className="text-[9px] text-slate-400 font-medium">* {course.feeCard.note}</p>
+              )}
             </div>
-            <button className="w-full py-2.5 bg-[#123a1a] text-white rounded-xl font-bold text-xs shadow-md hover:bg-[#1a4a25] transition-all">
-              Inquire for Admission
-            </button>
+            <CourseAction
+              href={course.feeCard.buttonUrl}
+              className="block w-full py-2.5 bg-[#123a1a] text-white text-center rounded-xl font-bold text-xs shadow-md hover:bg-[#1a4a25] transition-all"
+            >
+              {course.feeCard.buttonLabel}
+            </CourseAction>
           </div>
 
           <div className="bg-[#FAF8F3] rounded-2xl p-5 border border-[#D4AF37]/10 shadow-sm space-y-3">
-            <h3 className="text-base font-serif font-bold text-slate-900 tracking-tight">Admission Notice</h3>
+            <h3 className="text-base font-serif font-bold text-slate-900 tracking-tight">{course.notice.title}</h3>
             <div className="flex gap-3 items-start">
               <div className="p-1.5 rounded-lg bg-amber-100 text-[#D4AF37] shrink-0">
                 <FileText size={16} />
               </div>
               <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                Candidates must have passed 10+2 with Physics, Chemistry and Biology/Maths from a 
-                recognized board for undergraduate programs.
+                {course.notice.body}
               </p>
             </div>
           </div>
@@ -192,12 +206,16 @@ export const CourseDetailLayout: React.FC<CourseDetailProps> = ({
   );
 };
 
+
 interface ResourceDetailProps {
   title: string;
   description: string;
   details: string[];
   image: string;
   features: string[];
+  /** Editable on the pages that read their content from the panel. */
+  badge?: string;
+  detailsHeading?: string;
   gallery?: string[];
   photos?: string[];
 }
@@ -208,6 +226,8 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
   details,
   image,
   features,
+  badge = "Campus Facility",
+  detailsHeading = "Key Infrastructure Details",
   gallery,
   photos
 }) => {
@@ -221,9 +241,11 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
         <div className="grid lg:grid-cols-2 gap-8 items-center relative z-10">
           <div className="space-y-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123a1a]/5 text-[#123a1a] text-[9px] font-bold uppercase tracking-wider border border-[#123a1a]/10">
-                Campus Facility
-              </div>
+              {badge && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123a1a]/5 text-[#123a1a] text-[9px] font-bold uppercase tracking-wider border border-[#123a1a]/10">
+                  {badge}
+                </div>
+              )}
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-[#0c2411] tracking-tight leading-snug">
                 {title}
               </h2>
@@ -262,7 +284,7 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
       {/* Details Bento */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-serif font-bold text-slate-900 tracking-tight">Key Infrastructure Details</h3>
+          <h3 className="text-lg font-serif font-bold text-slate-900 tracking-tight">{detailsHeading}</h3>
           <div className="h-px flex-1 bg-slate-100 mx-4" />
         </div>
         

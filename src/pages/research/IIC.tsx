@@ -23,129 +23,20 @@ import {
   BookOpen
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useIicContent } from "../../hooks/useIicContent";
 
 type TabType = "about" | "structure";
 
-interface StructureMember {
-  no: number;
-  name: string;
-  designation: string;
-  role: string;
-  responsibility: string;
-  isExternal?: boolean;
-}
-
-const structureMembers: StructureMember[] = [
-  {
-    no: 1,
-    name: "Dr. Dhiren P. Shah",
-    designation: "Principal",
-    role: "President",
-    responsibility: "Govern all activities under IIC",
-    isExternal: false
-  },
-  {
-    no: 2,
-    name: "Dr. Bhumika C. Desai",
-    designation: "Asso. Professor",
-    role: "Vice president",
-    responsibility: "Govern and coordinate all activities under IIC",
-    isExternal: false
-  },
-  {
-    no: 3,
-    name: "Dr.Vinod D. Ramani",
-    designation: "Assoc. Professor",
-    role: "Convener, IPR Activity Co-oridinator",
-    responsibility: "1.Communicate all activities under IIC among faculty students, faculty and MIC 2.IPR Activity",
-    isExternal: false
-  },
-  {
-    no: 4,
-    name: "Mr. Dipayan Tarafder",
-    designation: "Asst. Professor",
-    role: "Innovation Activity Co-oridinator",
-    responsibility: "Innovation Activity",
-    isExternal: false
-  },
-  {
-    no: 5,
-    name: "Dr. Devendra J. Vaishnav",
-    designation: "Asst. Professor",
-    role: "Start up activity Co-oridinator",
-    responsibility: "Start up activity",
-    isExternal: false
-  },
-  {
-    no: 6,
-    name: "Mr. Yahya Ali Moolla",
-    designation: "Asst. Professor",
-    role: "Internship activity Co-oridinator",
-    responsibility: "Internship activity",
-    isExternal: false
-  },
-  {
-    no: 7,
-    name: "Mr. Nirmal T. Mehta",
-    designation: "Asst. Professor",
-    role: "Social Media coordinator",
-    responsibility: "Social media coordination",
-    isExternal: false
-  },
-  {
-    no: 8,
-    name: "Dr Praful D Bharadia",
-    designation: "Professor, L.M. College Of Pharmacy, Coordinator, Student Startup and Innovation Policy (SSIP), LMCP Nodal Centre, Mentor, Atal Incubation Centre, LMCP- AIC Foundation, Ahmedabad College in Ahmedabad, Gujarat",
-    role: "Incubation Center (External Member)",
-    responsibility: "Provide mentoring, incubation guidance and business network support.",
-    isExternal: true
-  },
-  {
-    no: 9,
-    name: "Mr Kamlesh Zota",
-    designation: "Director, Zota health care limited, Surat",
-    role: "Expert from Industry (External Member)",
-    responsibility: "As Technical Expert and mentor to the institute students",
-    isExternal: true
-  },
-  {
-    no: 10,
-    name: "Mr Nirmal Kumar shah",
-    designation: "Debt Manager at ICICI Bank, Surat",
-    role: "Bank / Investor (External member)",
-    responsibility: "Educate students about loan schemes, grant, and investments regarding startup and entrepreneurship",
-    isExternal: true
-  }
-];
-
 export default function IIC() {
   const [activeTab, setActiveTab] = useState<TabType>("about");
-
-  const objectives = [
-    "Create and sustain innovation and entrepreneurship culture in campus.",
-    "Streamline and strengthen innovation and entrepreneurship ecosystem in campus."
-  ];
-
-  const rolesAndResponsibilities = [
-    "Establish Synergy and coherency among various departments and units and better mobile resources to support innovation and entrepreneurship.",
-    "Plan, develop and support institution in formation and implementation of innovation and entrepreneurship policies at the institute level.",
-    "Plan and conduct various time-bounded innovation and entrepreneurship promotion activities round the year to generate awareness on innovation and startup.",
-    "Encourage, recognize and reward students, faculty members and staffs for their engagement, involvement and supporting innovation and entrepreneurship achievements.",
-    "Facilitate intra-institutional and inter-institutional interactions and partnership to promote interdisciplinary and multi-disciplinary innovations and entrepreneurial teams.",
-    "Network, collaborate, and partnership with ecosystem enablers at the regional, state and national level and support system development to provide easy access to resource to innovators and entrepreneurs.",
-    "Plan, build, manage and mobilize resources for the pre-incubation and incubation facility and service support creation.",
-    "Plan and conduct challenges, competitions, hackathons in the campus and encourage students to participate.",
-    "Create innovation repository of ideas, innovations, startups at the Institute level (YUKTI) and provide support to them and connect/linkage with ecosystem enablers for incubation, investment, IP and technology transfer service support.",
-    "Nominate faculty members of the IIC to undergo Innovation Ambassador Training and encourage them to perform post-training tasks such as delivering expert talks on innovation and startup, engage in mentoring role etc. as prescribed for the Innovation Ambassadors.",
-    "Train and build capacity of faculty members in innovation and entrepreneurship to play a hybrid role as mentor, drive IIC activities, innovator and entrepreneur.",
-    "Organize interactions with entrepreneurs, investors, ecosystem enablers and create a pool of experts to mentor student innovators & entrepreneurs.",
-    "Extend mentoring support to other IIC institutions and encourage HEIs to join the IIC network."
-  ];
+  const content = useIicContent();
+  const { objectives, roles } = content.about;
+  const { structure } = content;
 
   return (
     <SubPageLayout
-      title="Institution's Innovation Council (IIC)"
-      subtitle="Ministry of Education (MoE) Innovation Cell Initiative at CKPIPSR"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="IIC"
     >
@@ -155,8 +46,8 @@ export default function IIC() {
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar bg-slate-50/80 p-1.5 gap-1.5 sm:gap-2">
             {[
-              { id: "about", label: "About", icon: FileText },
-              { id: "structure", label: "Organizational Structure", icon: Users }
+              { id: "about", label: content.tabs.about, icon: FileText },
+              { id: "structure", label: content.tabs.structure, icon: Users }
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -206,16 +97,16 @@ export default function IIC() {
                       </div>
                       <div>
                         <span className="text-[11px] font-mono font-bold text-[#1a5d2e] uppercase tracking-wider block">
-                          Core Mandate
+                          {objectives.kicker}
                         </span>
                         <h3 className="text-xl font-serif font-bold text-slate-900 leading-tight">
-                          Objectives
+                          {objectives.heading}
                         </h3>
                       </div>
                     </div>
 
                     <div className="space-y-3 pt-2">
-                      {objectives.map((obj, idx) => (
+                      {objectives.items.map((obj, idx) => (
                         <div 
                           key={idx} 
                           className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-emerald-100/90 shadow-2xs"
@@ -232,7 +123,7 @@ export default function IIC() {
 
                     <div className="pt-2 border-t border-emerald-100/80 text-[11px] font-sans text-slate-500 flex items-center gap-1.5">
                       <Sparkles size={13} className="text-[#1a5d2e]" />
-                      <span>MoE's Innovation Cell (MIC) Certified</span>
+                      <span>{objectives.footer}</span>
                     </div>
                   </div>
                 </div>
@@ -245,16 +136,16 @@ export default function IIC() {
                     </div>
                     <div>
                       <span className="text-[11px] font-mono font-bold text-amber-900 uppercase tracking-wider block">
-                        Operational Framework
+                        {roles.kicker}
                       </span>
                       <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 leading-tight">
-                        Roles & Responsibilities
+                        {roles.heading}
                       </h3>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    {rolesAndResponsibilities.map((item, idx) => (
+                    {roles.items.map((item, idx) => (
                       <div
                         key={idx}
                         className="p-4 sm:p-4.5 rounded-xl border border-slate-200/90 bg-slate-50/50 hover:bg-white hover:border-[#1a5d2e]/30 hover:shadow-xs transition-all duration-200 flex items-start gap-3.5"
@@ -291,27 +182,29 @@ export default function IIC() {
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                      Council Governance
+                      {structure.kicker}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                      IIC Organizational Structure
+                      {structure.heading}
                     </h3>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#1a5d2e] text-white border border-[#1a5d2e] shadow-xs">
-                    Institute ID – IC202217445
-                  </span>
+                  {structure.instituteId && (
+                    <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#1a5d2e] text-white border border-[#1a5d2e] shadow-xs">
+                      {structure.instituteId}
+                    </span>
+                  )}
                   <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-50 text-[#1a5d2e] border border-emerald-200">
-                    10 Council Members
+                    {structure.countLabel}
                   </span>
                 </div>
               </div>
 
               {/* Members Grid Cards (Image not required) */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {structureMembers.map((member) => {
+                {structure.members.map((member) => {
                   const isPresident = member.role.toLowerCase() === "president";
                   const isVicePresident = member.role.toLowerCase().includes("vice");
                   const isConvener = member.role.toLowerCase().includes("convener");
@@ -324,7 +217,7 @@ export default function IIC() {
                           ? "bg-gradient-to-br from-emerald-50/70 to-white border-emerald-300/80 shadow-xs hover:shadow-md"
                           : isVicePresident || isConvener
                           ? "bg-gradient-to-br from-blue-50/40 to-white border-blue-200/80 shadow-xs hover:shadow-md"
-                          : member.isExternal
+                          : member.external
                           ? "bg-gradient-to-br from-amber-50/40 to-white border-amber-200/80 shadow-xs hover:shadow-md"
                           : "bg-slate-50/60 hover:bg-white border-slate-200 hover:border-[#1a5d2e]/40 hover:shadow-md"
                       }`}
@@ -337,7 +230,7 @@ export default function IIC() {
                                 ? "bg-[#1a5d2e] text-white border-[#1a5d2e]"
                                 : isVicePresident || isConvener
                                 ? "bg-blue-100 text-blue-800 border-blue-200"
-                                : member.isExternal
+                                : member.external
                                 ? "bg-amber-100 text-amber-900 border-amber-200"
                                 : "bg-slate-200/80 text-slate-700 border-slate-300"
                             }`}

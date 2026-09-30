@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useLenis } from "../context/LenisContext";
+import { useActivityEvents } from "../hooks/useActivityEvents";
 import { useModalScrollLock } from "../hooks/useModalScrollLock";
 import { motion, AnimatePresence } from 'motion/react';
 import gsap from 'gsap';
@@ -676,9 +677,35 @@ export default function NewsBlogs() {
   const listContainerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Events an editor put on the board, from Activities → Events. They take the
+  // top places of their tab, pushing the standing entries down by as many.
+  const activityEvents = useActivityEvents();
+  const registry = useMemo(() => {
+    const picked = activityEvents.gazette?.[bulletinTab] ?? [];
+    if (picked.length === 0) return ARCHIVE_REGISTRY;
+
+    const fromEvents: ArticleUnion[] = picked.map((entry) => ({
+      id: entry.id,
+      type: 'event',
+      title: entry.title,
+      date: entry.date,
+      image: '',
+      excerpt: entry.excerpt,
+      content: entry.content,
+      categoryTag: entry.categoryTag,
+      location: entry.location,
+      speaker: '',
+      bulletinCategory: bulletinTab,
+    }));
+    const standing = ARCHIVE_REGISTRY.filter((item) => item.bulletinCategory === bulletinTab);
+    const others = ARCHIVE_REGISTRY.filter((item) => item.bulletinCategory !== bulletinTab);
+    // As many as came in are replaced, so the tab keeps its length.
+    return [...others, ...fromEvents, ...standing.slice(fromEvents.length)];
+  }, [activityEvents.gazette, bulletinTab]);
+
   // Filter items based on active tab and search query
   const filteredItems = useMemo(() => {
-    return ARCHIVE_REGISTRY.filter((item) => {
+    return registry.filter((item) => {
       // Check active bulletin category
       if (item.bulletinCategory !== bulletinTab) return false;
 
@@ -692,7 +719,7 @@ export default function NewsBlogs() {
 
       return titleMatches || descMatches || categoryMatches;
     });
-  }, [bulletinTab, searchQuery]);
+  }, [registry, bulletinTab, searchQuery]);
 
   const displayItems = useMemo(() => {
     if (filteredItems.length === 0) return [];
@@ -1039,10 +1066,12 @@ export default function NewsBlogs() {
               <div data-lenis-prevent="true" className="overflow-y-auto flex-1 no-scrollbar">
 
                 {/* Stunning Premium Hero Image (When clicked/inside) */}
-                {('image' in selectedItem || selectedItem.type === 'notice') && (
+                {/* An entry with no picture of its own — an event put on the
+                    board from the Events page — shows no banner at all. */}
+                {((('image' in selectedItem) && (selectedItem as any).image) || selectedItem.type === 'notice') && (
                   <div className="w-full h-52 sm:h-64 relative overflow-hidden select-none bg-slate-100">
                     <img
-                      src={'image' in selectedItem ? (selectedItem as any).image : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200&auto=format&fit=crop"}
+                      src={'image' in selectedItem && (selectedItem as any).image ? (selectedItem as any).image : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200&auto=format&fit=crop"}
                       alt={selectedItem.title}
                       className="w-full h-full object-cover"
                       loading="lazy"

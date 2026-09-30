@@ -12,47 +12,20 @@ import {
   FileCheck
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-
-interface PublicationDocument {
-  id: string;
-  title: string;
-  academicYear: string;
-  description: string;
-  pdfUrl: string;
-  tag: string;
-  colorTheme: "emerald" | "blue";
-}
-
-const publicationDocs: PublicationDocument[] = [
-  {
-    id: "ay-2024-2025",
-    title: "Research Publication AY 2024-2025",
-    academicYear: "AY 2024 - 2025",
-    description: "Official compilation of scientific research papers, review articles, and journal publications published by faculty members and research scholars of CKPIPSR.",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/68f0d2dceabfa.pdf",
-    tag: "Latest Compilation",
-    colorTheme: "emerald"
-  },
-  {
-    id: "ay-2022-2023",
-    title: "Research Publication AY 2022-2023",
-    academicYear: "AY 2022 - 2023",
-    description: "Compendium of peer-reviewed journal publications, research achievements, and pharmaceutical science manuscripts published during the academic year 2022-2023.",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/64c1fc24f3171.pdf",
-    tag: "Archived Report",
-    colorTheme: "blue"
-  }
-];
+import { useResearchPublications } from "../../hooks/useResearchPublications";
 
 export default function ResearchPublications() {
+  const content = useResearchPublications();
+  const publicationDocs = content.publications;
+
   const handleOpenPdf = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
     <SubPageLayout
-      title="Research Publications"
-      subtitle="Comprehensive Reports of Peer-Reviewed Scientific Journals, Research Papers & Academic Publications"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - Publications"
     >
@@ -71,27 +44,31 @@ export default function ResearchPublications() {
                 <BookOpen size={24} />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  Official Document Repository
-                </span>
+                {content.intro.kicker && (
+                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                    {content.intro.kicker}
+                  </span>
+                )}
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                  Annual Research Publications
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-mono font-medium">
-              <FileCheck size={14} className="text-[#1a5d2e]" />
-              <span>Official PDF Records</span>
-            </div>
+            {content.intro.badge && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-mono font-medium">
+                <FileCheck size={14} className="text-[#1a5d2e]" />
+                <span>{content.intro.badge}</span>
+              </div>
+            )}
           </div>
 
           <p className="text-slate-600 font-sans text-sm sm:text-base leading-relaxed mt-4">
-            Access and download the official academic year reports documenting research papers, review articles, and scientific manuscripts authored by faculty members and research scholars at C.K. Pithawalla Institute of Pharmaceutical Science & Research.
+            {content.intro.body}
           </p>
         </motion.div>
 
-        {/* The 2 Publication Action Buttons / Cards */}
+        {/* The report cards: whichever the panel says to show. */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {publicationDocs.map((doc, index) => {
             const isEmerald = doc.colorTheme === "emerald";
@@ -111,15 +88,17 @@ export default function ResearchPublications() {
                       <span>{doc.academicYear}</span>
                     </span>
 
-                    <span
-                      className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
-                        isEmerald
-                          ? "bg-emerald-100 text-[#1a5d2e]"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {doc.tag}
-                    </span>
+                    {doc.tag && (
+                      <span
+                        className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
+                          isEmerald
+                            ? "bg-emerald-100 text-[#1a5d2e]"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {doc.tag}
+                      </span>
+                    )}
                   </div>
 
                   {/* Icon & Title */}
@@ -165,13 +144,19 @@ export default function ResearchPublications() {
         </div>
 
         {/* Quick Help & Note */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-            <span>Documents are stored in PDF format for direct viewing, printing, and reference.</span>
+        {(content.note.text || content.note.tagline) && (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
+            {content.note.text && (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
+                <span>{content.note.text}</span>
+              </div>
+            )}
+            {content.note.tagline && (
+              <span className="font-mono text-slate-400">{content.note.tagline}</span>
+            )}
           </div>
-          <span className="font-mono text-slate-400">CKPIPSR Research Portal</span>
-        </div>
+        )}
 
       </div>
     </SubPageLayout>

@@ -229,6 +229,19 @@ html.lenis, html.lenis body {
   opacity: 0.8;
 }
 
+/* Ensure no bullet points appear on main menu or subpage menu items */
+nav ul, nav li,
+.ckp-nav ul, .ckp-nav li,
+.ckp-menu, .ckp-menu ul, .ckp-menu li,
+[role="dialog"] ul, [role="dialog"] li,
+[role="dialog"] button, [role="dialog"] a {
+  list-style: none !important;
+  list-style-type: none !important;
+}
+nav li::before, .ckp-nav li::before, .ckp-menu li::before {
+  content: none !important;
+}
+
 /* Headers */
 .prose-content-area h1,
 .prose-content-area h2, 

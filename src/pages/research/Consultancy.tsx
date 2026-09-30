@@ -1,86 +1,64 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { 
-  Briefcase, 
-  User, 
-  Calendar, 
-  Building2, 
-  IndianRupee, 
-  MapPin, 
-  CheckCircle2, 
-  Clock, 
-  FileText, 
-  BadgeCheck, 
-  Sparkles, 
-  Landmark, 
-  ShieldCheck, 
-  Layers,
-  FlaskConical,
-  Compass
+import {
+  Briefcase,
+  User,
+  Calendar,
+  Building2,
+  IndianRupee,
+  MapPin,
+  CheckCircle2,
+  FileText,
+  BadgeCheck,
+  Landmark,
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useResearchConsultancy, type ConsultancyTone } from "../../hooks/useResearchConsultancy";
 
-interface ConsultancyProject {
-  srNo: number;
-  principalInvestigator: string;
-  designation?: string;
-  projectTitle: string;
-  status: "Going on" | "Completed";
-  grantDate: string;
-  startedYear: string;
-  fundingAgency: string;
-  agencyLocation: string;
-  agencyType: "GOVERNMENT" | "PRIVATE" | "INDUSTRY";
-  totalCostINR: string;
-}
+/** The status pill colours a status can choose from. */
+const PILL_CLASSES: Record<ConsultancyTone, string> = {
+  emerald: "bg-emerald-50 text-[#1a5d2e] border border-emerald-200",
+  purple: "bg-purple-50 text-purple-800 border border-purple-200",
+  blue: "bg-blue-50 text-blue-800 border border-blue-200",
+  amber: "bg-amber-50 text-amber-800 border border-amber-200",
+};
 
-const consultancyProjects: ConsultancyProject[] = [
-  {
-    srNo: 1,
-    principalInvestigator: "Dr. Naishadh I. Solanki",
-    designation: "Principal Investigator & Faculty of Pharmacy",
-    projectTitle: "Quinoline-Based ULK1 Inhibitors: A Comprehensive Study from Computational Design to In Vitro Anticancer Activity",
-    status: "Going on",
-    grantDate: "01-04-2025",
-    startedYear: "2025",
-    fundingAgency: "GTU-ICQC-RPS-MRP",
-    agencyLocation: "Gujarat, India",
-    agencyType: "GOVERNMENT",
-    totalCostINR: "50,000/-"
-  },
-  {
-    srNo: 2,
-    principalInvestigator: "Dr. Vinod D. Ramani",
-    designation: "Principal Investigator & Associate Professor",
-    projectTitle: "Next-Generation Antifungal Emulsions: A Surfactant-Free Approach",
-    status: "Completed",
-    grantDate: "15-04-2024",
-    startedYear: "2024",
-    fundingAgency: "GTU-ICQC-RPS-MRP",
-    agencyLocation: "Gujarat, India",
-    agencyType: "GOVERNMENT",
-    totalCostINR: "40,000/-"
-  }
+const DOT_CLASSES: Record<ConsultancyTone, string> = {
+  emerald: "bg-emerald-600",
+  purple: "bg-purple-600",
+  blue: "bg-blue-600",
+  amber: "bg-amber-500",
+};
+
+/** The four figure boxes, left to right. */
+const STAT_BOXES = [
+  { box: "bg-emerald-50/60 border-emerald-100", label: "text-emerald-800", value: "text-[#1a5d2e]", caption: "text-emerald-700" },
+  { box: "bg-blue-50/60 border-blue-100", label: "text-blue-800", value: "text-blue-950", caption: "text-blue-700" },
+  { box: "bg-amber-50/60 border-amber-100", label: "text-amber-800", value: "text-amber-950", caption: "text-amber-800" },
+  { box: "bg-purple-50/60 border-purple-100", label: "text-purple-800", value: "text-purple-950", caption: "text-purple-700" },
 ];
 
-export default function Consultancy() {
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "GOING_ON" | "COMPLETED">("ALL");
+/** A figure — a count or a sum — is set large; a name reads better small. */
+const isFigure = (value: string) => /^[₹\d]/.test(value.trim());
 
-  const filteredProjects = consultancyProjects.filter((item) => {
-    if (statusFilter === "GOING_ON") return item.status === "Going on";
-    if (statusFilter === "COMPLETED") return item.status === "Completed";
-    return true;
-  });
+export default function Consultancy() {
+  const content = useResearchConsultancy();
+  // "" is the button that clears the filter; the rest are status ids.
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const filteredProjects = statusFilter
+    ? content.projects.filter((item) => item.filterId === statusFilter)
+    : content.projects;
 
   return (
     <SubPageLayout
-      title="Consultancy & Sponsored Projects"
-      subtitle="Funded Research Projects, Principal Investigators, Institutional Grants & Scientific Consultancies"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - Consultancy"
     >
       <div className="space-y-8 max-w-5xl mx-auto">
-        
+
         {/* Header Introduction Card */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -94,94 +72,93 @@ export default function Consultancy() {
                 <Briefcase size={24} />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  Sponsored Research & Consultancy
-                </span>
+                {content.intro.kicker && (
+                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                    {content.intro.kicker}
+                  </span>
+                )}
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                  Institutional Minor Research Projects (MRP)
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-bold">
-                <BadgeCheck size={14} />
-                <span>GTU-ICQC Sanctioned</span>
-              </span>
-            </div>
+            {content.intro.badge && (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-bold">
+                  <BadgeCheck size={14} />
+                  <span>{content.intro.badge}</span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-            <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100">
-              <span className="text-[11px] font-mono uppercase text-emerald-800 font-bold block">Sanctioned Projects</span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-[#1a5d2e] mt-0.5">02</p>
-              <span className="text-[11px] font-sans text-emerald-700">RPS-MRP Grants</span>
+          {content.stats.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              {content.stats.map((stat, i) => {
+                const look = STAT_BOXES[i % STAT_BOXES.length];
+                return (
+                  <div key={i} className={`p-3.5 rounded-2xl border ${look.box}`}>
+                    <span className={`text-[11px] font-mono uppercase font-bold block ${look.label}`}>
+                      {stat.label}
+                    </span>
+                    {isFigure(stat.value) ? (
+                      <p className={`text-xl sm:text-2xl font-serif font-bold mt-0.5 ${look.value}`}>{stat.value}</p>
+                    ) : (
+                      <p className={`text-sm font-serif font-bold mt-1 truncate ${look.value}`}>{stat.value}</p>
+                    )}
+                    {stat.caption && (
+                      <span className={`text-[11px] font-sans ${look.caption}`}>{stat.caption}</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
+          )}
 
-            <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100">
-              <span className="text-[11px] font-mono uppercase text-blue-800 font-bold block">Funding Agency</span>
-              <p className="text-sm font-serif font-bold text-blue-950 mt-1 truncate">GTU-ICQC-RPS-MRP</p>
-              <span className="text-[11px] font-sans text-blue-700">Gujarat Tech. University</span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100">
-              <span className="text-[11px] font-mono uppercase text-amber-800 font-bold block">Agency Type</span>
-              <p className="text-sm font-serif font-bold text-amber-950 mt-1">Government</p>
-              <span className="text-[11px] font-sans text-amber-800">State / Autonomous</span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-purple-50/60 border border-purple-100">
-              <span className="text-[11px] font-mono uppercase text-purple-800 font-bold block">Total Outlay</span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-purple-950 mt-0.5">₹ 90,000</p>
-              <span className="text-[11px] font-sans text-purple-700">Sanctioned Budget</span>
-            </div>
-          </div>
-
-          {/* Filter Pills */}
+          {/* Filter Pills — the panel decides which statuses these are. */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-            <span className="text-xs font-mono font-semibold text-slate-400 mr-2">Filter by Status:</span>
+            {content.intro.filterLabel && (
+              <span className="text-xs font-mono font-semibold text-slate-400 mr-2">
+                {content.intro.filterLabel}
+              </span>
+            )}
             <button
-              onClick={() => setStatusFilter("ALL")}
+              onClick={() => setStatusFilter("")}
               className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === "ALL"
+                statusFilter === ""
                   ? "bg-[#1a5d2e] text-white shadow-2xs"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              All Projects (2)
+              {content.intro.allLabel} ({content.total})
             </button>
-            <button
-              onClick={() => setStatusFilter("GOING_ON")}
-              className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === "GOING_ON"
-                  ? "bg-[#1a5d2e] text-white shadow-2xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Going On / Active (1)
-            </button>
-            <button
-              onClick={() => setStatusFilter("COMPLETED")}
-              className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === "COMPLETED"
-                  ? "bg-[#1a5d2e] text-white shadow-2xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Completed (1)
-            </button>
+            {content.filters.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setStatusFilter(item.id)}
+                className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
+                  statusFilter === item.id
+                    ? "bg-[#1a5d2e] text-white shadow-2xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {item.label} ({item.count})
+              </button>
+            ))}
           </div>
         </motion.div>
 
         {/* Consultancy Project Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredProjects.map((project, index) => {
-            const isGoingOn = project.status === "Going on";
+            const status = content.filters.find((f) => f.id === project.filterId);
+            const tone = status?.tone ?? "emerald";
 
             return (
               <motion.div
-                key={project.srNo}
+                key={project.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: index * 0.1 }}
@@ -190,28 +167,23 @@ export default function Consultancy() {
                 <div className="space-y-5">
                   {/* Top Status & S.No */}
                   <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold ${
-                        isGoingOn
-                          ? "bg-blue-50 text-blue-800 border border-blue-200"
-                          : "bg-emerald-50 text-[#1a5d2e] border border-emerald-200"
-                      }`}
-                    >
-                      {isGoingOn ? (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                          <span>Status: Going on</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 size={13} className="text-[#1a5d2e]" />
-                          <span>Status: Completed</span>
-                        </>
-                      )}
-                    </span>
+                    {status ? (
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold ${PILL_CLASSES[tone]}`}
+                      >
+                        {status.marker === "pulse" ? (
+                          <span className={`w-2 h-2 rounded-full animate-pulse ${DOT_CLASSES[tone]}`} />
+                        ) : (
+                          <CheckCircle2 size={13} />
+                        )}
+                        <span>{status.badge}</span>
+                      </span>
+                    ) : (
+                      <span />
+                    )}
 
                     <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono text-xs font-bold flex items-center justify-center">
-                      #{project.srNo}
+                      #{content.projects.indexOf(project) + 1}
                     </span>
                   </div>
 
@@ -225,7 +197,7 @@ export default function Consultancy() {
                         Name of Principal Investigator
                       </span>
                       <h4 className="font-serif font-bold text-slate-900 text-base sm:text-lg group-hover:text-[#1a5d2e] transition-colors">
-                        {project.principalInvestigator}
+                        {project.investigator}
                       </h4>
                       {project.designation && (
                         <p className="text-[11px] font-sans text-slate-500 mt-0.5">
@@ -242,13 +214,13 @@ export default function Consultancy() {
                       <span>Title of Research Project</span>
                     </span>
                     <h5 className="font-sans font-bold text-slate-900 text-sm sm:text-base leading-relaxed">
-                      {project.projectTitle}
+                      {project.title}
                     </h5>
                   </div>
 
                   {/* Project Details Grid */}
                   <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs font-sans">
-                    
+
                     {/* Grant Date */}
                     <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-100 space-y-0.5">
                       <span className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
@@ -270,7 +242,7 @@ export default function Consultancy() {
                         <span>Sanctioned Cost</span>
                       </span>
                       <span className="font-bold text-[#1a5d2e] font-mono text-sm block">
-                        ₹ {project.totalCostINR}
+                        ₹ {project.cost}
                       </span>
                       <span className="text-[10px] font-sans text-emerald-700">
                         Total Project Layout
@@ -284,26 +256,30 @@ export default function Consultancy() {
                         <span>Funding Agency</span>
                       </span>
                       <span className="font-bold text-slate-900 text-xs block">
-                        {project.fundingAgency}
+                        {project.agency}
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-700 font-semibold uppercase">
-                        Type: {project.agencyType}
-                      </span>
+                      {project.agencyType && (
+                        <span className="text-[10px] font-mono text-emerald-700 font-semibold uppercase">
+                          Type: {project.agencyType}
+                        </span>
+                      )}
                     </div>
 
                     {/* Location */}
-                    <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-100 space-y-0.5 col-span-2 sm:col-span-1">
-                      <span className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
-                        <MapPin size={11} />
-                        <span>Agency Location</span>
-                      </span>
-                      <span className="font-semibold text-slate-900 text-xs block">
-                        {project.agencyLocation}
-                      </span>
-                      <span className="text-[10px] font-sans text-slate-500">
-                        State & Country
-                      </span>
-                    </div>
+                    {project.agencyLocation && (
+                      <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-100 space-y-0.5 col-span-2 sm:col-span-1">
+                        <span className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
+                          <MapPin size={11} />
+                          <span>Agency Location</span>
+                        </span>
+                        <span className="font-semibold text-slate-900 text-xs block">
+                          {project.agencyLocation}
+                        </span>
+                        <span className="text-[10px] font-sans text-slate-500">
+                          State & Country
+                        </span>
+                      </div>
+                    )}
 
                   </div>
                 </div>
@@ -311,8 +287,12 @@ export default function Consultancy() {
                 {/* Card Footer: Agency Verification */}
                 <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-sans text-slate-500">
                   <span className="flex items-center gap-1.5 text-slate-700 font-medium">
-                    <Landmark size={13} className="text-[#1a5d2e]" />
-                    <span>GTU-ICQC MRP Grant</span>
+                    {project.scheme && (
+                      <>
+                        <Landmark size={13} className="text-[#1a5d2e]" />
+                        <span>{project.scheme}</span>
+                      </>
+                    )}
                   </span>
                   <span className="font-mono text-[11px] font-bold text-emerald-700">
                     {project.startedYear} Cycle
@@ -324,13 +304,19 @@ export default function Consultancy() {
         </div>
 
         {/* Institutional Note */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-            <span>Research Promotion Scheme (RPS) - Minor Research Projects (MRP) approved by Gujarat Technological University (GTU) Innovation & Quality Council (ICQC).</span>
+        {(content.note.text || content.note.tagline) && (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
+            {content.note.text && (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
+                <span>{content.note.text}</span>
+              </div>
+            )}
+            {content.note.tagline && (
+              <span className="font-mono text-slate-400">{content.note.tagline}</span>
+            )}
           </div>
-          <span className="font-mono text-slate-400">CKPIPSR R&D Cell</span>
-        </div>
+        )}
 
       </div>
     </SubPageLayout>

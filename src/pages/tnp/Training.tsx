@@ -1,179 +1,75 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { 
-  Building2, 
-  GraduationCap, 
-  Briefcase, 
-  Award, 
-  Sparkles, 
-  Target, 
-  BookOpen, 
-  Cpu, 
-  Globe2, 
-  Users, 
-  TrendingUp, 
-  Compass, 
-  Phone, 
-  Mail, 
-  CheckCircle2, 
-  ShieldCheck, 
-  Copy, 
-  Check, 
-  Layers, 
+import {
+  Building2,
+  GraduationCap,
+  Briefcase,
+  Award,
+  Sparkles,
+  Target,
+  BookOpen,
+  Cpu,
+  Globe2,
+  Users,
+  TrendingUp,
+  Compass,
+  Phone,
+  Mail,
+  CheckCircle2,
+  ShieldCheck,
+  Copy,
+  Check,
+  Layers,
   ExternalLink,
-  CheckCircle,
   FlaskConical,
   Microscope,
   Network
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useTrainingContent } from "../../hooks/useTrainingContent";
 
-interface TrainingCommitteeMember {
-  id: number;
-  role: "Chairperson" | "Coordinator" | "Member";
-  name: string;
-  designation: string;
-  contactNo: string;
-  email: string;
-  image: string;
-  department: string;
-  badgeClass: string;
-}
+type IconType = React.ComponentType<{ size?: number; className?: string }>;
 
-const committeeMembers: TrainingCommitteeMember[] = [
-  {
-    id: 1,
-    role: "Chairperson",
-    name: "Dr. Dhiren P. Shah",
-    designation: "Principal",
-    contactNo: "9427474602",
-    email: "dhiren.shah@ckpipsr.ac.in",
-    image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-    department: "Institutional Leadership & Administration",
-    badgeClass: "bg-[#1a5d2e] text-white"
-  },
-  {
-    id: 2,
-    role: "Coordinator",
-    name: "Dr. Vinod D. Ramani",
-    designation: "Associate Professor",
-    contactNo: "9913792913",
-    email: "vinod.ramani@ckpipsr.ac.in",
-    image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-    department: "Department of Pharmaceutics",
-    badgeClass: "bg-emerald-100 text-emerald-900 border border-emerald-300"
-  },
-  {
-    id: 3,
-    role: "Member",
-    name: "Dr. Suchi P. Desai",
-    designation: "Assistant Professor",
-    contactNo: "8733826684",
-    email: "suchi.desai@ckpipsr.ac.in",
-    image: "https://ckpipsr.ac.in/images/about/shuchi-desai.png",
-    department: "Department of Pharmaceutical Chemistry",
-    badgeClass: "bg-slate-100 text-slate-800 border border-slate-200"
-  },
-  {
-    id: 4,
-    role: "Member",
-    name: "Mr. Yahya A. Moolla",
-    designation: "Assistant Professor",
-    contactNo: "7201932423",
-    email: "yahya.moolla @ckpipsr.ac.in",
-    image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d543b19366a.webp",
-    department: "Department of Pharmaceutics",
-    badgeClass: "bg-slate-100 text-slate-800 border border-slate-200"
-  },
-  {
-    id: 5,
-    role: "Member",
-    name: "Ms. Kinjal S. Gamit",
-    designation: "Assistant Professor",
-    contactNo: "9687198278",
-    email: "kinjal.gamit@ckpipsr.ac.in",
-    image: "https://ui-avatars.com/api/?name=Kinjal+Gamit&background=1a5d2e&color=ffffff&size=256",
-    department: "Department of Pharmacology",
-    badgeClass: "bg-slate-100 text-slate-800 border border-slate-200"
-  }
-];
+/** The icons the panel offers, by name. */
+const ICONS: Record<string, IconType> = {
+  Building2,
+  Microscope,
+  Award,
+  FlaskConical,
+  Cpu,
+  Network,
+  Briefcase,
+  Compass,
+  GraduationCap,
+  Target,
+  BookOpen,
+  Globe2,
+  Users,
+  TrendingUp,
+  Layers,
+  Sparkles,
+  ShieldCheck,
+  CheckCircle2
+};
 
-const trainingObjectives = [
-  {
-    id: 1,
-    title: "Practical application of theoretical knowledge",
-    description:
-      "Industrial training aims to bridge the gap between theoretical learning and practical implementation. It allows students to apply the knowledge and skills they have acquired during their academic studies in a real work environment.",
-    icon: FlaskConical,
-    tag: "Theory to Practice",
-    color: "from-blue-500/10 to-indigo-500/5",
-    border: "border-blue-200",
-    iconBg: "bg-blue-50 text-blue-700",
-    image: "/images/hero/pharmacy_lab.jpg"
-  },
-  {
-    id: 2,
-    title: "Skill development",
-    description:
-      "The training provides an opportunity for students to develop and enhance their technical, professional, and interpersonal skills. They can learn new techniques, tools, and methodologies relevant to their field of study, and acquire valuable industry-specific skills.",
-    icon: Cpu,
-    tag: "Core Competency",
-    color: "from-emerald-500/10 to-teal-500/5",
-    border: "border-emerald-200",
-    iconBg: "bg-emerald-50 text-[#1a5d2e]",
-    image: "/images/hero/students_learning.jpg"
-  },
-  {
-    id: 3,
-    title: "Industry exposure and understanding",
-    description:
-      "Industrial training offers students the chance to gain exposure to the industry they are interested in. They can observe and understand the organizational structure, work processes, and culture of the industry, as well as the roles and responsibilities of different professionals.",
-    icon: Building2,
-    tag: "Corporate Culture",
-    color: "from-purple-500/10 to-pink-500/5",
-    border: "border-purple-200",
-    iconBg: "bg-purple-50 text-purple-700",
-    image: "/images/hero/66e153e687221.webp"
-  },
-  {
-    id: 4,
-    title: "Networking opportunities",
-    description:
-      "During industrial training, students can establish connections and build relationships with professionals in their field of interest. These connections can be beneficial for future career prospects, such as obtaining references or job opportunities.",
-    icon: Network,
-    tag: "Professional Connect",
-    color: "from-amber-500/10 to-orange-500/5",
-    border: "border-amber-200",
-    iconBg: "bg-amber-50 text-amber-700",
-    image: "/images/hero/66e151f0d6a90.webp"
-  },
-  {
-    id: 5,
-    title: "Employability and career readiness",
-    description:
-      "The overall objective of industrial training is to enhance the employability of students and prepare them for their future careers. By gaining practical experience and industry exposure, students become more attractive to potential employers and better equipped to enter the workforce.",
-    icon: Briefcase,
-    tag: "Workforce Readiness",
-    color: "from-emerald-500/10 to-green-500/5",
-    border: "border-emerald-200",
-    iconBg: "bg-emerald-50 text-emerald-700",
-    image: "/images/hero/66e154b724ef6.webp"
-  },
-  {
-    id: 6,
-    title: "Self-assessment and personal growth",
-    description:
-      "Industrial training provides a platform for students to assess their strengths, weaknesses, and areas for improvement. They can identify their interests and aptitudes, and gain valuable insights into their career preferences and goals.",
-    icon: Compass,
-    tag: "Personal Evolution",
-    color: "from-rose-500/10 to-red-500/5",
-    border: "border-rose-200",
-    iconBg: "bg-rose-50 text-rose-700",
-    image: "/images/hero/college_campus.jpg"
-  }
-];
+/** A card's colour, as the highlight and objective cards use it. */
+const TONES: Record<string, string> = {
+  emerald: "bg-emerald-50 text-[#1a5d2e]",
+  blue: "bg-blue-50 text-blue-700",
+  purple: "bg-purple-50 text-purple-700",
+  amber: "bg-amber-50 text-amber-700",
+  rose: "bg-rose-50 text-rose-700"
+};
+
+/** The badge a member's role is drawn with. Follows the role, never stored. */
+const ROLE_BADGES: Record<string, string> = {
+  Chairperson: "bg-[#1a5d2e] text-white",
+  Coordinator: "bg-emerald-100 text-emerald-900 border border-emerald-300",
+  Member: "bg-slate-100 text-slate-800 border border-slate-200"
+};
 
 export default function Training() {
+  const content = useTrainingContent();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (text: string, id: string) => {
@@ -182,15 +78,17 @@ export default function Training() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const { overview, objectives, committee, office } = content;
+
   return (
     <SubPageLayout
-      title="Training"
-      subtitle="Training & Placement Cell – Industrial Training, Student Internships & Professional Development"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="tnp"
       activeItemLabel="Training"
     >
       <div className="space-y-12 max-w-6xl mx-auto">
-        
+
         {/* Section 1: Overview & Vision */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -200,75 +98,61 @@ export default function Training() {
               </div>
               <div>
                 <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider block">
-                  Training & Placement Cell
+                  {overview.kicker}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 leading-tight">
-                  Industrial Training & Practical Experience
+                  {overview.heading}
                 </h2>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-[#1a5d2e] text-white border border-[#1a5d2e] shadow-xs">
-                Est. 2005 • South Gujarat
-              </span>
-              <span className="text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-[#1a5d2e] border border-emerald-200">
-                Industry-Aligned Learning
-              </span>
+              {overview.badges.map((badge, index) => (
+                <span
+                  key={index}
+                  className={
+                    index === 0
+                      ? "text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-[#1a5d2e] text-white border border-[#1a5d2e] shadow-xs"
+                      : "text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-[#1a5d2e] border border-emerald-200"
+                  }
+                >
+                  {badge}
+                </span>
+              ))}
             </div>
           </div>
 
-          {/* User Provided Exact Introduction Content */}
+          {/* Vision & Institutional Commitment */}
           <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-50/70 via-slate-50 to-white border border-emerald-200/80 space-y-4">
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
               <Sparkles size={14} />
-              <span>Vision & Institutional Commitment</span>
+              <span>{overview.vision.kicker}</span>
             </div>
             <p className="text-sm sm:text-base font-sans text-slate-800 leading-relaxed font-normal">
-              C. K. Pithawala Institute of Pharmaceutical Science and Research Being a leading and renowned Pharmacy institute in south Gujarat zone since 2005. We have a vision Committed to promote high- quality education, training, and research in pharmacy to meet the needs of tomorrow’s healthy society. We believe that the End product of our educational system is students and we are always having a strong desire to prepare our students as per requirement of the industry. Therefore, during the study period, our schedule comprised of industrial visits /Industrial Experience /Training and as well as encourage to take part in various seminars/conferences to update them with advancement in the pharma sector.
+              {overview.vision.body}
             </p>
           </div>
 
           {/* Visual Highlight Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 text-xs font-mono">
-                <Building2 size={16} className="text-[#1a5d2e]" />
-                <span>Industrial Exposure</span>
-              </div>
-              <strong className="text-base font-serif font-bold text-slate-900 block">
-                Plant Visits & In-Plant Training
-              </strong>
-              <p className="text-xs text-slate-600 font-sans">
-                Direct engagement with cGMP-certified manufacturing and formulation units.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 text-xs font-mono">
-                <Microscope size={16} className="text-blue-600" />
-                <span>Seminars & Conferences</span>
-              </div>
-              <strong className="text-base font-serif font-bold text-slate-900 block">
-                Academic & Technical Forums
-              </strong>
-              <p className="text-xs text-slate-600 font-sans">
-                Continuous knowledge updating through national & state pharmaceutical symposia.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 text-xs font-mono">
-                <Award size={16} className="text-purple-600" />
-                <span>Career Readiness</span>
-              </div>
-              <strong className="text-base font-serif font-bold text-slate-900 block">
-                Industry-Ready Graduates
-              </strong>
-              <p className="text-xs text-slate-600 font-sans">
-                Hands-on skillset matching contemporary requirements of pharmaceutical recruiters.
-              </p>
-            </div>
+            {overview.highlights.map((item, index) => {
+              const IconComp = ICONS[item.icon] ?? Building2;
+              const tone = TONES[item.tone] ?? TONES.emerald;
+              return (
+                <div key={index} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                  <div className="flex items-center gap-2 text-slate-500 text-xs font-mono">
+                    <IconComp size={16} className={tone.split(" ").pop()} />
+                    <span>{item.kicker}</span>
+                  </div>
+                  <strong className="text-base font-serif font-bold text-slate-900 block">
+                    {item.title}
+                  </strong>
+                  <p className="text-xs text-slate-600 font-sans">
+                    {item.body}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -277,23 +161,24 @@ export default function Training() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider block">
-                Pedagogical Framework
+                {objectives.kicker}
               </span>
               <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
-                Objectives of Industrial Training
+                {objectives.heading}
               </h3>
             </div>
+            {/* Counted from the objectives themselves. */}
             <span className="text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-[#1a5d2e] border border-emerald-200 self-start sm:self-auto">
-              6 Core Pillars
+              {objectives.countLabel}
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trainingObjectives.map((obj, idx) => {
-              const IconComp = obj.icon;
+            {objectives.items.map((obj, idx) => {
+              const IconComp = ICONS[obj.icon] ?? Target;
               return (
                 <motion.div
-                  key={obj.id}
+                  key={idx}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: idx * 0.04 }}
@@ -319,8 +204,9 @@ export default function Training() {
                         <div className="w-7 h-7 rounded-lg bg-[#1a5d2e] text-white flex items-center justify-center shadow-xs">
                           <IconComp size={15} />
                         </div>
+                        {/* Numbered by their order in the panel. */}
                         <span className="text-xs font-mono font-bold tracking-wide">
-                          Objective 0{obj.id}
+                          Objective {String(idx + 1).padStart(2, "0")}
                         </span>
                       </div>
                     </div>
@@ -336,12 +222,14 @@ export default function Training() {
                     </div>
                   </div>
 
-                  <div className="p-5 pt-0">
-                    <div className="pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-mono text-[#1a5d2e] font-semibold">
-                      <CheckCircle2 size={13} />
-                      <span>CKPIPSR Curricular Goal</span>
+                  {objectives.footerLabel && (
+                    <div className="p-5 pt-0">
+                      <div className="pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-mono text-[#1a5d2e] font-semibold">
+                        <CheckCircle2 size={13} />
+                        <span>{objectives.footerLabel}</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               );
             })}
@@ -352,21 +240,23 @@ export default function Training() {
         <div className="space-y-6">
           <div>
             <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider block">
-              Executive Leadership
+              {committee.kicker}
             </span>
             <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
-              Committee Members
+              {committee.heading}
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {committeeMembers.map((member, index) => {
-              const phoneId = `phone-${member.id}`;
-              const emailId = `email-${member.id}`;
+            {committee.members.map((member, index) => {
+              const phoneId = `phone-${index}`;
+              const emailId = `email-${index}`;
+              const badge = ROLE_BADGES[member.role] ?? ROLE_BADGES.Member;
+              const email = member.email.trim();
 
               return (
                 <motion.div
-                  key={member.id}
+                  key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: index * 0.04 }}
@@ -379,23 +269,27 @@ export default function Training() {
                   <div className="space-y-4">
                     {/* Top Role Badge & Image */}
                     <div className="flex items-center justify-between">
-                      <span className={`text-xs font-mono font-bold px-3 py-1 rounded-full shadow-2xs ${member.badgeClass}`}>
+                      <span className={`text-xs font-mono font-bold px-3 py-1 rounded-full shadow-2xs ${badge}`}>
                         {member.role}
                       </span>
-                      {member.role === "Chairperson" && (
+                      {member.role === "Chairperson" && committee.chairNote && (
                         <span className="text-[11px] font-mono text-[#1a5d2e] font-semibold flex items-center gap-1">
                           <ShieldCheck size={13} />
-                          <span>Head of Cell</span>
+                          <span>{committee.chairNote}</span>
                         </span>
                       )}
                     </div>
 
                     {/* Small Member Image & Profile Information */}
                     <div className="flex items-center gap-3.5 pt-1">
-                      {/* Small Image */}
                       <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 group-hover:border-[#1a5d2e]/40 shrink-0 shadow-2xs">
                         <img
-                          src={member.image}
+                          src={
+                            member.image ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              member.name
+                            )}&background=1a5d2e&color=ffffff&size=256`
+                          }
                           alt={member.name}
                           className="w-full h-full object-cover object-top"
                           referrerPolicy="no-referrer"
@@ -411,76 +305,88 @@ export default function Training() {
                         <h4 className="text-base sm:text-lg font-serif font-bold text-slate-900 group-hover:text-[#1a5d2e] transition-colors leading-snug truncate">
                           {member.name}
                         </h4>
-                        <span className="inline-block px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-mono font-semibold">
-                          {member.designation}
-                        </span>
+                        {member.designation && (
+                          <span className="inline-block px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-mono font-semibold">
+                            {member.designation}
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     {/* Department */}
-                    <div className="text-[11px] font-sans text-slate-500">
-                      {member.department}
-                    </div>
+                    {member.department && (
+                      <div className="text-[11px] font-sans text-slate-500">
+                        {member.department}
+                      </div>
+                    )}
 
                     {/* Contact Channels */}
-                    <div className="space-y-2.5 pt-2 border-t border-slate-100">
-                      {/* Phone */}
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
-                        <a
-                          href={`tel:${member.contactNo}`}
-                          className="flex items-center gap-2 text-xs font-mono text-slate-800 hover:text-[#1a5d2e] font-semibold transition-colors"
-                        >
-                          <div className="w-6 h-6 rounded-md bg-white text-[#1a5d2e] flex items-center justify-center border border-slate-200 shadow-2xs">
-                            <Phone size={12} />
+                    {(member.phone || email) && (
+                      <div className="space-y-2.5 pt-2 border-t border-slate-100">
+                        {member.phone && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
+                            <a
+                              href={`tel:${member.phone}`}
+                              className="flex items-center gap-2 text-xs font-mono text-slate-800 hover:text-[#1a5d2e] font-semibold transition-colors"
+                            >
+                              <div className="w-6 h-6 rounded-md bg-white text-[#1a5d2e] flex items-center justify-center border border-slate-200 shadow-2xs">
+                                <Phone size={12} />
+                              </div>
+                              <span>+91 {member.phone}</span>
+                            </a>
+                            <button
+                              onClick={() => handleCopy(member.phone, phoneId)}
+                              title="Copy Contact Number"
+                              className="text-slate-400 hover:text-[#1a5d2e] p-1 rounded-md transition-colors cursor-pointer"
+                            >
+                              {copiedId === phoneId ? <Check size={14} className="text-[#1a5d2e]" /> : <Copy size={14} />}
+                            </button>
                           </div>
-                          <span>+91 {member.contactNo}</span>
-                        </a>
-                        <button
-                          onClick={() => handleCopy(member.contactNo, phoneId)}
-                          title="Copy Contact Number"
-                          className="text-slate-400 hover:text-[#1a5d2e] p-1 rounded-md transition-colors cursor-pointer"
-                        >
-                          {copiedId === phoneId ? <Check size={14} className="text-[#1a5d2e]" /> : <Copy size={14} />}
-                        </button>
-                      </div>
+                        )}
 
-                      {/* Email */}
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
-                        <a
-                          href={`mailto:${member.email.trim()}`}
-                          className="flex items-center gap-2 text-xs font-mono text-slate-800 hover:text-[#1a5d2e] font-medium transition-colors truncate"
-                        >
-                          <div className="w-6 h-6 rounded-md bg-white text-emerald-700 flex items-center justify-center border border-slate-200 shadow-2xs shrink-0">
-                            <Mail size={12} />
+                        {email && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
+                            <a
+                              href={`mailto:${email}`}
+                              className="flex items-center gap-2 text-xs font-mono text-slate-800 hover:text-[#1a5d2e] font-medium transition-colors truncate"
+                            >
+                              <div className="w-6 h-6 rounded-md bg-white text-emerald-700 flex items-center justify-center border border-slate-200 shadow-2xs shrink-0">
+                                <Mail size={12} />
+                              </div>
+                              <span className="truncate">{email}</span>
+                            </a>
+                            <button
+                              onClick={() => handleCopy(email, emailId)}
+                              title="Copy Email"
+                              className="text-slate-400 hover:text-[#1a5d2e] p-1 rounded-md transition-colors shrink-0 cursor-pointer"
+                            >
+                              {copiedId === emailId ? <Check size={14} className="text-[#1a5d2e]" /> : <Copy size={14} />}
+                            </button>
                           </div>
-                          <span className="truncate">{member.email}</span>
-                        </a>
-                        <button
-                          onClick={() => handleCopy(member.email.trim(), emailId)}
-                          title="Copy Email"
-                          className="text-slate-400 hover:text-[#1a5d2e] p-1 rounded-md transition-colors shrink-0 cursor-pointer"
-                        >
-                          {copiedId === emailId ? <Check size={14} className="text-[#1a5d2e]" /> : <Copy size={14} />}
-                        </button>
+                        )}
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Bottom Action Footer */}
                   <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <a
-                      href={`mailto:${member.email.trim()}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#1a5d2e] hover:underline"
-                    >
-                      <span>Send Email</span>
-                      <ExternalLink size={12} />
-                    </a>
-                    <a
-                      href={`tel:${member.contactNo}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-slate-600 hover:text-[#1a5d2e]"
-                    >
-                      <span>Call</span>
-                    </a>
+                    {email && (
+                      <a
+                        href={`mailto:${email}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#1a5d2e] hover:underline"
+                      >
+                        <span>{committee.emailLabel}</span>
+                        <ExternalLink size={12} />
+                      </a>
+                    )}
+                    {member.phone && (
+                      <a
+                        href={`tel:${member.phone}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-slate-600 hover:text-[#1a5d2e]"
+                      >
+                        <span>{committee.callLabel}</span>
+                      </a>
+                    )}
                   </div>
                 </motion.div>
               );
@@ -492,21 +398,21 @@ export default function Training() {
         <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-7 space-y-3">
           <div className="flex items-center gap-2 text-sm font-serif font-bold text-slate-900">
             <Building2 size={18} className="text-[#1a5d2e]" />
-            <span>Industrial Training Coordination Office</span>
+            <span>{office.heading}</span>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed">
-            The Industrial Training Committee coordinates with recognized pharmaceutical companies for mandatory student summer internships, plant visits, and hands-on skill development programs. Students can consult coordinator Dr. Vinod D. Ramani and committee members for training allotment and certificates.
+            {office.body}
           </p>
-          <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-600">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-[#1a5d2e]" />
-              <span>Training Cell: C.K. Pithawalla IP&SR Campus</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-[#1a5d2e]" />
-              <span>Timings: Mon - Sat, 9:00 AM to 5:00 PM</span>
-            </span>
-          </div>
+          {office.notes.length > 0 && (
+            <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-600">
+              {office.notes.map((note, index) => (
+                <span key={index} className="flex items-center gap-1.5">
+                  <CheckCircle2 size={14} className="text-[#1a5d2e]" />
+                  <span>{note}</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

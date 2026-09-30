@@ -78,9 +78,9 @@ export default function CkpcmcLogo({ className = 'h-12 w-auto', showText = true 
   }
 
   return (
-    <div className="flex items-center gap-3 select-none">
+    <div className="flex items-center gap-5 md:gap-6 select-none">
       {logoNode}
-      <div className="flex flex-col text-left font-sans tracking-tight leading-none">
+      <div className="flex flex-col text-left font-sans tracking-tight leading-none ml-1">
         <span className="text-[14px] md:text-[16px] font-bold text-white tracking-widest uppercase">
           CKPIPSR
         </span>

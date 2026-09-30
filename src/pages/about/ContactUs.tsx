@@ -2,74 +2,81 @@ import React from "react";
 import { motion } from "motion/react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { MapPin, Clock, Phone, Mail, Navigation, Building } from "lucide-react";
+import { useContactContent } from "../../hooks/useContactContent";
+
+/**
+ * Links are built here from values the API has already checked: a `tel:` from
+ * the digits of a printed number, a `mailto:` from a validated address. No
+ * editor text is ever used as a scheme.
+ */
+const telHref = (number: string) => `tel:${number.replace(/[^\d+]/g, "")}`;
 
 export default function ContactUs() {
+  const content = useContactContent();
+
+  const cards = [
+    {
+      title: content.address.title,
+      icon: MapPin,
+      content: content.address.text,
+      accent: "text-[#123a1a]",
+    },
+    {
+      title: content.timings.title,
+      icon: Clock,
+      content: content.timings.hours,
+      sub: content.timings.days,
+      note: content.timings.note,
+      accent: "text-[#D4AF37]",
+    },
+    {
+      title: content.phones.title,
+      icon: Phone,
+      links: content.phones.numbers.map((n) => ({ label: n, href: telHref(n) })),
+      accent: "text-[#123a1a]",
+    },
+    {
+      title: content.emails.title,
+      icon: Mail,
+      links: content.emails.addresses.map((e) => ({ label: e, href: `mailto:${e}` })),
+      accent: "text-[#D4AF37]",
+    },
+  ];
+
   return (
     <SubPageLayout
-      title="Contact Us"
-      subtitle="Reach out to C. K. Pithawalla Institute of Pharmaceutical Science & Research."
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="about-us"
       activeItemLabel="Contact Us"
     >
       <div className="space-y-16">
         {/* CAMPUS IMAGE BANNER - Refined Bento Style */}
         <section className="relative group overflow-hidden rounded-[3rem] h-[300px] md:h-[400px]">
-          <img 
-            src="/images/hero/65efeac7d49a3.webp" 
-            alt="CKPIPSR Campus" 
+          <img
+            src={content.banner.image}
+            alt={content.banner.imageAlt}
             className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-1000 opacity-90"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0c2411] via-[#0c2411]/40 to-transparent" />
-          
+
           <div className="absolute inset-0 p-10 flex flex-col justify-end">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] w-fit">
                 <Building size={14} />
-                <span>Modern Campus Infrastructure</span>
+                <span>{content.banner.badge}</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
-                Visit our Pharmaceutical <br /><span className="text-[#D4AF37]">Innovation Hub</span>
+                {content.banner.headingLead} <br /><span className="text-[#D4AF37]">{content.banner.headingAccent}</span>
               </h2>
             </div>
           </div>
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[
-            { 
-              title: "Campus Address", 
-              icon: MapPin, 
-              content: "Opposite Surat Airport, Behind DPS School, Near Malvan Mandir, Dumas Road, Surat - 395007, Gujarat, India.",
-              accent: "text-[#123a1a]"
-            },
-            { 
-              title: "Institute Timings", 
-              icon: Clock, 
-              content: "09:30 AM – 05:00 PM",
-              sub: "Monday to Saturday",
-              note: "2nd and 4th Saturday off",
-              accent: "text-[#D4AF37]"
-            },
-            { 
-              title: "Direct Connect", 
-              icon: Phone, 
-              links: [
-                { label: "+91 63550 65636", href: "tel:6355065636" },
-                { label: "+91 90990 63116", href: "tel:9099063116" }
-              ],
-              accent: "text-[#123a1a]"
-            },
-            { 
-              title: "Official Email", 
-              icon: Mail, 
-              links: [
-                { label: "ckpipsr@gmail.com", href: "mailto:ckpipsr@gmail.com" }
-              ],
-              accent: "text-[#D4AF37]"
-            }
-          ].map((item, iIdx) => (
-            <motion.div 
+          {cards.map((item, iIdx) => (
+            <motion.div
               key={iIdx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -103,7 +110,7 @@ export default function ContactUs() {
                   {item.links && (
                     <div className="space-y-2">
                        {item.links.map((link, lIdx) => (
-                         <a key={lIdx} href={link.href} className="block text-sm font-bold text-slate-700 hover:text-[#123a1a] transition-colors font-mono">
+                         <a key={lIdx} href={link.href} className="block text-sm font-bold text-slate-700 hover:text-[#123a1a] transition-colors font-mono break-all">
                            {link.label}
                          </a>
                        ))}
@@ -121,30 +128,33 @@ export default function ContactUs() {
             <div className="space-y-2">
                <div className="flex items-center gap-3">
                  <Navigation className="text-[#D4AF37]" size={24} />
-                 <h3 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">Geographic Location</h3>
+                 <h3 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">{content.map.title}</h3>
                </div>
-               <p className="text-slate-500 font-medium">Strategically located near Surat International Airport.</p>
+               {content.map.subtitle && (
+                 <p className="text-slate-500 font-medium">{content.map.subtitle}</p>
+               )}
             </div>
-            <a 
-              href="https://goo.gl/maps/embed?pb=!1m14!1m8!1m3!1d5923.654116328731!2d72.71618443860855!3d21.13191122833264!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be052ae998fda3d%3A0x23340ab807f12d7!2sC.K.%20Pthawalla%20Institute%20of%20Pharmaceutical%20Science%20and%20Research!5e0!3m2!1sen!2sin!4v1679122645038!5m2!1sen!2sin"
+            <a
+              href={content.map.directionsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 bg-[#123a1a] text-[#D4AF37] font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-[#123a1a]/10 hover:bg-[#1a4a25] transition-all"
             >
-              Get Directions
+              {content.map.buttonLabel}
             </a>
           </div>
-          
+
           <div className="aspect-[16/9] md:aspect-[21/9] w-full rounded-[2rem] overflow-hidden border border-slate-100 shadow-inner group-hover:shadow-2xl transition-all duration-700">
+            {/* Only ever a Google Maps embed; the API refuses anything else. */}
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5923.654116328731!2d72.71618443860855!3d21.13191122833264!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be052ae998fda3d%3A0x23340ab807f12d7!2sC.K.%20Pthawalla%20Institute%20of%20Pharmaceutical%20Science%20and%20Research!5e0!3m2!1sen!2sin!4v1679122645038!5m2!1sen!2sin"
+              src={content.map.embedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen={false}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="CKPIPSR Google Map Location"
+              title={`${content.map.title} — map`}
               className="filter contrast-125 saturate-50 grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
             />
           </div>

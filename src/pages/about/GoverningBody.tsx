@@ -1,16 +1,19 @@
 import React from "react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { GoverningBodyLayout } from "../../components/LeadershipSubPages";
+import { useGoverningBodyContent } from "../../hooks/useGoverningBodyContent";
 
 export default function GoverningBody() {
+  const content = useGoverningBodyContent();
+
   return (
     <SubPageLayout
-      title="Governing Body"
-      subtitle="The supreme executive body of C. K. Pithawalla Institute of Pharmaceutical Science & Research."
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="about-us"
       activeItemLabel="Governing Body"
     >
-      <GoverningBodyLayout />
+      <GoverningBodyLayout content={content} />
     </SubPageLayout>
   );
 }

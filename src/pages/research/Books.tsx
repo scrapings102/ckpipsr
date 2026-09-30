@@ -18,78 +18,11 @@ import {
   GraduationCap
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-
-interface BookPublication {
-  id: number;
-  author: string;
-  bookTitle: string;
-  chapterTitle: string;
-  scope: "International" | "National";
-  year: number;
-  isbn: string;
-  publisher: string;
-  isChapter: boolean;
-}
-
-const bookData: BookPublication[] = [
-  {
-    id: 1,
-    author: "Dr Dhiren P. Shah",
-    bookTitle: "Cystic Fibrosis Disease Management and Advanced Drug Delivery Systems",
-    chapterTitle: "Chapter-6-Lipid-Nanoparticles in Treating Cystic Fibrosis",
-    scope: "International",
-    year: 2025,
-    isbn: "9781779640406",
-    publisher: "Apple Academic Press",
-    isChapter: true
-  },
-  {
-    id: 2,
-    author: "Dr Dhiren P. Shah",
-    bookTitle: "Marine Biopolymers Processing Functionality and Applications",
-    chapterTitle: "Chapter- 15 - Marine biopolymers in cancer therapeutics",
-    scope: "International",
-    year: 2025,
-    isbn: "9780443156069 / 9780443156076",
-    publisher: "Elsevier",
-    isChapter: true
-  },
-  {
-    id: 3,
-    author: "Dr Dhiren P. Shah",
-    bookTitle: "Nanocarriers: Drug Delivery System:An Evidence Based Approach",
-    chapterTitle: "Chapter 1: Fundamentals of Nanocarriers and Drug Targeting",
-    scope: "International",
-    year: 2021,
-    isbn: "978-981-33-4497-6",
-    publisher: "SpringerNature©",
-    isChapter: true
-  },
-  {
-    id: 4,
-    author: "Dr Dhiren P. Shah",
-    bookTitle: "Text book of Pharmaceutical Industrial Management",
-    chapterTitle: "NA",
-    scope: "International",
-    year: 2010,
-    isbn: "978-81-312-2539-4",
-    publisher: "©Elsevier",
-    isChapter: false
-  },
-  {
-    id: 5,
-    author: "Dr Dhiren P. Shah",
-    bookTitle: "Experimental pharmacognosy",
-    chapterTitle: "NA",
-    scope: "National",
-    year: 2015,
-    isbn: "978-93-832-9052-9",
-    publisher: "S.Vikas & Company Jalandhar",
-    isChapter: false
-  }
-];
+import { useResearchBooks } from "../../hooks/useResearchBooks";
 
 export default function Books() {
+  const content = useResearchBooks();
+  const bookData = content.books;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedScope, setSelectedScope] = useState<"All" | "International" | "National">("All");
   const [selectedType, setSelectedType] = useState<"All" | "Textbook" | "Book Chapter">("All");
@@ -104,8 +37,8 @@ export default function Books() {
   const filteredBooks = bookData.filter((item) => {
     const matchesSearch =
       item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.bookTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.chapterTitle !== "NA" && item.chapterTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (!!item.chapterTitle && item.chapterTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
       item.publisher.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.isbn.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.year.toString().includes(searchQuery);
@@ -114,16 +47,16 @@ export default function Books() {
 
     const matchesType =
       selectedType === "All" ||
-      (selectedType === "Textbook" && !item.isChapter) ||
-      (selectedType === "Book Chapter" && item.isChapter);
+      (selectedType === "Textbook" && item.kind === "textbook") ||
+      (selectedType === "Book Chapter" && item.kind === "chapter");
 
     return matchesSearch && matchesScope && matchesType;
   });
 
   return (
     <SubPageLayout
-      title="Books & Chapters Published"
-      subtitle="Scholarly Textbooks, Reference Monographs & Authored Book Chapters in Pharmaceutical Sciences"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - Books"
     >
@@ -143,16 +76,22 @@ export default function Books() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                    Scholarly Publications
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100/70 border border-emerald-200 text-[#1a5d2e] text-[11px] font-mono font-bold">
-                    <GraduationCap size={12} />
-                    <span>5 Authored Works</span>
-                  </span>
+                  {content.intro.kicker && (
+                    <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                      {content.intro.kicker}
+                    </span>
+                  )}
+                  {content.intro.badgeSuffix && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100/70 border border-emerald-200 text-[#1a5d2e] text-[11px] font-mono font-bold">
+                      <GraduationCap size={12} />
+                      <span>
+                        {content.worksCount} {content.intro.badgeSuffix}
+                      </span>
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                  Authored Books & Chapters
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
@@ -162,7 +101,7 @@ export default function Books() {
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search book, chapter, publisher, ISBN..."
+                placeholder={content.intro.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs sm:text-sm font-sans focus:outline-none focus:border-[#1a5d2e] focus:bg-white transition-all placeholder:text-slate-400"
@@ -176,7 +115,7 @@ export default function Books() {
             <div className="flex items-center gap-2 overflow-x-auto">
               <span className="text-xs font-mono font-semibold text-slate-400 flex items-center gap-1 shrink-0 mr-1">
                 <Globe2 size={13} />
-                <span>Scope:</span>
+                <span>{content.intro.scopeLabel}</span>
               </span>
               {(["All", "International", "National"] as const).map((scope) => (
                 <button
@@ -197,7 +136,7 @@ export default function Books() {
             <div className="flex items-center gap-2 overflow-x-auto">
               <span className="text-xs font-mono font-semibold text-slate-400 flex items-center gap-1 shrink-0 mr-1">
                 <Layers size={13} />
-                <span>Type:</span>
+                <span>{content.intro.typeLabel}</span>
               </span>
               {(["All", "Textbook", "Book Chapter"] as const).map((type) => (
                 <button
@@ -231,7 +170,7 @@ export default function Books() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 font-mono text-xs font-bold flex items-center justify-center">
-                      0{book.id}
+                      {String(index + 1).padStart(2, "0")}
                     </span>
                     <span
                       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold ${
@@ -252,7 +191,7 @@ export default function Books() {
                     </span>
 
                     <span className="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/60">
-                      {book.isChapter ? "Book Chapter" : "Textbook"}
+                      {book.kind === "chapter" ? "Book Chapter" : "Textbook"}
                     </span>
                   </div>
                 </div>
@@ -263,12 +202,12 @@ export default function Books() {
                     Title of The Book / Publication
                   </span>
                   <h4 className="font-serif font-bold text-slate-900 text-lg sm:text-xl leading-snug group-hover:text-[#1a5d2e] transition-colors">
-                    {book.bookTitle}
+                    {book.title}
                   </h4>
                 </div>
 
                 {/* Chapter Title if applicable */}
-                {book.isChapter && book.chapterTitle !== "NA" && (
+                {book.kind === "chapter" && !!book.chapterTitle && (
                   <div className="p-3.5 rounded-2xl bg-emerald-50/50 border border-emerald-100 space-y-1">
                     <span className="text-[10px] font-mono uppercase font-bold text-[#1a5d2e] flex items-center gap-1 tracking-wider">
                       <FileText size={12} />

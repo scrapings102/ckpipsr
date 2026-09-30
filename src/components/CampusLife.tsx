@@ -1,11 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useLenis } from "../context/LenisContext";
 import { useModalScrollLock } from "../hooks/useModalScrollLock";
 import { Footprints, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import { PILLARS, ARCHIVE_ITEMS, GALLERY_ITEMS } from './campus-life/campusLifeData';
+import type { Pillar, LaneItem, GalleryItem } from './campus-life/campusLifeData';
+import { useCampusLifeContent, type CampusEvent, type CampusPolaroid } from '../hooks/useCampusLifeContent';
 import PillarCard from './campus-life/PillarCard';
 import CinematicGalleryModal from './campus-life/CinematicGalleryModal';
 import GalleryColumn from './campus-life/GalleryColumn';
@@ -16,7 +17,62 @@ type TrailPt = { x: number; y: number };
 type GapMarker = { x: number; y: number; index: number };
 type MobileSegment = { d: string; gStart: number; gEnd: number };
 
+/** Accents the pillars take in turn when the panel leaves one unset. */
+const DEFAULT_ACCENTS = ['#D4AF37', '#182f1d', '#B8933E', '#182f1d'];
+
+/** A panel event as the trail draws it: numbered by position. */
+const toPillar = (e: CampusEvent, i: number): Pillar => ({
+  id: `pillar-${i + 1}`,
+  num: String(i + 1).padStart(2, '0'),
+  category: e.category,
+  title: e.title,
+  headline: e.headline,
+  description: e.description,
+  accent: e.accent || DEFAULT_ACCENTS[i % DEFAULT_ACCENTS.length],
+  locationTag: e.locationTag,
+  stats: e.stats,
+  primaryImage: e.primaryImage,
+  sideImage: e.sideImage,
+  tags: e.tags ?? [],
+});
+
+const toArchiveItem = (p: CampusPolaroid, i: number): LaneItem => ({
+  url: p.url,
+  caption: p.caption,
+  tag: p.tag,
+  originalId: String(i + 1).padStart(2, '0'),
+  rotation: '',
+});
+
+/**
+ * Every photo on the section, so any of them opens the gallery at itself:
+ * each pillar's two, then the archive's, without repeats.
+ */
+function galleryFrom(pillars: Pillar[], archive: LaneItem[]): GalleryItem[] {
+  const seen = new Set<string>();
+  const items: GalleryItem[] = [];
+  const add = (url: string, title: string) => {
+    const key = url.split('?')[0];
+    if (!url || seen.has(key)) return;
+    seen.add(key);
+    items.push({ title, url, thumb: url });
+  };
+  pillars.forEach((p) => {
+    add(p.primaryImage, p.category);
+    add(p.sideImage, p.title);
+  });
+  archive.forEach((a) => add(a.url, a.caption));
+  return items;
+}
+
 export default function CampusLife() {
+  const content = useCampusLifeContent();
+  const PILLARS = useMemo(() => content.events.map(toPillar), [content.events]);
+  const ARCHIVE_ITEMS = useMemo(() => content.polaroids.map(toArchiveItem), [content.polaroids]);
+  const GALLERY_ITEMS = useMemo(() => galleryFrom(PILLARS, ARCHIVE_ITEMS), [PILLARS, ARCHIVE_ITEMS]);
+  // The eyebrow reads "The Living Ecosystem · Interactive Campus Trail": two halves.
+  const [eyebrowLead, eyebrowTrail] = content.eyebrow.split('·').map((part) => part.trim());
+
   const sectionRef = useRef<HTMLElement>(null);
   const pillarsWrapRef = useRef<HTMLDivElement>(null);
 
@@ -310,7 +366,7 @@ export default function CampusLife() {
       ScrollTrigger.getById('campusJourneyTrigger')?.kill();
       ScrollTrigger.getById('mobileCampusJourneyTrigger')?.kill();
     };
-  }, []);
+  }, [PILLARS]);
 
   useEffect(() => {
     const trigger = ScrollTrigger.getById('mobileCampusJourneyTrigger');
@@ -327,15 +383,19 @@ export default function CampusLife() {
             <div className="flex items-center gap-2 mb-4">
               <span className="w-2 h-2 rounded-full bg-[#2D2424]" />
               <div className="font-mono text-xs font-semibold uppercase tracking-wider text-[#2D2424] flex items-center gap-2">
-                <span>The Living Ecosystem</span>
-                <span className="text-slate-300">|</span>
-                <span className="flex items-center gap-1 font-bold"><Footprints className="w-3.5 h-3.5" /> Interactive Campus Trail</span>
+                <span>{eyebrowLead}</span>
+                {eyebrowTrail && (
+                  <>
+                    <span className="text-slate-300">|</span>
+                    <span className="flex items-center gap-1 font-bold"><Footprints className="w-3.5 h-3.5" /> {eyebrowTrail}</span>
+                  </>
+                )}
               </div>
             </div>
             <h2 className="font-bold text-4xl sm:text-6xl uppercase tracking-tight leading-[1.05] text-[#2D2424]">
-              Life Outside <br />
+              {content.headingLead} <br />
               <span className="relative inline-block text-[#2D2424] pb-3">
-                The Classroom
+                {content.headingAccent}
                 <span
                   ref={underlineRef}
                   aria-hidden
@@ -488,11 +548,13 @@ export default function CampusLife() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 select-none flex flex-col items-center">
             <h3 ref={archiveHeadingRef} className="font-montserrat text-3xl sm:text-4xl font-bold text-[#2D2424] tracking-tight uppercase">
-              Campus Memory Archive
+              {content.archiveTitle}
             </h3>
-            <p className="font-montserrat text-sm text-slate-500 font-medium max-w-xl mx-auto mt-2">
-              Real moments, real friendships, and unforgettable memories captured throughout our vibrant campus life.
-            </p>
+            {content.archiveSubtitle && (
+              <p className="font-montserrat text-sm text-slate-500 font-medium max-w-xl mx-auto mt-2">
+                {content.archiveSubtitle}
+              </p>
+            )}
             <button
               onClick={() => setActiveGalleryIndex(0)}
               className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#2D2424] hover:bg-[#D4AF37] text-white hover:text-[#2D2424] text-[10px] sm:text-xs font-bold tracking-widest uppercase rounded-full transition-all duration-300 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
@@ -718,37 +780,30 @@ export default function CampusLife() {
 
         {/* Reverted vertical-scrolling columns archive stage */}
         <div className="gc-stage mt-6">
-          <GalleryColumn
-            items={[ARCHIVE_ITEMS[0], ARCHIVE_ITEMS[4], ARCHIVE_ITEMS[8]]}
-            duration={32}
-            className="gc-col-a"
-            onSelect={openGalleryWithImage}
-          />
-          <GalleryColumn
-            items={[ARCHIVE_ITEMS[1], ARCHIVE_ITEMS[5], ARCHIVE_ITEMS[9]]}
-            duration={28}
-            reverse
-            className="gc-col-b"
-            onSelect={openGalleryWithImage}
-          />
-          <GalleryColumn
-            items={[ARCHIVE_ITEMS[2], ARCHIVE_ITEMS[6], ARCHIVE_ITEMS[10]]}
-            duration={36}
-            className="gc-col-c"
-            onSelect={openGalleryWithImage}
-          />
-          <GalleryColumn
-            items={[ARCHIVE_ITEMS[3], ARCHIVE_ITEMS[7], ARCHIVE_ITEMS[11]]}
-            duration={30}
-            reverse
-            className="gc-col-d"
-            onSelect={openGalleryWithImage}
-          />
+          {[
+            { duration: 32, reverse: false, className: 'gc-col-a' },
+            { duration: 28, reverse: true, className: 'gc-col-b' },
+            { duration: 36, reverse: false, className: 'gc-col-c' },
+            { duration: 30, reverse: true, className: 'gc-col-d' },
+          ].map((col, c) => {
+            const items = ARCHIVE_ITEMS.filter((_, i) => i % 4 === c);
+            return items.length > 0 ? (
+              <GalleryColumn
+                key={col.className}
+                items={items}
+                duration={col.duration}
+                reverse={col.reverse}
+                className={col.className}
+                onSelect={openGalleryWithImage}
+              />
+            ) : null;
+          })}
         </div>
       </div>
 
       {/* CINEMATIC GALLERY MODAL */}
       <CinematicGalleryModal
+        items={GALLERY_ITEMS}
         activeIndex={activeGalleryIndex}
         onClose={() => setActiveGalleryIndex(null)}
         setActiveIndex={setActiveGalleryIndex}

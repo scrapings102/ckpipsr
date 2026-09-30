@@ -32,10 +32,7 @@ const ContactUs = React.lazy(() => import("./pages/about/ContactUs"));
 
 // Lazy-loaded Academics
 const CoursesOffered = React.lazy(() => import("./pages/academics/CoursesOffered"));
-const DPharm = React.lazy(() => import("./pages/academics/CoursePages").then(m => ({ default: m.DPharm })));
-const BPharm = React.lazy(() => import("./pages/academics/CoursePages").then(m => ({ default: m.BPharm })));
-const MPharm = React.lazy(() => import("./pages/academics/CoursePages").then(m => ({ default: m.MPharm })));
-const ShortTermCertificate = React.lazy(() => import("./pages/academics/CoursePages").then(m => ({ default: m.ShortTermCertificate })));
+const CourseBySlug = React.lazy(() => import("./pages/academics/CoursePages").then(m => ({ default: m.CourseBySlug })));
 
 const Approvals = React.lazy(() => import("./pages/academics/Approvals"));
 const Faculties = React.lazy(() => import("./pages/academics/Faculties"));
@@ -54,6 +51,7 @@ const EVChargingStation = React.lazy(() => import("./pages/academics/ResourcePag
 const MedicinalGarden = React.lazy(() => import("./pages/academics/ResourcePages").then(m => ({ default: m.MedicinalGarden })));
 
 // Lazy-loaded Students Corner
+const CourseSyllabus = React.lazy(() => import("./pages/students/CourseSyllabus"));
 const Timetables = React.lazy(() => import("./pages/students/Timetables"));
 const Scholarships = React.lazy(() => import("./pages/students/Scholarships"));
 const HobbyClub = React.lazy(() => import("./pages/students/HobbyClub"));
@@ -68,6 +66,7 @@ const GRC = React.lazy(() => import("./pages/cells/GRC"));
 const ADC = React.lazy(() => import("./pages/cells/ADC"));
 const EDC = React.lazy(() => import("./pages/cells/EDC"));
 const GSC = React.lazy(() => import("./pages/cells/GSC"));
+const CommitteePage = React.lazy(() => import("./pages/cells/CommitteePage"));
 const AboutResearch = React.lazy(() => import("./pages/research/AboutResearch"));
 const ResearchPublications = React.lazy(() => import("./pages/research/ResearchPublications"));
 const Patents = React.lazy(() => import("./pages/research/Patents"));
@@ -234,10 +233,10 @@ export default function App() {
 
                 {/* Academics */}
                 <Route path="/academics/courses-offered" element={<CoursesOffered />} />
-                <Route path="/academics/courses-offered-d-pharm" element={<DPharm />} />
-                <Route path="/academics/courses-offered-b-pharm" element={<BPharm />} />
-                <Route path="/academics/courses-offered-m-pharm" element={<MPharm />} />
-                <Route path="/academics/courses-offered-short-term-certificate" element={<ShortTermCertificate />} />
+                {/* Course pages are data from the admin panel: /academics/courses-offered-<id>.
+                    The fixed /academics routes around this still win; any other slug falls
+                    through to DynamicSubPage inside CourseBySlug. */}
+                <Route path="/academics/:slug" element={<CourseBySlug />} />
                 <Route path="/academics/approvals" element={<Approvals />} />
                 <Route path="/academics/faculties" element={<Faculties />} />
                 <Route path="/academics/resources" element={<Resources />} />
@@ -257,6 +256,15 @@ export default function App() {
                 <Route path="/academics/resources-medicinal-garden" element={<MedicinalGarden />} />
                 
                 {/* Students Corner */}
+                <Route path="/students-corner/courses" element={<CourseSyllabus />} />
+                <Route path="/students/courses" element={<CourseSyllabus />} />
+                <Route path="/students-corner/course-syllabus" element={<CourseSyllabus />} />
+                <Route path="/students/course-syllabus" element={<CourseSyllabus />} />
+                <Route path="/students-corner/syllabus" element={<CourseSyllabus />} />
+                <Route path="/students/syllabus" element={<CourseSyllabus />} />
+                <Route path="/courses" element={<CourseSyllabus />} />
+                <Route path="/course-syllabus" element={<CourseSyllabus />} />
+                <Route path="/syllabus" element={<CourseSyllabus />} />
                 <Route path="/students-corner/timetables" element={<Timetables />} />
                 <Route path="/students/timetables" element={<Timetables />} />
                 <Route path="/students-corner/timetable" element={<Timetables />} />
@@ -323,7 +331,11 @@ export default function App() {
                 <Route path="/cells/gender-sensitization" element={<GSC />} />
                 <Route path="/about/gender-sensitization-cell" element={<GSC />} />
                 <Route path="/about-us/gender-sensitization-cell" element={<GSC />} />
-                
+                {/* Committees are data: one added in the admin panel gets its
+                    page here by its address. The spellings above are the old
+                    links people may still have, so they keep their own routes. */}
+                <Route path="/cells/:slug" element={<CommitteePage />} />
+
                 {/* Research & Innovation */}
                 <Route path="/research-and-innovation/research-about" element={<AboutResearch />} />
                 <Route path="/research-and-innovation/about-research" element={<AboutResearch />} />

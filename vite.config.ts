@@ -19,6 +19,15 @@ export default defineConfig(({mode}) => {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
+      proxy: {
+        // Editable content (the hero, for now) is read from the admin API.
+        // Proxied so the site fetches a same-origin /api path and needs no
+        // CORS rules and no build-time knowledge of where the API lives.
+        '/api': {
+          target: env.VITE_API_PROXY_TARGET || 'http://localhost:4000',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });

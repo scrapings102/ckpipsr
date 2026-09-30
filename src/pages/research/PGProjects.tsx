@@ -11,47 +11,24 @@ import {
   FlaskConical
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-
-interface PGProjectDocument {
-  id: string;
-  title: string;
-  academicYear: string;
-  description: string;
-  pdfUrl: string;
-  tag: string;
-  colorTheme: "emerald" | "blue";
-}
-
-const pgProjectDocs: PGProjectDocument[] = [
-  {
-    id: "ay-2024-2025",
-    title: "Research Publication AY 2024-2025",
-    academicYear: "AY 2024 - 2025",
-    description: "Official documentation and compilation of Post Graduate (M.Pharm) dissertation projects, experimental studies, and research publications for the academic year 2024-2025.",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/68c24ee48d6ad.pdf",
-    tag: "AY 2024-2025 Report",
-    colorTheme: "emerald"
-  },
-  {
-    id: "ay-2025-2026",
-    title: "Research Publication AY 2025-2026",
-    academicYear: "AY 2025 - 2026",
-    description: "Compendium and official repository of ongoing and completed Post Graduate research initiatives, thesis manuscripts, and scientific publications for AY 2025-2026.",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/69e33b71b7b8b.pdf",
-    tag: "AY 2025-2026 Report",
-    colorTheme: "blue"
-  }
-];
+import {
+  DEFAULT_PG_PROJECTS,
+  useResearchPublications,
+} from "../../hooks/useResearchPublications";
 
 export default function PGProjects() {
+  // The same page as Research - Publications, reading its own section.
+  const content = useResearchPublications("pg-projects", DEFAULT_PG_PROJECTS);
+  const pgProjectDocs = content.publications;
+
   const handleOpenPdf = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
     <SubPageLayout
-      title="PG Projects"
-      subtitle="Post Graduate (M.Pharm) Research Projects, Thesis Dissertations & Academic Reports"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - PG Projects"
     >
@@ -70,27 +47,31 @@ export default function PGProjects() {
                 <FlaskConical size={24} />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  Post Graduate Studies
-                </span>
+                {content.intro.kicker && (
+                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                    {content.intro.kicker}
+                  </span>
+                )}
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                  PG Projects & Research Documentation
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-mono font-medium">
-              <FileCheck size={14} className="text-[#1a5d2e]" />
-              <span>Official PDF Records</span>
-            </div>
+            {content.intro.badge && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-mono font-medium">
+                <FileCheck size={14} className="text-[#1a5d2e]" />
+                <span>{content.intro.badge}</span>
+              </div>
+            )}
           </div>
 
           <p className="text-slate-600 font-sans text-sm sm:text-base leading-relaxed mt-4">
-            Access and download the official academic year reports documenting Post Graduate (M.Pharm) dissertation projects, research findings, and scientific project publications guided by faculty members at C.K. Pithawalla Institute of Pharmaceutical Science & Research.
+            {content.intro.body}
           </p>
         </motion.div>
 
-        {/* The 2 PG Project Action Buttons / Cards */}
+        {/* The report cards: whichever the panel says to show. */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {pgProjectDocs.map((doc, index) => {
             const isEmerald = doc.colorTheme === "emerald";
@@ -110,15 +91,17 @@ export default function PGProjects() {
                       <span>{doc.academicYear}</span>
                     </span>
 
-                    <span
-                      className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
-                        isEmerald
-                          ? "bg-emerald-100 text-[#1a5d2e]"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {doc.tag}
-                    </span>
+                    {doc.tag && (
+                      <span
+                        className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
+                          isEmerald
+                            ? "bg-emerald-100 text-[#1a5d2e]"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {doc.tag}
+                      </span>
+                    )}
                   </div>
 
                   {/* Icon & Title */}
@@ -164,13 +147,19 @@ export default function PGProjects() {
         </div>
 
         {/* Quick Help & Note */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-            <span>Official Post Graduate project records are preserved in PDF format for academic reference and verification.</span>
+        {(content.note.text || content.note.tagline) && (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
+            {content.note.text && (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
+                <span>{content.note.text}</span>
+              </div>
+            )}
+            {content.note.tagline && (
+              <span className="font-mono text-slate-400">{content.note.tagline}</span>
+            )}
           </div>
-          <span className="font-mono text-slate-400">CKPIPSR PG Repository</span>
-        </div>
+        )}
 
       </div>
     </SubPageLayout>

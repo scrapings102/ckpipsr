@@ -10,97 +10,17 @@ import {
   Sparkles
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-
-interface ScholarRecord {
-  id: string;
-  scholarName: string;
-  registrationYear: number;
-  thesisTitle: string;
-}
-
-interface GuideRecord {
-  guideId: number;
-  guideName: string;
-  university: string;
-  scholars: ScholarRecord[];
-}
-
-const doctoralData: GuideRecord[] = [
-  {
-    guideId: 1,
-    guideName: "Dr. Dhiren P. Shah",
-    university: "Gujarat Technological University",
-    scholars: [
-      {
-        id: "dps-1",
-        scholarName: "Mr. Jaynish Tailor",
-        registrationYear: 2018,
-        thesisTitle: "Artificial Arterial Model : A Quality Tool for Evaluation of Endovascular Dosage Forms"
-      },
-      {
-        id: "dps-2",
-        scholarName: "Mr. Yash Dudhwala",
-        registrationYear: 2022,
-        thesisTitle: "Formulation Development & Optimization of Colon Targeted Drug Delivery System for Anticancer Drug"
-      },
-      {
-        id: "dps-3",
-        scholarName: "Ms. Nikita Vaghela",
-        registrationYear: 2022,
-        thesisTitle: "Formulation & Evaluation of Topical Drug Delivery System by DoE Approach"
-      },
-      {
-        id: "dps-4",
-        scholarName: "Ms. Bhumi Bhatt",
-        registrationYear: 2023,
-        thesisTitle: "Formulating & Evaluation of Nano Drug Delivery for Breast Cancer Therapy"
-      },
-      {
-        id: "dps-5",
-        scholarName: "Ms. Raja Manali",
-        registrationYear: 2023,
-        thesisTitle: "Formulation & Optimization of Oral Film of Anti-Emetic Drug"
-      },
-      {
-        id: "dps-6",
-        scholarName: "Ms. Zankruti Patel",
-        registrationYear: 2023,
-        thesisTitle: "Development & Characterization of Brain Targeted Nano Based Formulation via Nasal Route"
-      }
-    ]
-  },
-  {
-    guideId: 2,
-    guideName: "Dr. Vinod D. Ramani",
-    university: "Gujarat Technological University",
-    scholars: [
-      {
-        id: "vdr-1",
-        scholarName: "Ms. Mehta Riya Kalpesh",
-        registrationYear: 2025,
-        thesisTitle: "Design And Optimization of Nanoparticle-Based Site-Specific Anticancer Therapy in Non-Hodgkin Lymphoma"
-      },
-      {
-        id: "vdr-2",
-        scholarName: "Ms. Nirali Sharma",
-        registrationYear: 2025,
-        thesisTitle: "Formulation And Optimization of Nano-Carrier for Targeted Therapy in Skin Cancer"
-      },
-      {
-        id: "vdr-3",
-        scholarName: "Ms. Siddique Iram Fatema Mohammed Faruk",
-        registrationYear: 2025,
-        thesisTitle: "Nano-Emulsion Gel of Luliconazole and Azelaic Acid for Recalcitrant Dermatophytosis & Sebo-Inflammatory Skin"
-      }
-    ]
-  }
-];
+import { useResearchDoctoral } from "../../hooks/useResearchDoctoral";
 
 export default function DoctoralStudies() {
+  const content = useResearchDoctoral();
+  // A guide with no scholars has no row to span, so the table leaves them out.
+  const doctoralData = content.guides.filter((guide) => guide.scholars.length > 0);
+
   return (
     <SubPageLayout
-      title="Doctoral Studies"
-      subtitle="Ph.D. Research Scholars, Approved University Guides & Advanced Doctoral Dissertations"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - Doctoral Studies"
     >
@@ -121,18 +41,22 @@ export default function DoctoralStudies() {
               </div>
               <div>
                 <h3 className="text-lg sm:text-xl font-serif font-bold text-white tracking-wide">
-                  Doctoral Studies (Ph.D. Program)
+                  {content.banner.heading}
                 </h3>
-                <p className="text-xs font-sans text-slate-300 mt-0.5">
-                  C.K. Pithawalla Institute of Pharmaceutical Science & Research
-                </p>
+                {content.banner.subheading && (
+                  <p className="text-xs font-sans text-slate-300 mt-0.5">
+                    {content.banner.subheading}
+                  </p>
+                )}
               </div>
             </div>
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-mono font-medium self-start sm:self-center">
-              <Building2 size={13} />
-              <span>GTU Affiliated Research Center</span>
-            </span>
+            {content.banner.badge && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-mono font-medium self-start sm:self-center">
+                <Building2 size={13} />
+                <span>{content.banner.badge}</span>
+              </span>
+            )}
           </div>
 
           {/* Official Formatted Table */}
@@ -141,28 +65,28 @@ export default function DoctoralStudies() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-800 font-serif">
                   <th className="py-4 px-4 font-bold text-center w-14 text-slate-900">
-                    No
+                    {content.columns.no}
                   </th>
                   <th className="py-4 px-5 font-bold w-52 text-slate-900 border-l border-slate-200">
-                    Name of Full Time Teacher with Ph.D
+                    {content.columns.guide}
                   </th>
                   <th className="py-4 px-5 font-bold w-52 text-slate-900 border-l border-slate-200">
-                    Recognized as Research Guide for Ph.D in University
+                    {content.columns.university}
                   </th>
                   <th className="py-4 px-5 font-bold w-52 text-slate-900 border-l border-slate-200">
-                    Name of Scholar
+                    {content.columns.scholar}
                   </th>
                   <th className="py-4 px-4 font-bold text-center w-36 text-slate-900 border-l border-slate-200">
-                    Year of Registration of Scholar
+                    {content.columns.year}
                   </th>
                   <th className="py-4 px-5 font-bold text-slate-900 border-l border-slate-200">
-                    Title of Thesis
+                    {content.columns.thesis}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {doctoralData.map((guide, gIdx) => (
-                  <React.Fragment key={guide.guideId}>
+                  <React.Fragment key={guide.id}>
                     {guide.scholars.map((scholar, sIdx) => {
                       const isFirstRowOfGuide = sIdx === 0;
                       return (
@@ -177,7 +101,7 @@ export default function DoctoralStudies() {
                               className="py-4 px-4 font-mono font-bold text-slate-800 text-center align-top bg-slate-50/40 border-r border-slate-200"
                             >
                               <span className="w-7 h-7 rounded-lg bg-emerald-50 text-[#1a5d2e] border border-emerald-200 font-mono text-xs font-bold inline-flex items-center justify-center">
-                                {guide.guideId}
+                                {gIdx + 1}
                               </span>
                             </td>
                           ) : null}
@@ -194,11 +118,13 @@ export default function DoctoralStudies() {
                                 </div>
                                 <div>
                                   <span className="font-serif font-bold text-slate-900 text-sm block">
-                                    {guide.guideName}
+                                    {guide.guide}
                                   </span>
-                                  <span className="text-[11px] font-mono text-slate-500 block mt-0.5">
-                                    Approved Ph.D. Guide
-                                  </span>
+                                  {content.guideCaption && (
+                                    <span className="text-[11px] font-mono text-slate-500 block mt-0.5">
+                                      {content.guideCaption}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </td>
@@ -220,7 +146,7 @@ export default function DoctoralStudies() {
                           {/* Scholar Name */}
                           <td className="py-4 px-5 font-semibold text-slate-900 align-top border-r border-slate-200">
                             <span className="text-slate-900 block font-medium">
-                              {scholar.scholarName}
+                              {scholar.name}
                             </span>
                           </td>
 
@@ -252,13 +178,19 @@ export default function DoctoralStudies() {
         </motion.div>
 
         {/* Footer Institutional Note */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-            <span>Ph.D. Research Center approved by Gujarat Technological University (GTU), Ahmedabad.</span>
+        {(content.note.text || content.note.tagline) && (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
+            {content.note.text && (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
+                <span>{content.note.text}</span>
+              </div>
+            )}
+            {content.note.tagline && (
+              <span className="font-mono text-slate-400">{content.note.tagline}</span>
+            )}
           </div>
-          <span className="font-mono text-slate-400">CKPIPSR Doctoral Registry</span>
-        </div>
+        )}
 
       </div>
     </SubPageLayout>

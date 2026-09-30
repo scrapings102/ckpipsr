@@ -16,80 +16,17 @@ import {
   Filter
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-
-interface PatentItem {
-  id: number;
-  facultyStudent: string;
-  title: string;
-  applicationNumber: string;
-  dateOfFiling: string;
-  publishedDate: string;
-  status: "Granted" | "Published" | "Filed";
-}
-
-const patentData: PatentItem[] = [
-  {
-    id: 1,
-    facultyStudent: "DR. SHAH DHIREN PRAFULKUMAR",
-    title: "A MOUTH DISSOLVING FILM OF GRANISETRON HYDROCHLORIDE",
-    applicationNumber: "202021042061",
-    dateOfFiling: "28/09/2020",
-    publishedDate: "30/01/2023",
-    status: "Granted"
-  },
-  {
-    id: 2,
-    facultyStudent: "DR.VINODKUMAR D. RAMANI",
-    title: "ULTRACENTRIFUGE LABORATORY APPARATUS FOR SEPARATION OF ANOPARTICLES",
-    applicationNumber: "385428-001",
-    dateOfFiling: "02/05/2023",
-    publishedDate: "12/09/2023",
-    status: "Granted"
-  },
-  {
-    id: 3,
-    facultyStudent: "DR.VINODKUMAR D. RAMANI",
-    title: "LABORATORY ROTARY EVAPORATOR FOR EXTRACTION OF HERBAL DRUGS",
-    applicationNumber: "384767-001",
-    dateOfFiling: "25/04/2023",
-    publishedDate: "10/08/2023",
-    status: "Granted"
-  },
-  {
-    id: 4,
-    facultyStudent: "MR. JITESH JARIWALA",
-    title: "LABORATORY ROTARY EVAPORATOR FOR EXTRACTION OF HERBAL DRUGS",
-    applicationNumber: "384767-001",
-    dateOfFiling: "25/04/2023",
-    publishedDate: "10/08/2023",
-    status: "Granted"
-  },
-  {
-    id: 5,
-    facultyStudent: "DR. VAISHNAV DEVENDRA JAYANTILAL",
-    title: "HPTLC METHOD FOR DETECTION OF PHTHALATE METABOLITES IN BIOLOGICAL MATERIAL",
-    applicationNumber: "202021024529",
-    dateOfFiling: "11/06/2020",
-    publishedDate: "21/09/2023",
-    status: "Granted"
-  },
-  {
-    id: 6,
-    facultyStudent: "MR. NAISHADH SOLANKI",
-    title: "PORTABLE TOPICAL DEVICE FOR ESTIMATION OF ULCERS IN STOMACH",
-    applicationNumber: "394980-001",
-    dateOfFiling: "13/09/2023",
-    publishedDate: "30/10/2023",
-    status: "Granted"
-  }
-];
+import { useResearchPatents } from "../../hooks/useResearchPatents";
 
 export default function Patents() {
+  const content = useResearchPatents();
+  const patentData = content.patents;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFaculty, setSelectedFaculty] = useState("All");
   const [copiedAppNo, setCopiedAppNo] = useState<string | null>(null);
 
-  const uniqueInventors = ["All", ...Array.from(new Set(patentData.map((p) => p.facultyStudent)))];
+  // The order the panel lists them in, each one once.
+  const uniqueInventors = ["All", ...content.inventors];
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -99,22 +36,21 @@ export default function Patents() {
 
   const filteredPatents = patentData.filter((patent) => {
     const matchesSearch =
-      patent.facultyStudent.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patent.inventor.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patent.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patent.applicationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patent.dateOfFiling.includes(searchQuery) ||
       patent.publishedDate.includes(searchQuery);
 
-    const matchesFaculty =
-      selectedFaculty === "All" || patent.facultyStudent === selectedFaculty;
+    const matchesFaculty = selectedFaculty === "All" || patent.inventor === selectedFaculty;
 
     return matchesSearch && matchesFaculty;
   });
 
   return (
     <SubPageLayout
-      title="Patents"
-      subtitle="Intellectual Property Rights, Patented Inventions & Pharmaceutical Technology Innovations"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - Patents"
     >
@@ -134,16 +70,22 @@ export default function Patents() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                    Intellectual Property Rights
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100/70 border border-emerald-200 text-[#1a5d2e] text-[11px] font-mono font-bold">
-                    <Award size={12} />
-                    <span>6 Granted Patents</span>
-                  </span>
+                  {content.intro.kicker && (
+                    <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                      {content.intro.kicker}
+                    </span>
+                  )}
+                  {content.intro.badgeSuffix && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100/70 border border-emerald-200 text-[#1a5d2e] text-[11px] font-mono font-bold">
+                      <Award size={12} />
+                      <span>
+                        {content.grantedCount} {content.intro.badgeSuffix}
+                      </span>
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                  Patents Granted to Faculty & Researchers
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
@@ -153,7 +95,7 @@ export default function Patents() {
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search patent title, inventor, app no..."
+                placeholder={content.intro.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs sm:text-sm font-sans focus:outline-none focus:border-[#1a5d2e] focus:bg-white transition-all placeholder:text-slate-400"
@@ -165,7 +107,7 @@ export default function Patents() {
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <span className="text-xs font-mono font-semibold text-slate-400 flex items-center gap-1 shrink-0 mr-1">
               <Filter size={13} />
-              <span>Inventor:</span>
+              <span>{content.intro.filterLabel}</span>
             </span>
             {uniqueInventors.map((faculty) => (
               <button
@@ -197,7 +139,7 @@ export default function Patents() {
                 {/* Header: Serial No & Status Badge */}
                 <div className="flex items-center justify-between gap-2">
                   <span className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 font-mono text-xs font-bold flex items-center justify-center">
-                    0{patent.id}
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] font-mono text-xs font-bold shadow-2xs">
                     <ShieldCheck size={14} className="text-[#1a5d2e]" />
@@ -222,7 +164,7 @@ export default function Patents() {
                     <span>Name of Faculty / Student</span>
                   </span>
                   <p className="font-sans font-bold text-slate-900 text-xs sm:text-sm">
-                    {patent.facultyStudent}
+                    {patent.inventor}
                   </p>
                 </div>
               </div>
@@ -269,7 +211,7 @@ export default function Patents() {
                       <span>Published Date</span>
                     </span>
                     <p className="font-mono font-bold text-slate-900 text-xs mt-0.5">
-                      {patent.publishedDate}
+                      {patent.publishedDate || "—"}
                     </p>
                   </div>
                 </div>

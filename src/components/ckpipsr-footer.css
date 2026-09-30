@@ -1,0 +1,236 @@
+/* ============================================================
+   CKPIPSR footer — "Until we meet on campus"
+   Warm ivory field, centred gold farewell in Great Vibes with a
+   hand-drawn marker underline, over a classical facade engraving.
+   IPSR palette: greens #123a1a / #1C592F / #2c7a47, with a touch of gold #D4AF37.
+   Thin gold lines on white read faintly, so line work and small
+   text use the deeper golds; bright gold is kept for the large
+   farewell, where it has the size to carry.
+   ============================================================ */
+
+.ckpf-sky {
+    background: linear-gradient(180deg, #ffffff 0%, #eef5ec 100%);
+}
+
+/* ---- the handwritten farewell ---- */
+
+.ckpf-script {
+    display: inline-block;
+    font-family: 'Great Vibes', 'Apple Chancery', 'Snell Roundhand', cursive;
+    font-size: clamp(38px, 5.6vw, 76px);
+    line-height: 1.1;
+    margin: 0;
+    padding: 0 .08em;
+    background: linear-gradient(90deg, #1C592F 0%, #2c7a47 55%, #D4AF37 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+/* hand-drawn marker squiggle under the farewell */
+.ckpf-underline {
+    display: block;
+    width: clamp(150px, 22vw, 320px);
+    height: clamp(12px, 1.4vw, 18px);
+    margin: 4px auto 0;
+    overflow: visible;
+}
+
+.ckpf-underline path {
+    fill: none;
+    stroke: #2c7a47;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    /* pathLength="1" on the path */
+    stroke-dashoffset: 1;
+}
+
+/* Hidden state carries NO transition, so leaving the footer resets it
+   instantly (off-screen) and it rewrites every time the user returns.
+   The transitions live only on the visible state. */
+.ckpf-write .ckpf-script {
+    clip-path: inset(0 100% 0 0);
+}
+
+.ckpf-write.is-written .ckpf-script {
+    clip-path: inset(0 -6% 0 0);
+    transition: clip-path 1.4s cubic-bezier(.55, .1, .45, 1) .1s;
+}
+
+.ckpf-write.is-written .ckpf-underline path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset .5s cubic-bezier(.65, 0, .35, 1) 1.4s;
+}
+
+/* ---- the facade ---- */
+
+.ckpg {
+    margin-top: clamp(14px, 2.2vw, 30px);
+}
+
+.ckpg-svg {
+    width: 100%;
+    height: clamp(124px, 16vw, 200px);
+}
+
+/* Exactly one drawing per breakpoint. Deliberately NOT done with Tailwind's
+   hidden / sm:hidden: Tailwind v4 puts utilities in a CSS layer, and an
+   un-layered rule always beats a layered one, which rendered both at once. */
+.ckpg-full {
+    display: none;
+}
+
+.ckpg-compact {
+    display: block;
+    height: 140px;
+}
+
+@media (min-width: 640px) {
+    .ckpg-full {
+        display: block;
+    }
+
+    .ckpg-compact {
+        display: none;
+    }
+}
+
+.ckpg-wall {
+    fill: #f3f8f1;
+    opacity: 0;
+}
+
+.ckpg-fill {
+    fill: #e1ecdd;
+    opacity: 0;
+}
+
+.ckpg-ln {
+    fill: none;
+    stroke: #1C592F;
+    /* legible deep green for 1px lines on white */
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+}
+
+.ckpg-structure {
+    stroke-width: 1.25;
+    stroke-opacity: .92;
+}
+
+.ckpg-columns {
+    stroke-width: 1;
+    stroke-opacity: .86;
+}
+
+.ckpg-wings {
+    stroke-width: .85;
+    stroke-opacity: .74;
+}
+
+.ckpg-detail {
+    stroke-width: .7;
+    stroke-opacity: .55;
+}
+
+.ckpg-key {
+    stroke-width: .9;
+    stroke-opacity: .6;
+}
+
+/* Drawn state: key and structure first, then wings and columns rise,
+   the fine detail is engraved last, and the stone fills settle in. */
+.ckpg.is-drawn .ckpg-ln {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.2s cubic-bezier(.65, 0, .35, 1);
+}
+
+.ckpg.is-drawn .ckpg-structure {
+    transition-delay: .1s;
+}
+
+.ckpg.is-drawn .ckpg-wings {
+    transition-delay: .2s;
+}
+
+.ckpg.is-drawn .ckpg-columns {
+    transition-delay: .3s;
+}
+
+.ckpg.is-drawn .ckpg-detail {
+    transition-delay: .5s;
+    transition-duration: 1s;
+}
+
+.ckpg.is-drawn .ckpg-wall,
+.ckpg.is-drawn .ckpg-fill {
+    opacity: 1;
+    transition: opacity .6s ease .8s;
+}
+
+/* ---- section headings ---- */
+
+.ckpf-h {
+    margin: 0 0 16px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: #1C592F;
+}
+
+/* ---- motion preferences: everything shown, nothing animated ---- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ckpf-write .ckpf-script,
+    .ckpf-write.is-written .ckpf-script {
+        clip-path: none;
+        transition: none;
+    }
+
+    .ckpf-underline path,
+    .ckpf-write.is-written .ckpf-underline path {
+        stroke-dashoffset: 0;
+        transition: none;
+    }
+
+    .ckpg-ln,
+    .ckpg.is-drawn .ckpg-ln {
+        stroke-dashoffset: 0;
+        transition: none;
+    }
+
+    .ckpg-wall,
+    .ckpg-fill,
+    .ckpg.is-drawn .ckpg-wall,
+    .ckpg.is-drawn .ckpg-fill {
+        opacity: 1;
+        transition: none;
+    }
+}
+
+/* ---- mobile ---- */
+
+@media (max-width: 640px) {
+    .ckpf-script {
+        font-size: clamp(34px, 10vw, 44px);
+        line-height: 1.15;
+    }
+
+    .ckpf-h {
+        font-size: 9px;
+        margin-bottom: 12px;
+    }
+}
+
+/* inside pages: no farewell scene, so the footer opens with a clean rule */
+.ckpf.ckpf-inner {
+    border-top: 1px solid rgba(18, 58, 26, .10);
+}

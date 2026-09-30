@@ -1,83 +1,78 @@
 import React from "react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowRight, EyeOff, GraduationCap } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-import { CourseDetailLayout } from "../../components/AcademicsLayouts";
+import { CourseDetail } from "../../components/AcademicsLayouts";
+import DynamicSubPage from "../DynamicSubPage";
+import { COURSE_SLUG_PREFIX, courseNavLabel, useCourses } from "../../hooks/useCourses";
 
-export const DPharm = () => (
-  <SubPageLayout
-    title="Diploma in Pharmacy"
-    subtitle="D.Pharm — 2 Year Professional Diploma"
-    category="academics"
-    activeItemLabel="Courses Offered - D.Pharm"
-  >
-    <CourseDetailLayout
-      title="D.Pharm."
-      fullName="Diploma in Pharmacy (Full Time)"
-      intake="60 Seats"
-      duration="2 Years"
-      eligibility="Passed 10+2 examination with Physics, Chemistry and Biology/Mathematics"
-      fees="₹50,000 / Year"
-      overview="The Diploma in Pharmacy (D.Pharm.) is a 2-year undergraduate diploma course designed to provide students with fundamental knowledge in pharmaceutical science, drug distribution, community pharmacy practice, and hospital pharmacy management."
-      image="/images/hero/pharmacy_lab.jpg"
-    />
-  </SubPageLayout>
-);
+/**
+ * /academics/<slug>. Course pages are data, so they are matched here by
+ * address rather than each having a route: /academics/courses-offered-<id> is
+ * the course with that id. Any other /academics/<slug> is the scraped page it
+ * always was.
+ */
+export function CourseBySlug() {
+  const { slug = "" } = useParams();
+  const { content, preview, loaded } = useCourses();
 
-export const BPharm = () => (
-  <SubPageLayout
-    title="Bachelor of Pharmacy"
-    subtitle="B.Pharm — 4 Year Degree Program"
-    category="academics"
-    activeItemLabel="Courses Offered - B.Pharm"
-  >
-    <CourseDetailLayout
-      title="B.Pharm."
-      fullName="Bachelor of Pharmacy (Full Time)"
-      intake="100 Seats"
-      duration="4 Years"
-      eligibility="As per ACPC / GTU Norms (10+2 Science with PCB/PCM)"
-      fees="₹85,995 (Subject to FRC)"
-      overview="The B.Pharm course is an undergraduate degree program that provides comprehensive knowledge of pharmaceutical sciences, drug discovery, formulation, and clinical pharmacy, preparing students for diverse roles in the healthcare industry."
-      image="/images/hero/students_learning.jpg"
-    />
-  </SubPageLayout>
-);
+  if (!slug.startsWith(COURSE_SLUG_PREFIX)) return <DynamicSubPage />;
 
-export const MPharm = () => (
-  <SubPageLayout
-    title="Master of Pharmacy"
-    subtitle="M.Pharm — 2 Year Postgraduate Research Program"
-    category="academics"
-    activeItemLabel="Courses Offered - M.Pharm"
-  >
-    <CourseDetailLayout
-      title="M.Pharm."
-      fullName="Master of Pharmacy (Full Time)"
-      intake="15 Seats"
-      duration="2 Years"
-      eligibility="B.Pharm with valid GPAT score / PGCET rank"
-      fees="₹1,31,250 (Subject to FRC)"
-      overview="M.Pharm is a postgraduate program focused on advanced research and specialization. At CKPIPSR, we focus on producing researchers who can lead innovations in pharmaceutical formulation and quality assurance."
-      image="/images/hero/66e153e687221.webp"
-    />
-  </SubPageLayout>
-);
+  const id = slug.slice(COURSE_SLUG_PREFIX.length);
+  const course = content.courses.find((c) => c.id === id);
+  // A disabled course is absent from the live data; a preview carries it, flagged.
+  const shown = course && (course.enabled || preview);
 
-export const ShortTermCertificate = () => (
-  <SubPageLayout
-    title="Short Term Certificate"
-    subtitle="Industry Skill Development Program"
-    category="academics"
-    activeItemLabel="Courses Offered - Short Term Certificate"
-  >
-    <CourseDetailLayout
-      title="Certificate"
-      fullName="Pharmaceutical Dossier Preparation And Filing"
-      intake="100 Seats"
-      duration="60 Hours (8 weeks, Sat/Sun only, Online)"
-      eligibility="Pharmacy Students / Professionals"
-      fees="₹2,000 (Indian) / $50 USD (Overseas)"
-      overview="A specialized intensive program focused on the regulatory aspects of drug filing, dossier preparation (CTD/eCTD formats), and international pharmaceutical compliance. Fees inclusive of certification and exam fees."
-      image="/images/hero/66e1522d09fc0.webp"
-    />
-  </SubPageLayout>
-);
+  if (!shown) {
+    // A course added in the panel is not in the shipped defaults; wait for the list.
+    if (!loaded) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[#123a1a] border-t-transparent rounded-full animate-spin" />
+        </div>
+      );
+    }
+    return (
+      <SubPageLayout
+        title="Course not offered"
+        subtitle="This course is not currently offered at CKPIPSR."
+        category="academics"
+        activeItemLabel="Courses Offered"
+      >
+        <div className="bg-white rounded-2xl border border-slate-100 p-8 sm:p-10 shadow-sm text-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-[#123a1a]/5 text-[#123a1a] flex items-center justify-center mx-auto">
+            <GraduationCap size={22} />
+          </div>
+          <h2 className="text-xl font-serif font-bold text-slate-900">This course is not currently offered</h2>
+          <p className="text-sm text-slate-600 max-w-md mx-auto">
+            It may have been renamed or withdrawn. See the programs we offer now.
+          </p>
+          <Link
+            to="/academics/courses-offered"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#123a1a] text-white font-bold text-xs hover:bg-[#1a4a25] transition-all"
+          >
+            All courses
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      </SubPageLayout>
+    );
+  }
+
+  return (
+    <SubPageLayout
+      title={course.page.pageTitle}
+      subtitle={course.page.pageSubtitle}
+      category="academics"
+      activeItemLabel={courseNavLabel(course)}
+    >
+      {!course.enabled && (
+        <div className="mb-6 flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+          <EyeOff size={16} className="shrink-0" />
+          Preview only: this course is disabled and hidden on the live site.
+        </div>
+      )}
+      <CourseDetail course={course.page} />
+    </SubPageLayout>
+  );
+}

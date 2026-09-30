@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     LifeBuoy,
@@ -33,93 +33,41 @@ import {
     Filter
 } from 'lucide-react';
 import SubPageLayout from '../../components/SubPageLayout';
+import { useStudentHelpDeskContent } from '../../hooks/useStudentHelpDeskContent';
 
 // ── Types ──
-export interface TicketData {
-    ticketId: string;
+/**
+ * A ticket as the API hands it back, on the confirmation screen and on the
+ * tracking tab. Everything else this page shows is content.
+ */
+export interface TrackedTicket {
+    reference: string;
+    submittedAt: string;
+    updatedAt: string;
     fullName: string;
-    email: string;
-    phone: string;
-    studentCode: string;
     course: string;
     semester: string;
     issueCategory: string;
     priority: string;
-    contactMethod: 'Email' | 'Phone';
     subject: string;
     description: string;
-    fileName: string | null;
-    submittedAt: string;
-    status: 'Submitted' | 'Under Review' | 'In Progress' | 'Resolved';
+    attachmentName: string;
+    status: string;
     assignedOfficer: string;
-    estimatedResolution: string;
-    timeline: { title: string; date: string; completed: boolean; note?: string }[];
+    /** What the desk wants the student to read. */
+    resolutionNote: string;
 }
 
-export interface FAQItem {
-    id: string;
-    category: 'Examination' | 'Scholarships & Fees' | 'Certificates' | 'Library' | 'General';
-    question: string;
-    answer: string;
-    steps?: string[];
-}
-
-export interface FormDocument {
-    id: string;
+/** One line of the tracking timeline, worked out from the stages and a status. */
+interface TimelineStep {
     title: string;
-    category: string;
-    size: string;
-    description: string;
-    fileName: string;
+    date: string;
+    completed: boolean;
+    note?: string;
 }
 
-export interface NodalOfficer {
-    name: string;
-    designation: string;
-    department: string;
-    email: string;
-    phone: string;
-    office: string;
-}
-
-// ── Constant Options ──
-const ISSUE_CATEGORIES = [
-    'Examination & Results (GTU Re-checking, Marksheets)',
-    'Fees & Payment Receipts',
-    'Scholarship Verification (Digital Gujarat, MYSY, NSP)',
-    'Certificates & Transcripts (Bonafide, NOC, Leaving Cert)',
-    'Attendance & Academic Records',
-    'Library & E-Resource Access',
-    'Hostel & Campus Bus Transport',
-    'Website & IT Portal Access',
-    'Other General Enquiry',
-];
-
-const COURSE_OPTIONS = [
-    'B.Pharm (Bachelor of Pharmacy)',
-    'M.Pharm (Pharmaceutics)',
-    'D.Pharm (Diploma in Pharmacy)',
-];
-
-const SEMESTER_OPTIONS = [
-    'Semester 1',
-    'Semester 2',
-    'Semester 3',
-    'Semester 4',
-    'Semester 5',
-    'Semester 6',
-    'Semester 7',
-    'Semester 8',
-    'Passout / Alumni',
-];
-
-const PRIORITY_OPTIONS = [
-    { value: 'Low', label: 'Low – General Query' },
-    { value: 'Medium', label: 'Medium – Standard Inquiry' },
-    { value: 'High', label: 'High – Needs Attention Soon' },
-    { value: 'Urgent', label: 'Urgent – Exam / Scholarship Deadline' },
-];
-
+// The three limits the server also holds. They are here so the page can say no
+// before a 10 MB upload travels, not so that it decides on its own.
 const MAX_DESCRIPTION_LENGTH = 1000;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_FILE_TYPES = [
@@ -129,234 +77,28 @@ const ALLOWED_FILE_TYPES = [
     'image/webp',
 ];
 
-// ── Sample Pre-populated Tickets for Demo Lookup ──
-const SAMPLE_TICKETS: Record<string, TicketData> = {
-    'CKP-2026-1042': {
-        ticketId: 'CKP-2026-1042',
-        fullName: 'Rahul Sharma',
-        email: 'rahul.sharma@ckpipsr.ac.in',
-        phone: '9876543210',
-        studentCode: 'UG240015',
-        course: 'B.Pharm (Bachelor of Pharmacy)',
-        semester: 'Semester 4',
-        issueCategory: 'Examination & Results (GTU Re-checking, Marksheets)',
-        priority: 'High',
-        contactMethod: 'Email',
-        subject: 'GTU Semester 3 Re-assessment Marksheet Status',
-        description: 'Applied for GTU re-assessment in Organic Chemistry-II on August 15. Requesting updated mark sheet for scholarship submission.',
-        fileName: 'gtu_receipt_1042.pdf',
-        submittedAt: '2026-09-02T10:30:00Z',
-        status: 'In Progress',
-        assignedOfficer: 'Prof. Exam Coordinator (GTU Section)',
-        estimatedResolution: 'Within 24 Hours',
-        timeline: [
-            { title: 'Ticket Submitted & Logged', date: 'Sept 02, 10:30 AM', completed: true, note: 'Ticket reference code assigned.' },
-            { title: 'Assigned to GTU Exam Cell', date: 'Sept 02, 02:15 PM', completed: true, note: 'Assigned to Prof. Exam Coordinator.' },
-            { title: 'GTU Portal Verification', date: 'Sept 03, 11:00 AM', completed: true, note: 'Re-assessment marks verified with GTU server.' },
-            { title: 'Final Resolution & Updated Certificate', date: 'Pending', completed: false, note: 'Updated mark sheet will be emailed upon GTU dispatch.' }
-        ]
-    },
-    'CKP-2026-1089': {
-        ticketId: 'CKP-2026-1089',
-        fullName: 'Priya Patel',
-        email: 'priya.patel@ckpipsr.ac.in',
-        phone: '9825012345',
-        studentCode: 'PG250008',
-        course: 'M.Pharm (Pharmaceutics)',
-        semester: 'Semester 2',
-        issueCategory: 'Scholarship Verification (Digital Gujarat, MYSY, NSP)',
-        priority: 'Medium',
-        contactMethod: 'Email',
-        subject: 'Digital Gujarat Scholarship Verification Signature',
-        description: 'Submitted physical copy of Digital Gujarat renewal form at Room 102. Requesting online portal approval status.',
-        fileName: 'digital_gujarat_form.pdf',
-        submittedAt: '2026-09-08T14:20:00Z',
-        status: 'Resolved',
-        assignedOfficer: 'Head of Student Section (Room 102)',
-        estimatedResolution: 'Completed',
-        timeline: [
-            { title: 'Ticket Submitted', date: 'Sept 08, 02:20 PM', completed: true },
-            { title: 'Document Verified by Student Cell', date: 'Sept 09, 11:00 AM', completed: true },
-            { title: 'Approved on Digital Gujarat Portal', date: 'Sept 10, 04:30 PM', completed: true, note: 'Scholarship proposal approved and forwarded to Govt officer.' },
-            { title: 'Ticket Closed', date: 'Sept 10, 05:00 PM', completed: true, note: 'Verification completed successfully.' }
-        ]
-    }
+/** A time as the timeline prints it. */
+const stamp = (iso: string) => {
+    const date = new Date(iso);
+    return Number.isNaN(date.getTime())
+        ? iso
+        : date.toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 };
 
-// ── FAQs Data ──
-const FAQS_DATA: FAQItem[] = [
-    {
-        id: 'faq-1',
-        category: 'Certificates',
-        question: 'How do I obtain a Bonafide Certificate or Character Certificate?',
-        answer: 'You can request a Bonafide or Character Certificate by submitting a ticket online or visiting the Student Section (Room 102). Processing takes 1 to 2 working days.',
-        steps: [
-            'Fill out the online ticket form or download the Bonafide Application PDF from this page.',
-            'Attach your latest semester fee receipt and Student ID card copy.',
-            'Collect your stamped certificate from Room 102 during office hours (9 AM - 4 PM).'
-        ]
-    },
-    {
-        id: 'faq-2',
-        category: 'Examination',
-        question: 'What is the procedure for GTU Re-assessment / Re-checking of marks?',
-        answer: 'GTU re-assessment forms must be submitted within 7 days of GTU result declaration via the GTU student portal.',
-        steps: [
-            'Log into your GTU Student Portal (student.gtu.ac.in).',
-            'Apply for Re-assessment / Re-checking and pay the GTU prescribed online fee.',
-            'Submit a copy of the payment receipt to the CKPIPSR Exam Cell or raise a ticket here for confirmation.'
-        ]
-    },
-    {
-        id: 'faq-3',
-        category: 'Scholarships & Fees',
-        question: 'How do I get my Digital Gujarat / MYSY Scholarship documents verified?',
-        answer: 'Scholarship verification is handled by the Student Welfare Desk on the Ground Floor.',
-        steps: [
-            'Complete your application on the Digital Gujarat portal or MYSY web portal.',
-            'Print the completed application and attach required income, caste, and Marksheet photocopies.',
-            'Submit physical copies at Room 102 for nodal officer digital sign verification.'
-        ]
-    },
-    {
-        id: 'faq-4',
-        category: 'Scholarships & Fees',
-        question: 'My online fee payment failed but money was deducted. What should I do?',
-        answer: 'Online payment gateways usually auto-reconcile failed transactions within 24 to 48 hours. If the status remains unpaid, raise a ticket under Fees & Payments with your Transaction Ref ID.',
-        steps: [
-            'Check your bank statement for UTR / Reference Number.',
-            'Do not make a double payment immediately if the bank account was debited.',
-            'Raise a ticket with subject "Payment Deducted but Receipt Pending" attaching the bank screenshot.'
-        ]
-    },
-    {
-        id: 'faq-5',
-        category: 'Library',
-        question: 'How do I reset my GTU E-Library / DELNET login credentials?',
-        answer: 'E-Library access is managed by the Central Library. Send your Student Roll Code and official email to library@ckpipsr.ac.in or raise a ticket under Library & E-Resource Access.',
-        steps: [
-            'Select "Library & E-Resource Access" in the ticket category.',
-            'Provide your Roll Code, Course, and Semester.',
-            'The librarian will dispatch reset credentials to your registered email within 24 hours.'
-        ]
-    },
-    {
-        id: 'faq-6',
-        category: 'General',
-        question: 'What is the minimum GTU attendance requirement for appearing in end-sem exams?',
-        answer: 'As per Gujarat Technological University (GTU) & PCI norms, a minimum of 75% attendance is compulsory in lectures and practicals to be eligible for term grant and university exams.',
-        steps: [
-            'Students with medical emergencies must submit medical certificates within 3 days of resuming college.',
-            'Submit medical leave applications approved by HOD to the Student Section.'
-        ]
-    }
-];
-
-// ── Downloadable Documents ──
-const DOWNLOADABLE_FORMS: FormDocument[] = [
-    {
-        id: 'form-1',
-        title: 'Bonafide Certificate Application Form',
-        category: 'Certificates',
-        size: '145 KB',
-        description: 'Official application format for passport, bank account, or scholarship bonafide certificate.',
-        fileName: 'CKPIPSR_Bonafide_Application_Form.pdf'
-    },
-    {
-        id: 'form-2',
-        title: 'Academic Transcript & Verification Request',
-        category: 'GTU & Academics',
-        size: '210 KB',
-        description: 'Form for requesting official college transcripts for higher studies WES / Foreign evaluation.',
-        fileName: 'CKPIPSR_Transcript_Request_Form.pdf'
-    },
-    {
-        id: 'form-3',
-        title: 'No Dues & Leaving Certificate Clearance Form',
-        category: 'Administrative',
-        size: '180 KB',
-        description: 'Clearance form for library, lab equipment, hostel, and fee accounts required for LC issuance.',
-        fileName: 'CKPIPSR_NoDues_Clearance_Form.pdf'
-    },
-    {
-        id: 'form-4',
-        title: 'Duplicate Student ID Card Request Form',
-        category: 'Student Welfare',
-        size: '120 KB',
-        description: 'Application for re-issuance of lost or damaged smart RFID Student Identity Card.',
-        fileName: 'CKPIPSR_Duplicate_ID_Card_Form.pdf'
-    },
-    {
-        id: 'form-5',
-        title: 'Medical Leave & Attendance Exemption Form',
-        category: 'Academic Welfare',
-        size: '160 KB',
-        description: 'Form to apply for medical leave approval along with doctor certificate and parent signature.',
-        fileName: 'CKPIPSR_Medical_Leave_Form.pdf'
-    },
-    {
-        id: 'form-6',
-        title: 'GTU Exam Re-assessment Application',
-        category: 'Examination',
-        size: '195 KB',
-        description: 'Form for requesting institutional endorsement for GTU re-assessment and re-checking.',
-        fileName: 'CKPIPSR_GTU_Reassessment_Form.pdf'
-    }
-];
-
-// ── Nodal Officers ──
-const NODAL_OFFICERS: NodalOfficer[] = [
-    {
-        name: 'Dr. Dhiren P. Shah',
-        designation: 'Principal & Appellate Grievance Officer',
-        department: 'Institutional Administration',
-        email: 'principal@ckpipsr.ac.in',
-        phone: '+91 (0261) 2727123 Ext. 101',
-        office: 'Principal Office, 1st Floor, Main Academic Building'
-    },
-    {
-        name: 'Prof. Exam In-Charge',
-        designation: 'Controller of Examinations (GTU Cell)',
-        department: 'Examination & University Evaluation Section',
-        email: 'exam@ckpipsr.ac.in',
-        phone: '+91 (0261) 2727123 Ext. 104',
-        office: 'Exam Control Room 104, Ground Floor'
-    },
-    {
-        name: 'Head of Student Affairs',
-        designation: 'Nodal Officer (Scholarships & Certificates)',
-        department: 'Student Welfare Section',
-        email: 'students@ckpipsr.ac.in',
-        phone: '+91 (0261) 2727123 Ext. 102',
-        office: 'Student Helpdesk Wing, Room 102, Ground Floor'
-    },
-    {
-        name: 'Accounts & Finance Officer',
-        designation: 'Senior Accountant & Fee Manager',
-        department: 'Accounts & Finance Department',
-        email: 'accounts@ckpipsr.ac.in',
-        phone: '+91 (0261) 2727123 Ext. 103',
-        office: 'Accounts Office, Room 103, Ground Floor'
-    },
-    {
-        name: 'Central Librarian',
-        designation: 'Head Librarian & E-Resource Administrator',
-        department: 'Central Pharmacy Library',
-        email: 'library@ckpipsr.ac.in',
-        phone: '+91 (0261) 2727123 Ext. 108',
-        office: 'Central Library, 2nd Floor'
-    },
-    {
-        name: 'Convenor, Grievance Cell (GRC)',
-        designation: 'Head, Student Grievance Redressal Committee',
-        department: 'GRC & Student Welfare',
-        email: 'grc@ckpipsr.ac.in',
-        phone: '+91 (0261) 2727123 Ext. 105',
-        office: 'GRC Office Room 105'
-    }
-];
-
 export default function StudentHelpDesk() {
+    const content = useStudentHelpDeskContent();
+
+    // Named as the constants they replaced, so the markup below is unchanged:
+    // these lists are now the panel’s, and a ticket is offered whatever it says.
+    const ISSUE_CATEGORIES = content.form.categories;
+    const COURSE_OPTIONS = content.form.courses;
+    const SEMESTER_OPTIONS = content.form.semesters;
+    const PRIORITY_OPTIONS = content.form.priorities;
+    const FAQS_DATA = content.faqs.items;
+    const DOWNLOADABLE_FORMS = content.forms.items;
+    const NODAL_OFFICERS = content.directory.officers;
+    const FAQ_CATEGORIES = ['All', ...content.faqCategories];
+
     // ── Active Tab ──
     const [activeTab, setActiveTab] = useState<'raise' | 'track' | 'faqs' | 'forms' | 'directory'>('raise');
 
@@ -369,7 +111,7 @@ export default function StudentHelpDesk() {
     const [semester, setSemester] = useState('');
 
     const [issueCategory, setIssueCategory] = useState('');
-    const [priority, setPriority] = useState('Medium');
+    const [priority, setPriority] = useState('');
     const [contactMethod, setContactMethod] = useState<'Email' | 'Phone'>('Email');
     const [subject, setSubject] = useState('');
     const [description, setDescription] = useState('');
@@ -380,22 +122,37 @@ export default function StudentHelpDesk() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [isConfirmed, setIsConfirmed] = useState(false);
-    const [submitState, setSubmitState] = useState<'idle' | 'submitted'>('idle');
-    const [generatedTicket, setGeneratedTicket] = useState<TicketData | null>(null);
+    const [submitState, setSubmitState] = useState<'idle' | 'submitted' | 'sending'>('idle');
+    const [generatedTicket, setGeneratedTicket] = useState<TrackedTicket | null>(null);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const [copiedRef, setCopiedRef] = useState(false);
 
     // ── Track Ticket State ──
+    //
+    // Both the reference and the email are asked for: references run in
+    // sequence, so a reference on its own would let anyone read anyone’s ticket.
     const [searchTicketId, setSearchTicketId] = useState('');
-    const [trackedTicket, setTrackedTicket] = useState<TicketData | null>(null);
+    const [trackEmail, setTrackEmail] = useState('');
+    const [trackedTicket, setTrackedTicket] = useState<TrackedTicket | null>(null);
     const [trackError, setTrackError] = useState<string | null>(null);
+    const [trackBusy, setTrackBusy] = useState(false);
 
     // ── FAQ Search State ──
     const [faqSearchQuery, setFaqSearchQuery] = useState('');
     const [selectedFaqCategory, setSelectedFaqCategory] = useState<string>('All');
     const [expandedFaqId, setExpandedFaqId] = useState<string | null>('faq-1');
 
-    // ── User Submitted Local Ticket Storage ──
-    const [userTickets, setUserTickets] = useState<Record<string, TicketData>>(SAMPLE_TICKETS);
+
+    // The panel picks which priority is selected to begin with, and the page
+    // renders before the answer arrives — so it is filled in when it does, and
+    // only while the student has not chosen for themselves.
+    useEffect(() => {
+        setPriority((current) =>
+            current && PRIORITY_OPTIONS.some((p) => p.value === current)
+                ? current
+                : content.form.defaultPriority,
+        );
+    }, [content.form.defaultPriority, PRIORITY_OPTIONS]);
 
     // ── Touched States for Blur Validation ──
     const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -514,61 +271,61 @@ export default function StudentHelpDesk() {
     };
 
     // ── Submission Handler ──
+    //
+    // Sent as multipart, because the ticket may carry a file. The reference on
+    // the confirmation screen is the one the database generated — nothing here
+    // invents one, so what the student quotes always names a row.
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isValid) return;
+        if (!isValid || submitState === 'sending') return;
 
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
-        const refId = `CKP-2026-${randomNum}`;
+        setSubmitState('sending');
+        setSubmitError(null);
 
-        const newTicket: TicketData = {
-            ticketId: refId,
+        const body = new FormData();
+        const fields: Record<string, string> = {
             fullName,
             email,
-            phone: phone || 'N/A',
-            studentCode: studentCode || 'N/A',
-            course: course || 'Not Specified',
-            semester: semester || 'Not Specified',
+            phone,
+            studentCode,
+            course,
+            semester,
             issueCategory,
             priority,
             contactMethod,
             subject,
             description,
-            fileName: file?.name ?? null,
-            submittedAt: new Date().toISOString(),
-            status: 'Submitted',
-            assignedOfficer: 'Nodal Student Officer (Room 102)',
-            estimatedResolution: 'Within 24-48 Hours',
-            timeline: [
-                {
-                    title: 'Ticket Submitted & Registered',
-                    date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    completed: true,
-                    note: 'Support ticket reference generated and logged into helpdesk registry.'
-                },
-                {
-                    title: 'Verification by Department In-Charge',
-                    date: 'Pending',
-                    completed: false,
-                    note: 'Ticket queued for review by nodal section officer.'
-                },
-                {
-                    title: 'Processing & Resolution',
-                    date: 'Pending',
-                    completed: false
-                },
-                {
-                    title: 'Final Notification & Ticket Closure',
-                    date: 'Pending',
-                    completed: false
-                }
-            ]
         };
+        Object.entries(fields).forEach(([key, value]) => body.append(key, value.trim()));
+        if (file) body.append('attachment', file);
 
-        // Save into local ticket registry for instant live tracking
-        setUserTickets(prev => ({ ...prev, [refId]: newTicket }));
-        setGeneratedTicket(newTicket);
-        setSubmitState('submitted');
+        try {
+            const res = await fetch('/api/help-desk/tickets', { method: 'POST', body });
+            const payload = await res.json().catch(() => null);
+            if (!res.ok) {
+                throw new Error(payload?.error ?? 'Your ticket could not be sent. Please try again.');
+            }
+            setGeneratedTicket({
+                reference: payload.ticket.reference,
+                submittedAt: payload.ticket.submittedAt,
+                updatedAt: payload.ticket.submittedAt,
+                fullName,
+                course,
+                semester,
+                issueCategory,
+                priority,
+                subject,
+                description,
+                attachmentName: payload.ticket.attachmentName ?? '',
+                status: payload.ticket.status,
+                assignedOfficer: payload.ticket.assignedOfficer || content.success.defaultOfficer,
+                resolutionNote: '',
+            });
+            setSubmitState('submitted');
+        } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : 'Your ticket could not be sent.');
+            setSubmitState('idle');
+        }
     };
 
     const handleReset = () => {
@@ -579,7 +336,7 @@ export default function StudentHelpDesk() {
         setCourse('');
         setSemester('');
         setIssueCategory('');
-        setPriority('Medium');
+        setPriority(content.form.defaultPriority);
         setContactMethod('Email');
         setSubject('');
         setDescription('');
@@ -589,6 +346,7 @@ export default function StudentHelpDesk() {
         setTouched({});
         setSubmitState('idle');
         setGeneratedTicket(null);
+        setSubmitError(null);
         setCopiedRef(false);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -596,24 +354,62 @@ export default function StudentHelpDesk() {
     };
 
     // ── Handle Track Ticket Lookup ──
-    const handleTrackSearch = (e?: React.FormEvent, customId?: string) => {
-        if (e) e.preventDefault();
-        const idToSearch = (customId || searchTicketId).trim().toUpperCase();
+    const runTrack = async (reference: string, emailUsed: string) => {
         setTrackError(null);
-
-        if (!idToSearch) {
-            setTrackError('Please enter a valid ticket reference ID (e.g. CKP-2026-1042).');
+        if (!reference.trim() || !emailUsed.trim()) {
+            setTrackError('Enter both your ticket reference and the email address you raised it with.');
             setTrackedTicket(null);
             return;
         }
 
-        if (userTickets[idToSearch]) {
-            setTrackedTicket(userTickets[idToSearch]);
-        } else {
-            setTrackError(`No support ticket found for reference ID "${idToSearch}". Please check the ID or raise a new ticket.`);
+        setTrackBusy(true);
+        try {
+            const res = await fetch('/api/help-desk/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reference: reference.trim(), email: emailUsed.trim() }),
+            });
+            const payload = await res.json().catch(() => null);
+            if (!res.ok) throw new Error(payload?.error ?? 'That ticket could not be found.');
+            setTrackedTicket(payload.ticket);
+        } catch (err) {
+            setTrackError(err instanceof Error ? err.message : 'That ticket could not be found.');
             setTrackedTicket(null);
+        } finally {
+            setTrackBusy(false);
         }
     };
+
+    const handleTrackSearch = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        void runTrack(searchTicketId, trackEmail);
+    };
+
+    /**
+     * The timeline: the stages the panel wrote, marked off against the status
+     * the desk has set. Everything up to it is done, the rest is still to come,
+     * and the desk’s own note replaces the stage’s wording where it has left one.
+     */
+    const timelineFor = (ticket: TrackedTicket): TimelineStep[] => {
+        const current = content.track.stages.findIndex((stage) => stage.status === ticket.status);
+        return content.track.stages.map((stage, index) => ({
+            title: stage.title,
+            date:
+                index === 0
+                    ? stamp(ticket.submittedAt)
+                    : index === current
+                        ? stamp(ticket.updatedAt)
+                        : index < current
+                            ? ''
+                            : 'Pending',
+            completed: current >= 0 && index <= current,
+            note: index === current && ticket.resolutionNote ? ticket.resolutionNote : stage.note,
+        }));
+    };
+
+    /** What the page promises for a ticket at the priority chosen. */
+    const slaFor = (value: string) =>
+        content.form.priorities.find((p) => p.value === value)?.sla ?? '';
 
     const copyTicketId = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -634,8 +430,8 @@ export default function StudentHelpDesk() {
 
     return (
         <SubPageLayout
-            title="Student Help Desk Portal"
-            subtitle="Submit support requests, track ticket status, download official application forms, and search student FAQs."
+            title={content.pageTitle}
+            subtitle={content.pageSubtitle}
             category="students-corner"
             activeItemLabel="Student Help Desk"
         >
@@ -652,25 +448,31 @@ export default function StudentHelpDesk() {
                                 </div>
 
                                 <h2 className="font-serif font-bold text-2xl sm:text-3xl text-[#2D2424] mb-2">
-                                    Support Ticket Successfully Registered!
+                                    {content.success.heading}
                                 </h2>
 
                                 <p className="text-[#2D2424]/80 text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-6">
-                                    Thank you, <span className="font-semibold text-[#2D2424]">{generatedTicket.fullName}</span>. Your ticket has been logged into the student portal system.
+                                    Thank you, <span className="font-semibold text-[#2D2424]">{generatedTicket.fullName}</span>. {content.success.lead}
                                 </p>
 
                                 {/* Ticket Reference Code Highlight */}
                                 <div className="inline-flex items-center gap-3 bg-white border border-[#D4AF37]/40 px-6 py-3.5 rounded-2xl shadow-sm mb-8">
                                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">Reference ID:</span>
-                                    <span className="font-mono font-bold text-xl sm:text-2xl text-[#123a1a]">{generatedTicket.ticketId}</span>
+                                    <span className="font-mono font-bold text-xl sm:text-2xl text-[#123a1a]">{generatedTicket.reference}</span>
                                     <button
-                                        onClick={() => copyTicketId(generatedTicket.ticketId)}
+                                        onClick={() => copyTicketId(generatedTicket.reference)}
                                         className="p-2 text-[#96771d] hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
                                         title="Copy Ticket Reference ID"
                                     >
                                         {copiedRef ? <Check size={18} className="text-emerald-600" /> : <Copy size={18} />}
                                     </button>
                                 </div>
+
+                                {content.success.note && (
+                                    <p className="text-xs text-slate-500 max-w-xl mx-auto -mt-5 mb-8">
+                                        {content.success.note}
+                                    </p>
+                                )}
 
                                 <div className="bg-white rounded-2xl border border-slate-200/80 p-6 text-left max-w-2xl mx-auto mb-8 shadow-xs space-y-4">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-b border-slate-100 pb-4">
@@ -680,7 +482,7 @@ export default function StudentHelpDesk() {
                                         </div>
                                         <div>
                                             <span className="text-slate-400 uppercase tracking-wider block font-mono text-[10px]">Priority &amp; SLA</span>
-                                            <span className="font-semibold text-[#2D2424] text-sm mt-0.5 block">{generatedTicket.priority} ({generatedTicket.estimatedResolution})</span>
+                                            <span className="font-semibold text-[#2D2424] text-sm mt-0.5 block">{generatedTicket.priority}{slaFor(generatedTicket.priority) ? ` (${slaFor(generatedTicket.priority)})` : ''}</span>
                                         </div>
                                         <div>
                                             <span className="text-slate-400 uppercase tracking-wider block font-mono text-[10px]">Course &amp; Sem</span>
@@ -697,12 +499,12 @@ export default function StudentHelpDesk() {
                                         <p className="font-semibold text-[#2D2424] text-sm">{generatedTicket.subject}</p>
                                     </div>
 
-                                    {generatedTicket.fileName && (
+                                    {generatedTicket.attachmentName && (
                                         <div>
                                             <span className="text-slate-400 uppercase tracking-wider block font-mono text-[10px] mb-1">Attached File</span>
                                             <span className="font-medium text-slate-700 text-xs flex items-center gap-1.5">
                                                 <FileText size={14} className="text-[#D4AF37]" />
-                                                {generatedTicket.fileName}
+                                                {generatedTicket.attachmentName}
                                             </span>
                                         </div>
                                     )}
@@ -712,7 +514,9 @@ export default function StudentHelpDesk() {
                                     <button
                                         onClick={() => {
                                             setActiveTab('track');
-                                            handleTrackSearch(undefined, generatedTicket.ticketId);
+                                            setSearchTicketId(generatedTicket.reference);
+                                            setTrackEmail(email);
+                                            void runTrack(generatedTicket.reference, email);
                                         }}
                                         className="px-6 py-3.5 rounded-xl bg-[#123a1a] hover:bg-[#1a4f23] text-[#D4AF37] font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
                                     >
@@ -739,10 +543,10 @@ export default function StudentHelpDesk() {
                                         </span>
                                         <div>
                                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424]">
-                                                Personal &amp; Academic Details
+                                                {content.form.personal.heading}
                                             </h2>
                                             <p className="text-xs sm:text-sm text-[#2D2424]/70 mt-1">
-                                                Tell us who you are so our administrative section can reach you.
+                                                {content.form.personal.blurb}
                                             </p>
                                         </div>
                                     </div>
@@ -885,10 +689,10 @@ export default function StudentHelpDesk() {
                                         </span>
                                         <div>
                                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424]">
-                                                Issue Details &amp; Priority
+                                                {content.form.issue.heading}
                                             </h2>
                                             <p className="text-xs sm:text-sm text-[#2D2424]/70 mt-1">
-                                                Describe your inquiry clearly so we can route it directly to the responsible section officer.
+                                                {content.form.issue.blurb}
                                             </p>
                                         </div>
                                     </div>
@@ -926,7 +730,7 @@ export default function StudentHelpDesk() {
                                         {/* Priority Level */}
                                         <div>
                                             <label htmlFor="priority" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Priority Level <span className="text-slate-400 text-[10px] font-normal normal-case">(Defaults to Medium)</span>
+                                                Priority Level <span className="text-slate-400 text-[10px] font-normal normal-case">(Defaults to {content.form.defaultPriority})</span>
                                             </label>
                                             <select
                                                 id="priority"
@@ -1037,10 +841,10 @@ export default function StudentHelpDesk() {
                                         </span>
                                         <div>
                                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424]">
-                                                Attach Supporting Document
+                                                {content.form.attachment.heading}
                                             </h2>
                                             <p className="text-xs sm:text-sm text-[#2D2424]/70 mt-1">
-                                                Optional. Screenshots, GTU payment receipts, or fee slips help speed up verification.
+                                                {content.form.attachment.blurb}
                                             </p>
                                         </div>
                                     </div>
@@ -1072,7 +876,7 @@ export default function StudentHelpDesk() {
                                                 Drag and drop document here, or <span className="text-[#96771d] underline">browse files</span>
                                             </p>
                                             <p className="text-xs text-slate-400">
-                                                Supports PDF, JPG, PNG, WEBP up to 10 MB
+                                                {content.form.attachment.hint}
                                             </p>
                                         </div>
                                     ) : (
@@ -1120,19 +924,26 @@ export default function StudentHelpDesk() {
                                             className="mt-1 w-4 h-4 rounded border-slate-300 text-[#D4AF37] focus:ring-[#D4AF37] cursor-pointer"
                                         />
                                         <span className="text-xs sm:text-sm text-[#2D2424]/80 group-hover:text-[#2D2424] leading-relaxed">
-                                            I confirm that the information provided is accurate and complete. I understand that submitting false or duplicate requests may delay response time.
+                                            {content.form.consent}
                                         </span>
                                     </label>
+
+                                    {submitError && (
+                                        <p className="text-xs text-rose-600 flex items-start gap-1.5 font-medium">
+                                            <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                                            <span>{submitError}</span>
+                                        </p>
+                                    )}
 
                                     {/* Action Buttons */}
                                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                                         <button
                                             type="submit"
-                                            disabled={!isValid}
+                                            disabled={!isValid || submitState === 'sending'}
                                             className="flex-1 sm:flex-initial px-8 py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#C19A20] text-[#1a1208] font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer active:scale-98 text-center flex items-center justify-center gap-2"
                                         >
                                             <Send size={16} />
-                                            <span>Submit Support Ticket</span>
+                                            <span>{submitState === 'sending' ? 'Sending…' : content.form.submitLabel}</span>
                                         </button>
 
                                         <button
@@ -1141,7 +952,7 @@ export default function StudentHelpDesk() {
                                             className="px-6 py-3.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 transition-colors"
                                         >
                                             <Search size={16} />
-                                            <span>Track Existing Ticket</span>
+                                            <span>{content.form.trackLabel}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -1156,56 +967,48 @@ export default function StudentHelpDesk() {
                         {/* Search Card */}
                         <div className="bg-[#FAF8F3] border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424] mb-2">
-                                Track Support Ticket Progress
+                                {content.track.heading}
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-600 mb-6">
-                                Enter your unique Ticket Reference ID (e.g. <span className="font-mono font-bold text-[#123a1a]">CKP-2026-1042</span> or <span className="font-mono font-bold text-[#123a1a]">CKP-2026-1089</span>) to check real-time resolution status.
+                                {content.track.blurb}
                             </p>
 
-                            <form onSubmit={handleTrackSearch} className="flex flex-col sm:flex-row gap-3 max-w-xl">
-                                <div className="relative flex-1">
-                                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        value={searchTicketId}
-                                        onChange={(e) => setSearchTicketId(e.target.value)}
-                                        placeholder="Enter Ticket Reference ID (e.g. CKP-2026-1042)"
-                                        className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] font-mono text-sm uppercase text-[#2D2424] outline-none shadow-xs"
-                                    />
+                            <form onSubmit={handleTrackSearch} className="flex flex-col gap-3 max-w-xl">
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <div className="relative flex-1">
+                                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            value={searchTicketId}
+                                            onChange={(e) => setSearchTicketId(e.target.value)}
+                                            aria-label={content.track.referenceLabel}
+                                            placeholder={content.track.referenceLabel}
+                                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] font-mono text-sm uppercase text-[#2D2424] outline-none shadow-xs"
+                                        />
+                                    </div>
+
+                                    <div className="relative flex-1">
+                                        <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <input
+                                            type="email"
+                                            value={trackEmail}
+                                            onChange={(e) => setTrackEmail(e.target.value)}
+                                            aria-label={content.track.emailLabel}
+                                            placeholder={content.track.emailLabel}
+                                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] text-sm text-[#2D2424] outline-none shadow-xs"
+                                        />
+                                    </div>
                                 </div>
+
                                 <button
                                     type="submit"
-                                    className="px-6 py-3 rounded-xl bg-[#123a1a] hover:bg-[#1a4f23] text-[#D4AF37] font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all flex items-center justify-center gap-2"
+                                    disabled={trackBusy}
+                                    className="px-6 py-3 rounded-xl bg-[#123a1a] hover:bg-[#1a4f23] text-[#D4AF37] font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-60 sm:self-start"
                                 >
                                     <Search size={15} />
-                                    <span>Check Status</span>
+                                    <span>{trackBusy ? 'Checking…' : content.track.buttonLabel}</span>
                                 </button>
                             </form>
-
-                            {/* Demo Shortcut Chips */}
-                            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                                <span>Try Demo Tickets:</span>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setSearchTicketId('CKP-2026-1042');
-                                        handleTrackSearch(undefined, 'CKP-2026-1042');
-                                    }}
-                                    className="px-2.5 py-1 rounded-lg bg-amber-100/60 hover:bg-amber-200/80 text-amber-900 font-mono text-xs font-bold transition-colors cursor-pointer"
-                                >
-                                    CKP-2026-1042 (In Progress)
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setSearchTicketId('CKP-2026-1089');
-                                        handleTrackSearch(undefined, 'CKP-2026-1089');
-                                    }}
-                                    className="px-2.5 py-1 rounded-lg bg-emerald-100/60 hover:bg-emerald-200/80 text-emerald-900 font-mono text-xs font-bold transition-colors cursor-pointer"
-                                >
-                                    CKP-2026-1089 (Resolved)
-                                </button>
-                            </div>
 
                             {trackError && (
                                 <p className="text-xs text-rose-600 mt-3 flex items-center gap-1.5 font-medium">
@@ -1222,7 +1025,7 @@ export default function StudentHelpDesk() {
                                     <div>
                                         <div className="flex items-center gap-2">
                                             <span className="font-mono text-xs font-bold text-slate-400 uppercase">Ticket ID:</span>
-                                            <span className="font-mono font-bold text-xl text-[#123a1a]">{trackedTicket.ticketId}</span>
+                                            <span className="font-mono font-bold text-xl text-[#123a1a]">{trackedTicket.reference}</span>
                                             <span className={`px-3 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider ${trackedTicket.status === 'Resolved'
                                                 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                                                 : trackedTicket.status === 'In Progress'
@@ -1237,7 +1040,7 @@ export default function StudentHelpDesk() {
 
                                     <div className="text-left sm:text-right text-xs text-slate-500 font-mono">
                                         <div>Submitted: {new Date(trackedTicket.submittedAt).toLocaleDateString()}</div>
-                                        <div>SLA Target: <span className="font-bold text-slate-800">{trackedTicket.estimatedResolution}</span></div>
+                                        <div>SLA Target: <span className="font-bold text-slate-800">{slaFor(trackedTicket.priority) || 'As scheduled'}</span></div>
                                     </div>
                                 </div>
 
@@ -1249,7 +1052,7 @@ export default function StudentHelpDesk() {
                                     </h4>
 
                                     <div className="relative pl-6 border-l-2 border-slate-200 space-y-6">
-                                        {trackedTicket.timeline.map((step, idx) => (
+                                        {timelineFor(trackedTicket).map((step, idx) => (
                                             <div key={idx} className="relative group">
                                                 <div className={`absolute -left-[31px] top-0 w-4 h-4 rounded-full border-2 bg-white ${step.completed
                                                     ? 'border-emerald-600 bg-emerald-500'
@@ -1279,11 +1082,11 @@ export default function StudentHelpDesk() {
                                     </div>
                                     <div>
                                         <span className="text-slate-400 uppercase font-mono text-[10px] block">Course &amp; Semester</span>
-                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.course} ({trackedTicket.semester})</span>
+                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{[trackedTicket.course, trackedTicket.semester].filter(Boolean).join(' · ') || 'Not specified'}</span>
                                     </div>
                                     <div>
                                         <span className="text-slate-400 uppercase font-mono text-[10px] block">Assigned Nodal Officer</span>
-                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.assignedOfficer}</span>
+                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.assignedOfficer || content.success.defaultOfficer}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1298,10 +1101,10 @@ export default function StudentHelpDesk() {
                         <div className="bg-[#FAF8F3] border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
                             <div>
                                 <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424] mb-2">
-                                    Student Knowledge Base &amp; FAQs
+                                    {content.faqs.heading}
                                 </h2>
                                 <p className="text-xs sm:text-sm text-slate-600">
-                                    Search common administrative, examination, scholarship, and certificate queries.
+                                    {content.faqs.blurb}
                                 </p>
                             </div>
 
@@ -1319,7 +1122,7 @@ export default function StudentHelpDesk() {
 
                             {/* Category Filter Pills */}
                             <div className="flex flex-wrap items-center gap-2">
-                                {['All', 'Certificates', 'Examination', 'Scholarships & Fees', 'Library', 'General'].map((cat) => (
+                                {FAQ_CATEGORIES.map((cat) => (
                                     <button
                                         key={cat}
                                         onClick={() => setSelectedFaqCategory(cat)}
@@ -1393,10 +1196,10 @@ export default function StudentHelpDesk() {
                     <div className="space-y-6 animate-in fade-in duration-300">
                         <div className="bg-[#FAF8F3] border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424] mb-2">
-                                Official Student Application Forms
+                                {content.forms.heading}
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-600">
-                                Download standard institutional application formats for bonafide certificates, transcripts, GTU re-assessment, and leaving clearances.
+                                {content.forms.blurb}
                             </p>
                         </div>
 
@@ -1421,12 +1224,8 @@ export default function StudentHelpDesk() {
 
                                     <div className="pt-3 border-t border-slate-100">
                                         <a
-                                            href={`/documents/${form.fileName}`}
+                                            href={form.href}
                                             download={form.fileName}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                alert(`Downloading ${form.title} (${form.fileName}).`);
-                                            }}
                                             className="w-full py-2.5 px-4 rounded-xl bg-[#123a1a] hover:bg-[#1a4f23] text-[#D4AF37] font-bold font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                                         >
                                             <Download size={14} />
@@ -1444,10 +1243,10 @@ export default function StudentHelpDesk() {
                     <div className="space-y-6 animate-in fade-in duration-300">
                         <div className="bg-[#FAF8F3] border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424] mb-2">
-                                Institutional Nodal Officers &amp; Desk In-Charges
+                                {content.directory.heading}
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-600">
-                                Direct contact directory for academic, examination, scholarship, and student grievance inquiries.
+                                {content.directory.blurb}
                             </p>
                         </div>
 

@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Flip } from "gsap/all";
+import { usePreloaderContent } from "../hooks/usePreloaderContent";
 
 gsap.registerPlugin(Flip);
 
-// Cinematic pace control: 1.0 = snappier, 1.4 = slower/calmer
-const SPEED = 1.15;
-
-const images = [
-  "/images/hero/646efc827452b.webp",
-  "/images/hero/65efea4943a49.webp",
-  "/images/hero/65efeac7d49a3.webp",
-  "/images/hero/65efeaeece007.webp"
-];
+// The images shown, their order, and the pace are edited in the admin panel
+// under Homepage -> Loader. They are picked from the hero's own images so the
+// final one can zoom into the hero without a seam. `usePreloaderContent` falls
+// back to what this file used to hold if the API is unreachable.
 
 interface PreloaderProps {
   onExitStart: () => void;
@@ -20,6 +16,9 @@ interface PreloaderProps {
 }
 
 export default function Preloader({ onExitStart, onComplete }: PreloaderProps) {
+  const { content, ready } = usePreloaderContent();
+  const { images, speed: SPEED } = content;
+
   const rootRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
@@ -180,11 +179,24 @@ export default function Preloader({ onExitStart, onComplete }: PreloaderProps) {
     };
   }, [dismissed, onExitStart, onComplete]);
 
+  // Held until the loader's content has settled. The timeline is built from the
+  // image elements on screen, so starting before they are the right ones would
+  // animate the fallback set and then swap the pictures mid-run.
   useEffect(() => {
+    if (!ready) return;
+
+    // Turned off in the panel: hand straight over to the hero rather than
+    // playing an animation nobody asked for.
+    if (!content.enabled) {
+      onExitStart();
+      onComplete();
+      return;
+    }
+
     play();
     return () => ctxRef.current?.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ready, content.enabled]);
 
   return (
     <div 
@@ -216,7 +228,12 @@ export default function Preloader({ onExitStart, onComplete }: PreloaderProps) {
 
       {/* Main sliding image container */}
       <div className="preloader-container shadow-2xl">
-        {images.map((src, i) => (
+        {/* Held back until the fetched list is in hand.
+            Rendering the fallback set first put the old hardcoded photos on
+            screen for a frame before they were replaced — a visible flash of an
+            image nobody had chosen. The wrappers start clipped to nothing
+            anyway, so there is nothing to see in the meantime. */}
+        {ready && images.map((src, i) => (
           <div
             className="image-wrapper"
             id={i === images.length - 1 ? "final-image" : undefined}

@@ -28,7 +28,7 @@ export const categoryDisplayNames: Record<string, string> = {
   "Students": "Students Corner",
   "Cells": "Cells",
   "Rni": "Research & Innovation",
-  "Iqac": "IQAC",
+  "Iqac": "Accreditation & Ranking",
   "Tnp": "T&P",
   "Activities": "Activities"
 };
@@ -92,6 +92,7 @@ const PAGE_ORDER: Record<string, string[]> = {
   "Students Corner": [
     "Timetables",
     "Courses",
+    "Course Syllabus",
     "Scholorships",
     "E-Library",
     "Educational Videos",
@@ -125,7 +126,7 @@ const PAGE_ORDER: Record<string, string[]> = {
     "SSIP - Apply",
     "IIC"
   ],
-  "IQAC": [
+  "Accreditation & Ranking": [
     "About IQAC",
     "IQAC Composition",
     "IQAC Initiatives and Activities",
@@ -154,7 +155,7 @@ const PAGE_ORDER: Record<string, string[]> = {
 Object.keys(categoryDisplayNames).forEach((key) => {
   const label = categoryDisplayNames[key];
   const prefix = categoryUrlPrefixes[key];
-  
+
   const pages = scrapedData[key] || [];
   let items = pages.map((page) => {
     const pageSlug = slugify(page.Page);
@@ -204,7 +205,7 @@ Object.keys(categoryDisplayNames).forEach((key) => {
     if (idxB === -1) return -1;
     return idxA - idxB;
   });
-  
+
   ckpipsrNavigation[label] = items;
 });
 
@@ -225,7 +226,7 @@ export function getCkpipsrPage(pathname: string): { page: ContentPage; categoryL
 
   const pages = scrapedData[jsonKey] || [];
   const matchedPage = pages.find((page) => slugify(page.Page) === pageSlug);
-  
+
   if (!matchedPage) return null;
 
   return {

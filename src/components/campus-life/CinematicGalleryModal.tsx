@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, Sparkles, Image as ImageIcon } from 'lucide-react';
-import { GALLERY_ITEMS } from './campusLifeData';
+import type { GalleryItem } from './campusLifeData';
 
 interface CinematicGalleryModalProps {
+  /** Every photo the section shows, in the order the gallery steps through them. */
+  items: GalleryItem[];
   activeIndex: number | null;
   onClose: () => void;
   setActiveIndex: (index: number) => void;
 }
 
 export default function CinematicGalleryModal({
+  items,
   activeIndex,
   onClose,
   setActiveIndex
@@ -19,10 +22,10 @@ export default function CinematicGalleryModal({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight') {
-        setActiveIndex(activeIndex === GALLERY_ITEMS.length - 1 ? 0 : activeIndex + 1);
+        setActiveIndex(activeIndex === items.length - 1 ? 0 : activeIndex + 1);
       }
       if (e.key === 'ArrowLeft') {
-        setActiveIndex(activeIndex === 0 ? GALLERY_ITEMS.length - 1 : activeIndex - 1);
+        setActiveIndex(activeIndex === 0 ? items.length - 1 : activeIndex - 1);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -31,7 +34,7 @@ export default function CinematicGalleryModal({
 
   if (activeIndex === null) return null;
 
-  const currentItem = GALLERY_ITEMS[activeIndex] || GALLERY_ITEMS[0];
+  const currentItem = items[activeIndex] || items[0];
 
   return (
     <AnimatePresence>
@@ -67,7 +70,7 @@ export default function CinematicGalleryModal({
                 <span>Memory Archive</span>
               </span>
               <span className="text-white/60 font-mono text-xs">
-                {activeIndex + 1} / {GALLERY_ITEMS.length}
+                {activeIndex + 1} / {items.length}
               </span>
             </div>
 
@@ -87,7 +90,7 @@ export default function CinematicGalleryModal({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setActiveIndex(activeIndex === 0 ? GALLERY_ITEMS.length - 1 : activeIndex - 1);
+                setActiveIndex(activeIndex === 0 ? items.length - 1 : activeIndex - 1);
               }}
               className="absolute left-2 sm:left-4 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md text-white/90 hover:text-white border border-white/20 flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-95 shadow-xl"
               title="Previous Image"
@@ -116,7 +119,7 @@ export default function CinematicGalleryModal({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setActiveIndex(activeIndex === GALLERY_ITEMS.length - 1 ? 0 : activeIndex + 1);
+                setActiveIndex(activeIndex === items.length - 1 ? 0 : activeIndex + 1);
               }}
               className="absolute right-2 sm:right-4 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md text-white/90 hover:text-white border border-white/20 flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-95 shadow-xl"
               title="Next Image"
@@ -128,7 +131,7 @@ export default function CinematicGalleryModal({
 
           {/* Thumbnail Strip */}
           <div className="w-full flex items-center justify-center gap-2 sm:gap-2.5 overflow-x-auto py-2 no-scrollbar shrink-0 z-10">
-            {GALLERY_ITEMS.map((item, idx) => {
+            {items.map((item, idx) => {
               const isActive = activeIndex === idx;
               return (
                 <button

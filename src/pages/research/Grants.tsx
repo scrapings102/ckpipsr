@@ -18,84 +18,29 @@ import {
   Clock
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useResearchGrants, type GrantTone } from "../../hooks/useResearchGrants";
 
-interface GrantItem {
-  srNo: number;
-  categoryType: "Seminar" | "Refresher Course";
-  categoryBadge: string;
-  title: string;
-  date: string;
-  sponsoringAgency: string;
-  amountSanctioned: string | null;
-  coordinator: string;
-}
-
-const grantsData: GrantItem[] = [
-  {
-    srNo: 1,
-    categoryType: "Seminar",
-    categoryBadge: "Seminar",
-    title: "Recent advancement in Pharmaceutical Biotechnology: From drug discovery to drug delivery",
-    date: "01-03-2025",
-    sponsoringAgency: "DST - GSBTM",
-    amountSanctioned: "70,000",
-    coordinator: "Dr. Shuchu M. Desai"
-  },
-  {
-    srNo: 2,
-    categoryType: "Refresher Course",
-    categoryBadge: "Refresher Course - 2024",
-    title: "Two days offline refresher course for registered pharmacist",
-    date: "21/9/2024 - 22/9/2024",
-    sponsoringAgency: "GSPC (Gujarat State Pharmacy Council)",
-    amountSanctioned: null,
-    coordinator: "Mrs. Prakruti Jadav"
-  },
-  {
-    srNo: 3,
-    categoryType: "Refresher Course",
-    categoryBadge: "Refresher Course - 2023",
-    title: "Two days online refresher course for registered pharmacist",
-    date: "2/9/2023 - 3/9/2023",
-    sponsoringAgency: "GSPC (Gujarat State Pharmacy Council)",
-    amountSanctioned: null,
-    coordinator: "Mrs. Prakruti Jadav"
-  },
-  {
-    srNo: 4,
-    categoryType: "Refresher Course",
-    categoryBadge: "Refresher Course - 2022",
-    title: "Refresher course for registered pharmacist",
-    date: "2/07/2022 - 3/7/2022",
-    sponsoringAgency: "GSPC (Gujarat State Pharmacy Council)",
-    amountSanctioned: null,
-    coordinator: "Mrs. Prakruti Jadav"
-  },
-  {
-    srNo: 5,
-    categoryType: "Seminar",
-    categoryBadge: "Seminar / FDP",
-    title: "Professional development programme (PDP) Pioneer for non teachers",
-    date: "7/3/2022 - 22/3/2022",
-    sponsoringAgency: "GTU-AICTE Jointly",
-    amountSanctioned: "3,00,000",
-    coordinator: "Mr. Yahya A. Moollla"
-  }
-];
+/** The card badge colours a filter can choose from. */
+const TONE_CLASSES: Record<GrantTone, string> = {
+  emerald: "bg-emerald-50 text-[#1a5d2e] border border-emerald-200",
+  purple: "bg-purple-50 text-purple-800 border border-purple-200",
+  blue: "bg-blue-50 text-blue-800 border border-blue-200",
+  amber: "bg-amber-50 text-amber-800 border border-amber-200",
+};
 
 export default function Grants() {
-  const [filter, setFilter] = useState<"ALL" | "SEMINAR" | "REFRESHER">("ALL");
+  const content = useResearchGrants();
+  // "" is the button that clears the filter; the rest are filter ids.
+  const [filter, setFilter] = useState("");
 
-  const filteredGrants = grantsData.filter((item) => {
-    if (filter === "SEMINAR") return item.categoryType === "Seminar";
-    if (filter === "REFRESHER") return item.categoryType === "Refresher Course";
-    return true;
-  });
+  const filteredGrants = filter
+    ? content.grants.filter((item) => item.filterId === filter)
+    : content.grants;
 
   return (
     <SubPageLayout
-      title="Grants & Sponsored Programs"
-      subtitle="Sponsored Seminars, Refresher Courses, Government Grants & Faculty Development Programs"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - Grants"
     >
@@ -114,72 +59,75 @@ export default function Grants() {
                 <Landmark size={26} />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  Funded Initiatives & Academic Programs
-                </span>
+                {content.intro.kicker && (
+                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                    {content.intro.kicker}
+                  </span>
+                )}
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                  Seminar & Refresher Course Grants
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-bold">
-                <BadgeCheck size={14} />
-                <span>5 Sanctioned Programs</span>
-              </span>
-            </div>
+            {content.intro.badgeSuffix && (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-bold">
+                  <BadgeCheck size={14} />
+                  <span>
+                    {content.total} {content.intro.badgeSuffix}
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
 
           <p className="text-slate-600 font-sans text-sm sm:text-base leading-relaxed">
-            Record of sponsored seminars, professional development programs, and certified pharmacist refresher courses conducted at C.K. Pithawalla Institute of Pharmaceutical Science & Research with financial and academic sponsorship from DST-GSBTM, GSPC, GTU, and AICTE.
+            {content.intro.body}
           </p>
 
-          {/* Filter Pills */}
+          {/* Filter Pills — the panel decides which buttons these are. */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-            <span className="text-xs font-mono font-semibold text-slate-400 mr-2">Filter by Type:</span>
+            {content.intro.filterLabel && (
+              <span className="text-xs font-mono font-semibold text-slate-400 mr-2">
+                {content.intro.filterLabel}
+              </span>
+            )}
             <button
-              onClick={() => setFilter("ALL")}
+              onClick={() => setFilter("")}
               className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                filter === "ALL"
+                filter === ""
                   ? "bg-[#1a5d2e] text-white shadow-2xs"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              All Programs ({grantsData.length})
+              {content.intro.allLabel} ({content.total})
             </button>
-            <button
-              onClick={() => setFilter("SEMINAR")}
-              className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                filter === "SEMINAR"
-                  ? "bg-[#1a5d2e] text-white shadow-2xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Seminars / PDP (2)
-            </button>
-            <button
-              onClick={() => setFilter("REFRESHER")}
-              className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                filter === "REFRESHER"
-                  ? "bg-[#1a5d2e] text-white shadow-2xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Refresher Courses (3)
-            </button>
+            {content.filters.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setFilter(item.id)}
+                className={`px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
+                  filter === item.id
+                    ? "bg-[#1a5d2e] text-white shadow-2xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {item.label} ({item.count})
+              </button>
+            ))}
           </div>
         </motion.div>
 
         {/* Grants Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGrants.map((item, index) => {
-            const isSeminar = item.categoryType === "Seminar";
-            const hasAmount = item.amountSanctioned !== null;
+            const tone = content.filters.find((f) => f.id === item.filterId)?.tone ?? "emerald";
+            const hasAmount = !!item.amount;
 
             return (
               <motion.div
-                key={item.srNo}
+                key={item.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: index * 0.08 }}
@@ -188,19 +136,17 @@ export default function Grants() {
                 <div className="space-y-4">
                   {/* Top Header: Badge & Sr No */}
                   <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold ${
-                        isSeminar
-                          ? "bg-purple-50 text-purple-800 border border-purple-200"
-                          : "bg-emerald-50 text-[#1a5d2e] border border-emerald-200"
-                      }`}
-                    >
-                      <Tag size={12} />
-                      <span>{item.categoryBadge}</span>
-                    </span>
+                    {item.badge && (
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold ${TONE_CLASSES[tone]}`}
+                      >
+                        <Tag size={12} />
+                        <span>{item.badge}</span>
+                      </span>
+                    )}
 
                     <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono text-xs font-bold flex items-center justify-center">
-                      #{item.srNo}
+                      #{index + 1}
                     </span>
                   </div>
 
@@ -235,7 +181,7 @@ export default function Grants() {
                       </div>
                       <div>
                         <span className="text-[10px] font-mono uppercase text-slate-400 block">Sponsoring Agency</span>
-                        <span className="font-semibold text-slate-900">{item.sponsoringAgency}</span>
+                        <span className="font-semibold text-slate-900">{item.agency}</span>
                       </div>
                     </div>
 
@@ -250,11 +196,11 @@ export default function Grants() {
                         <span className="text-[10px] font-mono uppercase text-slate-400 block">Amount Sanctioned</span>
                         {hasAmount ? (
                           <span className="font-bold text-[#1a5d2e] font-mono text-sm">
-                            ₹ {item.amountSanctioned}
+                            ₹ {item.amount}
                           </span>
                         ) : (
                           <span className="text-xs text-slate-500 font-medium italic">
-                            Institutional / Council Sponsored
+                            {content.noAmountText}
                           </span>
                         )}
                       </div>
@@ -275,9 +221,11 @@ export default function Grants() {
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-mono text-emerald-700 font-bold px-2 py-0.5 rounded-md bg-emerald-50">
-                    Completed
-                  </span>
+                  {item.status && (
+                    <span className="text-[11px] font-mono text-emerald-700 font-bold px-2 py-0.5 rounded-md bg-emerald-50">
+                      {item.status}
+                    </span>
+                  )}
                 </div>
               </motion.div>
             );
@@ -285,13 +233,19 @@ export default function Grants() {
         </div>
 
         {/* Footer Note */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-            <span>All academic programs and refresher courses are verified by regulatory bodies (AICTE, PCI, GSPC, and GTU).</span>
+        {(content.note.text || content.note.tagline) && (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
+            {content.note.text && (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
+                <span>{content.note.text}</span>
+              </div>
+            )}
+            {content.note.tagline && (
+              <span className="font-mono text-slate-400">{content.note.tagline}</span>
+            )}
           </div>
-          <span className="font-mono text-slate-400">CKPIPSR Research Cell</span>
-        </div>
+        )}
 
       </div>
     </SubPageLayout>

@@ -1,241 +1,95 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "motion/react";
-import { 
-  Handshake, 
-  Building2, 
-  Calendar, 
-  MapPin, 
-  FileText, 
-  Sparkles, 
-  BadgeCheck, 
-  CheckCircle2, 
-  Briefcase, 
-  GraduationCap, 
-  Hospital, 
-  Zap, 
-  Search, 
+import {
+  Handshake,
+  Building2,
+  Calendar,
+  MapPin,
+  FileText,
+  Sparkles,
+  BadgeCheck,
+  CheckCircle2,
+  Briefcase,
+  GraduationCap,
+  Hospital,
+  Zap,
+  Search,
   Award,
   Layers,
-  ArrowUpRight,
-  TrendingUp,
-  Tag
+  FlaskConical,
+  Leaf,
+  Globe,
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useResearchMous, type MouTone } from "../../hooks/useResearchMous";
 
-interface MOUItem {
-  no: number;
-  organization: string;
-  location: string;
-  purpose: string;
-  effectiveFrom: string;
-  category: "Academic" | "Pharma Industry" | "Hospital & Healthcare" | "Skill & Innovation" | "Campus Sustainability";
-  highlights: string[];
-}
+type IconType = React.ComponentType<{ size?: number; className?: string }>;
 
-const mousData: MOUItem[] = [
-  {
-    no: 1,
-    organization: "C. D. Pachchigar College of Homoeopathic Medicine and Hospital, Surat",
-    location: "Surat, Gujarat",
-    purpose: "Interdisciplinary academic collaboration and Research",
-    effectiveFrom: "06.01.2026",
-    category: "Academic",
-    highlights: ["Interdisciplinary Research", "Academic Exchange", "Healthcare Synergy"]
-  },
-  {
-    no: 2,
-    organization: "Shree Naranjibhai Lalbhai Patel College of Pharmacy, Umrakh",
-    location: "Umrakh, Gujarat",
-    purpose: "Research Consultancy and Training",
-    effectiveFrom: "18.12.2024",
-    category: "Academic",
-    highlights: ["Faculty & Student Training", "Joint Research", "Consultancy"]
-  },
-  {
-    no: 3,
-    organization: "ASG HOSPITAL PVT. LTD., JODHPUR, RAJASTHAN",
-    location: "Jodhpur, Rajasthan",
-    purpose: "For Rendering Medical Facilities For Ophthalmology",
-    effectiveFrom: "29.07.2023",
-    category: "Hospital & Healthcare",
-    highlights: ["Ophthalmology Facilities", "Clinical Services", "Medical Support"]
-  },
-  {
-    no: 4,
-    organization: "ELEKTROPOD TECHNOLOGIES, BANGALORE",
-    location: "Bangalore, Karnataka",
-    purpose: "Providing Electric vehicle Recharge facility",
-    effectiveFrom: "10.04.2023",
-    category: "Campus Sustainability",
-    highlights: ["EV Green Infrastructure", "Campus Sustainability", "Clean Energy"]
-  },
-  {
-    no: 5,
-    organization: "MVUE HOSPITAL, VESU, SURAT",
-    location: "Vesu, Surat, Gujarat",
-    purpose: "Scientific Exchange, Hospital Services, Training and Collaborative Research Projects.",
-    effectiveFrom: "20.03.2023",
-    category: "Hospital & Healthcare",
-    highlights: ["Scientific Exchange", "Hospital Services", "Collaborative Projects"]
-  },
-  {
-    no: 6,
-    organization: "YOUTH DEVELOPMENT PHARMACEUTICAL ASSOCIATION (YDPA), AHMEDABAD",
-    location: "Ahmedabad, Gujarat",
-    purpose: "Promotion of Entrepreneurship activities among students",
-    effectiveFrom: "30.09.2022",
-    category: "Skill & Innovation",
-    highlights: ["Student Entrepreneurship", "SSIP Incubation", "Leadership Bootcamps"]
-  },
-  {
-    no: 7,
-    organization: "PURE CHEM PRIVATE LIMITED, ANKLESHWAR",
-    location: "Ankleshwar, Gujarat",
-    purpose: "Research, Consultancy and Training.",
-    effectiveFrom: "18.02.2022",
-    category: "Pharma Industry",
-    highlights: ["Chemical Synthesis", "Industrial Training", "R&D Consultancy"]
-  },
-  {
-    no: 8,
-    organization: "OJAS CHARITABLE TRUST, SURAT",
-    location: "Surat, Gujarat",
-    purpose: "Providing medical facility to students",
-    effectiveFrom: "15.09.2020",
-    category: "Hospital & Healthcare",
-    highlights: ["Student Healthcare", "Medical Checkups", "Community Welfare"]
-  },
-  {
-    no: 9,
-    organization: "CONCEPT MEDICA INC., SURAT",
-    location: "Surat, Gujarat",
-    purpose: "Promotion of advance skill based training, internship, research and development, placement, industry expert sessions",
-    effectiveFrom: "22.07.2019",
-    category: "Pharma Industry",
-    highlights: ["Skill Training", "Internships", "Placements & Expert Sessions"]
-  },
-  {
-    no: 10,
-    organization: "FIDES BIOCARE AD UNITED FIDES PHARMACEUTICAL PVT. LTD, KAMREJ, SURAT",
-    location: "Kamrej, Surat, Gujarat",
-    purpose: "Training and Consultancy Projects",
-    effectiveFrom: "18.02.2019",
-    category: "Pharma Industry",
-    highlights: ["Formulation Consultancy", "Industrial Exposure", "Hands-on Training"]
-  },
-  {
-    no: 11,
-    organization: "GLOBELA PHARMA PVT. LTD, SURAT",
-    location: "Surat, Gujarat",
-    purpose: "Research, Consultancy and Training",
-    effectiveFrom: "18.02.2018",
-    category: "Pharma Industry",
-    highlights: ["Pharma Manufacturing", "Quality Assurance", "R&D Projects"]
-  },
-  {
-    no: 12,
-    organization: "CUBIC ANALYTICAL SOLUTION, ANKLESHWAR",
-    location: "Ankleshwar, Gujarat",
-    purpose: "Research, Consultancy and Training",
-    effectiveFrom: "18.02.2018",
-    category: "Pharma Industry",
-    highlights: ["Analytical Testing", "Instrumentation", "Method Validation"]
-  },
-  {
-    no: 13,
-    organization: "BIOGEN PHARMACEUTICAL CO., SURAT",
-    location: "Surat, Gujarat",
-    purpose: "Training and Consultancy Projects",
-    effectiveFrom: "18.02.2018",
-    category: "Pharma Industry",
-    highlights: ["Pharmaceutical Production", "Industrial Internships", "Consultancy"]
-  }
+/** The icons the panel offers a sector, by name. */
+const ICONS: Record<string, IconType> = {
+  GraduationCap,
+  Building2,
+  Hospital,
+  Sparkles,
+  Zap,
+  Handshake,
+  Briefcase,
+  FlaskConical,
+  Award,
+  Layers,
+  Leaf,
+  Globe,
+};
+
+/** Each sector colour: the card's pill and the card's hover border. */
+const THEMES: Record<MouTone, { badge: string; borderHover: string }> = {
+  emerald: { badge: "bg-emerald-50 text-[#1a5d2e] border-emerald-200", borderHover: "hover:border-[#1a5d2e]/50" },
+  rose: { badge: "bg-rose-50 text-rose-700 border-rose-200", borderHover: "hover:border-rose-500/50" },
+  blue: { badge: "bg-blue-50 text-blue-700 border-blue-200", borderHover: "hover:border-blue-500/50" },
+  amber: { badge: "bg-amber-50 text-amber-800 border-amber-200", borderHover: "hover:border-amber-500/50" },
+  teal: { badge: "bg-teal-50 text-teal-800 border-teal-200", borderHover: "hover:border-teal-500/50" },
+  purple: { badge: "bg-purple-50 text-purple-700 border-purple-200", borderHover: "hover:border-purple-500/50" },
+  slate: { badge: "bg-slate-50 text-slate-700 border-slate-200", borderHover: "hover:border-slate-400" },
+};
+
+/** The four figure boxes, left to right. */
+const STAT_BOXES = [
+  { box: "bg-emerald-50/60 border-emerald-100", label: "text-emerald-800", value: "text-[#1a5d2e]", caption: "text-emerald-700" },
+  { box: "bg-rose-50/60 border-rose-100", label: "text-rose-800", value: "text-rose-950", caption: "text-rose-700" },
+  { box: "bg-blue-50/60 border-blue-100", label: "text-blue-800", value: "text-blue-950", caption: "text-blue-700" },
+  { box: "bg-amber-50/60 border-amber-100", label: "text-amber-800", value: "text-amber-950", caption: "text-amber-800" },
 ];
 
 export default function MOUs() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const content = useResearchMous();
+  // "" is the button that clears the filter; the rest are sector ids.
+  const [selectedSector, setSelectedSector] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const filteredMOUs = useMemo(() => {
-    return mousData.filter((item) => {
-      const matchesCategory = 
-        selectedCategory === "ALL" || item.category === selectedCategory;
-      const matchesSearch = 
-        item.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.purpose.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const q = searchQuery.toLowerCase();
+    return content.mous.filter((item) => {
+      const matchesSector = !selectedSector || item.sectorId === selectedSector;
+      const matchesSearch =
+        item.organization.toLowerCase().includes(q) ||
+        item.purpose.toLowerCase().includes(q) ||
+        item.location.toLowerCase().includes(q) ||
         item.effectiveFrom.includes(searchQuery);
-      return matchesCategory && matchesSearch;
+      return matchesSector && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [content.mous, selectedSector, searchQuery]);
 
-  const getCategoryIcon = (category: MOUItem["category"]) => {
-    switch (category) {
-      case "Academic":
-        return <GraduationCap size={18} />;
-      case "Pharma Industry":
-        return <Building2 size={18} />;
-      case "Hospital & Healthcare":
-        return <Hospital size={18} />;
-      case "Skill & Innovation":
-        return <Sparkles size={18} />;
-      case "Campus Sustainability":
-        return <Zap size={18} />;
-      default:
-        return <Handshake size={18} />;
-    }
-  };
-
-  const getCategoryTheme = (category: MOUItem["category"]) => {
-    switch (category) {
-      case "Academic":
-        return {
-          badge: "bg-blue-50 text-blue-700 border-blue-200",
-          iconBg: "bg-blue-50 text-blue-700",
-          borderHover: "hover:border-blue-500/50"
-        };
-      case "Pharma Industry":
-        return {
-          badge: "bg-emerald-50 text-[#1a5d2e] border-emerald-200",
-          iconBg: "bg-emerald-50 text-[#1a5d2e]",
-          borderHover: "hover:border-[#1a5d2e]/50"
-        };
-      case "Hospital & Healthcare":
-        return {
-          badge: "bg-rose-50 text-rose-700 border-rose-200",
-          iconBg: "bg-rose-50 text-rose-700",
-          borderHover: "hover:border-rose-500/50"
-        };
-      case "Skill & Innovation":
-        return {
-          badge: "bg-amber-50 text-amber-800 border-amber-200",
-          iconBg: "bg-amber-50 text-amber-700",
-          borderHover: "hover:border-amber-500/50"
-        };
-      case "Campus Sustainability":
-        return {
-          badge: "bg-teal-50 text-teal-800 border-teal-200",
-          iconBg: "bg-teal-50 text-teal-700",
-          borderHover: "hover:border-teal-500/50"
-        };
-      default:
-        return {
-          badge: "bg-slate-50 text-slate-700 border-slate-200",
-          iconBg: "bg-slate-50 text-slate-700",
-          borderHover: "hover:border-slate-400"
-        };
-    }
-  };
+  const sectorOf = (id: string) => content.sectors.find((s) => s.id === id);
 
   return (
     <SubPageLayout
-      title="Memorandums of Understanding (MOUs)"
-      subtitle="Strategic Partnerships with Leading Pharmaceutical Industries, Healthcare Institutions & Academic Centers"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="research-and-innovation"
       activeItemLabel="Research - MOUs"
     >
       <div className="space-y-8 max-w-6xl mx-auto">
-        
+
         {/* Header Overview Card */}
         <motion.div
           id="mou-header-card"
@@ -250,60 +104,59 @@ export default function MOUs() {
                 <Handshake size={26} />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
-                  Industry-Academia Linkages & Collaborations
-                </span>
+                {content.intro.kicker && (
+                  <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">
+                    {content.intro.kicker}
+                  </span>
+                )}
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                  Institutional MOUs & Alliances
+                  {content.intro.heading}
                 </h3>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-bold">
-                <BadgeCheck size={14} />
-                <span>13 Active MOUs</span>
-              </span>
-            </div>
+            {content.intro.badgeSuffix && (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#1a5d2e] text-xs font-mono font-bold">
+                  <BadgeCheck size={14} />
+                  <span>
+                    {content.total} {content.intro.badgeSuffix}
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-            <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100">
-              <span className="text-[11px] font-mono uppercase text-emerald-800 font-bold block">Pharma Industries</span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-[#1a5d2e] mt-0.5">06</p>
-              <span className="text-[11px] font-sans text-emerald-700">R&D & Training Partners</span>
+          {content.stats.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              {content.stats.map((stat, i) => {
+                const look = STAT_BOXES[i % STAT_BOXES.length];
+                return (
+                  <div key={i} className={`p-3.5 rounded-2xl border ${look.box}`}>
+                    <span className={`text-[11px] font-mono uppercase font-bold block ${look.label}`}>
+                      {stat.label}
+                    </span>
+                    <p className={`text-xl sm:text-2xl font-serif font-bold mt-0.5 ${look.value}`}>{stat.value}</p>
+                    {stat.caption && (
+                      <span className={`text-[11px] font-sans ${look.caption}`}>{stat.caption}</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
+          )}
 
-            <div className="p-3.5 rounded-2xl bg-rose-50/60 border border-rose-100">
-              <span className="text-[11px] font-mono uppercase text-rose-800 font-bold block">Hospitals & Medical</span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-rose-950 mt-0.5">03</p>
-              <span className="text-[11px] font-sans text-rose-700">Clinical & Health Services</span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100">
-              <span className="text-[11px] font-mono uppercase text-blue-800 font-bold block">Academic Colleges</span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-blue-950 mt-0.5">02</p>
-              <span className="text-[11px] font-sans text-blue-700">Interdisciplinary Collabs</span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100">
-              <span className="text-[11px] font-mono uppercase text-amber-800 font-bold block">Innovation & Campus</span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-amber-950 mt-0.5">02</p>
-              <span className="text-[11px] font-sans text-amber-800">SSIP & Green Tech EV</span>
-            </div>
-          </div>
-
-          {/* Search & Category Filter Controls */}
+          {/* Search & Sector Filter Controls */}
           <div className="space-y-3 pt-2 border-t border-slate-100">
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-              
+
               {/* Search Bar */}
               <div className="relative w-full sm:w-80">
                 <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search organization, purpose, location..."
+                  placeholder={content.intro.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9.5 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-[#1a5d2e] focus:ring-2 focus:ring-emerald-100 bg-slate-50/50 font-sans"
@@ -312,26 +165,26 @@ export default function MOUs() {
 
               {/* Counter status */}
               <span className="text-xs font-mono text-slate-500">
-                Showing <strong className="text-slate-800">{filteredMOUs.length}</strong> of {mousData.length} MOUs
+                Showing <strong className="text-slate-800">{filteredMOUs.length}</strong> of {content.total} MOUs
               </span>
             </div>
 
-            {/* Filter Pills */}
+            {/* Filter Pills — the panel decides which sectors these are. */}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-xs font-mono font-semibold text-slate-400 mr-1.5">Sector:</span>
+              {content.intro.filterLabel && (
+                <span className="text-xs font-mono font-semibold text-slate-400 mr-1.5">
+                  {content.intro.filterLabel}
+                </span>
+              )}
               {[
-                { label: "All Sectors", value: "ALL", count: mousData.length },
-                { label: "Pharma Industry", value: "Pharma Industry", count: 6 },
-                { label: "Hospital & Healthcare", value: "Hospital & Healthcare", count: 3 },
-                { label: "Academic", value: "Academic", count: 2 },
-                { label: "Skill & Innovation", value: "Skill & Innovation", count: 1 },
-                { label: "Campus Sustainability", value: "Campus Sustainability", count: 1 }
+                { label: content.intro.allLabel, value: "", count: content.total },
+                ...content.sectors.map((s) => ({ label: s.label, value: s.id, count: s.count })),
               ].map((btn) => (
                 <button
-                  key={btn.value}
-                  onClick={() => setSelectedCategory(btn.value)}
+                  key={btn.value || "all"}
+                  onClick={() => setSelectedSector(btn.value)}
                   className={`px-3 py-1 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer ${
-                    selectedCategory === btn.value
+                    selectedSector === btn.value
                       ? "bg-[#1a5d2e] text-white shadow-2xs"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
@@ -346,12 +199,15 @@ export default function MOUs() {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMOUs.map((item, index) => {
-            const theme = getCategoryTheme(item.category);
+            const sector = sectorOf(item.sectorId);
+            const theme = THEMES[sector?.tone ?? "slate"] ?? THEMES.slate;
+            const SectorIcon = (sector && ICONS[sector.icon]) || Handshake;
+            const number = content.mous.indexOf(item) + 1;
 
             return (
               <motion.div
-                key={item.no}
-                id={`mou-card-${item.no}`}
+                key={item.id}
+                id={`mou-card-${number}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: index * 0.05 }}
@@ -360,15 +216,19 @@ export default function MOUs() {
                 <div className="space-y-4">
                   {/* Top Header: Badge & Number */}
                   <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold border ${theme.badge}`}
-                    >
-                      {getCategoryIcon(item.category)}
-                      <span>{item.category}</span>
-                    </span>
+                    {sector ? (
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold border ${theme.badge}`}
+                      >
+                        <SectorIcon size={18} />
+                        <span>{sector.label}</span>
+                      </span>
+                    ) : (
+                      <span />
+                    )}
 
                     <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono text-xs font-bold flex items-center justify-center">
-                      #{item.no}
+                      #{number}
                     </span>
                   </div>
 
@@ -383,10 +243,12 @@ export default function MOUs() {
                   </div>
 
                   {/* Location Pin */}
-                  <div className="flex items-center gap-1.5 text-xs font-sans text-slate-500">
-                    <MapPin size={13} className="text-slate-400 shrink-0" />
-                    <span>{item.location}</span>
-                  </div>
+                  {item.location && (
+                    <div className="flex items-center gap-1.5 text-xs font-sans text-slate-500">
+                      <MapPin size={13} className="text-slate-400 shrink-0" />
+                      <span>{item.location}</span>
+                    </div>
+                  )}
 
                   {/* Purpose Box */}
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
@@ -400,16 +262,18 @@ export default function MOUs() {
                   </div>
 
                   {/* Highlight Chips */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {item.highlights.map((tag, tIdx) => (
-                      <span
-                        key={tIdx}
-                        className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  {item.highlights.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {item.highlights.map((tag, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Card Footer: Effective Date */}
@@ -424,9 +288,11 @@ export default function MOUs() {
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-mono text-emerald-700 font-bold px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200">
-                    Active Partner
-                  </span>
+                  {item.status && (
+                    <span className="text-[11px] font-mono text-emerald-700 font-bold px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200">
+                      {item.status}
+                    </span>
+                  )}
                 </div>
               </motion.div>
             );
@@ -439,10 +305,12 @@ export default function MOUs() {
             <Handshake size={36} className="mx-auto text-slate-300" />
             <h4 className="font-serif font-bold text-slate-800 text-lg">No MOUs Found</h4>
             <p className="text-sm font-sans text-slate-500">
-              No memorandums matched your query "{searchQuery}". Try searching with different terms.
+              {searchQuery
+                ? `No memorandums matched your query "${searchQuery}". Try searching with different terms.`
+                : "No memorandums are listed under this sector yet."}
             </p>
             <button
-              onClick={() => { setSearchQuery(""); setSelectedCategory("ALL"); }}
+              onClick={() => { setSearchQuery(""); setSelectedSector(""); }}
               className="mt-2 px-4 py-2 bg-[#1a5d2e] text-white rounded-xl text-xs font-bold cursor-pointer"
             >
               Reset Filters
@@ -451,13 +319,19 @@ export default function MOUs() {
         )}
 
         {/* Institutional Verification Footer */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-            <span>All Memorandums of Understanding are executed with legal endorsement and managed under the Industry-Institute Interaction (III) Cell.</span>
+        {(content.note.text || content.note.tagline) && (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs font-sans text-slate-600">
+            {content.note.text && (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
+                <span>{content.note.text}</span>
+              </div>
+            )}
+            {content.note.tagline && (
+              <span className="font-mono text-slate-400">{content.note.tagline}</span>
+            )}
           </div>
-          <span className="font-mono text-slate-400">CKPIPSR R&D Cell</span>
-        </div>
+        )}
 
       </div>
     </SubPageLayout>

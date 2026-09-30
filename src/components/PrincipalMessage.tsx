@@ -28,30 +28,30 @@ export const PrincipalMessage = () => {
       {/* Editorial Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-gold/3 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-brand-accent/3 rounded-full blur-3xl pointer-events-none" />
-      
+
       {/* Subtle background graticule pattern for academic gravitas */}
       <div className="absolute inset-0 bg-[radial-gradient(#FAF8F5_1px,transparent_1px)] [background-size:24px_24px] opacity-60 pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         <div className="max-w-6xl mx-auto">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            
+
             {/* LEFT COLUMN: Premium Editorial Portrait & Official Insignia (lg:col-span-5) */}
             <div className="lg:col-span-5 flex flex-col items-center">
-              
+
               {/* Portrait Frame */}
               <div className="relative w-full max-w-[340px] select-none group">
-                
+
                 {/* Mathematical double-border with elegant alignment */}
                 <div className="absolute -inset-4 rounded-3xl border border-gold/25 pointer-events-none transition-transform duration-700 ease-out group-hover:scale-[1.02]" />
                 <div className="absolute -inset-2 rounded-2xl border border-gold/15 pointer-events-none" />
-                
+
                 {/* Main image container */}
                 <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#FAF8F5] shadow-[0_24px_48px_-12px_rgba(59,49,49,0.12)] border border-slate-200">
-                  <img 
-                    src="/images/faculty/dhiren-p-shah.jpg" 
-                    alt="Dr. Dhiren P. Shah - Principal" 
+                  <img
+                    src="/images/faculty/dhiren-p-shah.jpg"
+                    alt="Dr. Dhiren P. Shah - Principal"
                     className="w-full h-full object-cover object-top scale-102 group-hover:scale-108 transition-transform duration-700 ease-out"
                     loading="lazy"
                     referrerPolicy="no-referrer"
@@ -93,7 +93,7 @@ export const PrincipalMessage = () => {
 
             {/* RIGHT COLUMN: The Academic Open Letter (lg:col-span-7) */}
             <div className="lg:col-span-7 space-y-8">
-              
+
               {/* Header Title with fine lines */}
               <div className="space-y-2 text-center lg:text-left">
                 <span className="text-[#D4AF37] font-mono text-[11px] font-bold uppercase tracking-[0.3em] block">
@@ -107,10 +107,10 @@ export const PrincipalMessage = () => {
 
               {/* Unique Scrollable Editorial Reader Pane */}
               <div className="relative border border-slate-200/80 bg-white rounded-2xl shadow-[0_16px_32px_rgba(59,49,49,0.02)] p-6 md:p-8 overflow-hidden">
-                
+
                 {/* Visual Reading progress line thread on the left margin */}
                 <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-slate-100">
-                  <div 
+                  <div
                     className="w-full bg-[#D4AF37] transition-all duration-100 ease-out"
                     style={{ height: `${scrollProgress * 100}%` }}
                   />
@@ -120,7 +120,7 @@ export const PrincipalMessage = () => {
                 <div className="pointer-events-none absolute left-[3px] right-0 top-0 h-10 bg-gradient-to-b from-white to-transparent z-10 opacity-90" />
                 <div className="pointer-events-none absolute left-[3px] right-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent z-10 opacity-90" />
 
-                <div 
+                <div
                   ref={scrollRef}
                   onScroll={handleScroll}
                   data-lenis-prevent="true"
@@ -159,7 +159,7 @@ export const PrincipalMessage = () => {
 
               {/* Call-to-actions (CTA) panel */}
               <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-                <button 
+                <button
                   onClick={() => setToast({ message: "Opening Academic Vision Prospectus..." })}
                   className="w-full sm:w-auto px-6 py-3 bg-[#123a1a] hover:bg-[#D4AF37] text-white hover:text-[#123a1a] rounded-xl font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer select-none shadow-md hover:shadow-lg flex items-center justify-center gap-2 border border-transparent"
                 >
@@ -168,7 +168,7 @@ export const PrincipalMessage = () => {
                   <ArrowUpRight size={14} />
                 </button>
 
-                <button 
+                <button
                   onClick={() => setToast({ message: "Loading Institutional Annual Report..." })}
                   className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-slate-50 text-[#3B3131] border-2 border-slate-200 hover:border-slate-300 rounded-xl font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer select-none shadow-sm flex items-center justify-center gap-2"
                 >

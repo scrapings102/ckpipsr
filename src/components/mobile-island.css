@@ -1,0 +1,344 @@
+/* ============================================================
+   Hanging Island — mobile / tablet header
+   Colours arrive as CSS variables from the component's theme.
+   ============================================================ */
+
+.mi {
+  /* sizes scale with the screen, within limits */
+  --mi-h: clamp(58px, 17.2vw, 67px); /* capsule height (+20%) */
+  --mi-dot: clamp(40px, 12.9vw, 50px); /* seal + menu button (+20%) */
+  position: relative;
+  width: 100%;
+  height: calc(42px + var(--mi-h));
+  margin-top: -12px; /* reach the true top edge of the screen */
+  pointer-events: none; /* only the island itself takes taps */
+}
+
+.mi-rig {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  margin: 0 auto; /* centred without the `translate` property,
+                                 which pre-2022 Android Chrome lacks */
+  width: min(384px, calc(100% - 16px)); /* +20% */
+  height: 100%;
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+.mi-idle {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+  animation: mi-idle 3.9s ease-in-out infinite;
+}
+@keyframes mi-idle {
+  0%,
+  100% {
+    transform: rotate(-0.7deg);
+  }
+  50% {
+    transform: rotate(0.7deg);
+  }
+}
+
+/* cords, clasps, rings — at 22% and 78% of the width */
+.mi-clasp,
+.mi-cord,
+.mi-ring {
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+.mi-l {
+  left: 22%;
+}
+.mi-r {
+  left: 78%;
+}
+.mi-clasp {
+  top: -1px;
+  width: 14px;
+  height: 8px;
+  margin-left: -7px;
+  border-radius: 0 0 5px 5px;
+  background: var(--mi-clasp);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.mi-cord {
+  top: 6px;
+  width: 1.6px;
+  height: 34px;
+  margin-left: -0.8px;
+  border-radius: 1px;
+  background: var(--mi-cord);
+}
+.mi-ring {
+  top: 37px;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  border: 1.6px solid var(--mi-ring);
+  box-sizing: border-box;
+}
+
+/* the capsule */
+.mi-island {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42px;
+  height: var(--mi-h);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 8px;
+  border-radius: 999px;
+  z-index: 0; /* own stacking context for the surface layer */
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the capsule's surface, on its own layer so it can fade out while the
+   menu is open (a gradient background cannot be transitioned) */
+.mi-island::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--mi-body1), var(--mi-body2));
+  border: 1px solid var(--mi-edge);
+  box-shadow:
+    0 16px 32px -12px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: opacity 0.3s ease;
+}
+/* soft glass highlight along the top */
+.mi-island::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 64px;
+  top: 5px;
+  height: 11px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mi-seal {
+  width: var(--mi-dot);
+  height: var(--mi-dot);
+  flex: none;
+  margin-right: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  padding: 2px;
+  box-shadow: 0 0 0 2px var(--mi-ring);
+  border: 0; /* no reliance on a CSS reset */
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+.mi-seal:active {
+  transform: scale(0.94);
+}
+
+.mi-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  transition: opacity 0.3s ease;
+}
+.mi-title {
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: clamp(12px, 3.85vw, 15px);
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mi-sub {
+  margin-top: 4px;
+  color: var(--mi-status);
+  font-family: var(--font-sans);
+  font-size: clamp(6.6px, 2.12vw, 8.7px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mi-menu {
+  margin-left: auto;
+  flex: none;
+  width: var(--mi-dot);
+  height: var(--mi-dot);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mi-button);
+  box-shadow:
+    0 6px 16px -4px var(--mi-button-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  border: 0;
+  padding: 0; /* no reliance on a CSS reset */
+  cursor: pointer;
+  /* --mi-dx / --mi-dy move it to the reference's corner while the menu is open */
+  transform: translate(var(--mi-dx, 0px), var(--mi-dy, 0px))
+    scale(var(--mi-press, 1));
+}
+.mi-menu:active {
+  --mi-press: 0.92;
+}
+.mi-bars {
+  position: relative;
+  width: 21px;
+  height: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.mi-bars i {
+  display: block;
+  height: 3px;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--mi-button-icon);
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+/* open: top and bottom rotate into an X, the middle fades out */
+.mi-menu.is-open .mi-bars i:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.mi-menu.is-open .mi-bars i:nth-child(2) {
+  opacity: 0;
+}
+.mi-menu.is-open .mi-bars i:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ---- menu open: only the X button stays, like the reference ---- */
+.mi.is-open .mi-island::before,
+.mi.is-away .mi-island::before,
+.mi.is-open .mi-island::after,
+.mi.is-away .mi-island::after,
+.mi.is-open .mi-clasp,
+.mi.is-away .mi-clasp,
+.mi.is-open .mi-cord,
+.mi.is-away .mi-cord,
+.mi.is-open .mi-ring,
+.mi.is-away .mi-ring,
+.mi.is-open .mi-seal,
+.mi.is-away .mi-seal,
+.mi.is-open .mi-text,
+.mi.is-away .mi-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* closing while scrolled: the X fades out too, and everything stays hidden
+   until the header has unpinned — then it all fades back in, in place */
+.mi-menu {
+  transition:
+    transform 0.45s cubic-bezier(0.76, 0, 0.24, 1),
+    opacity 0.3s ease;
+}
+.mi.is-away .mi-menu {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* opening while scrolled: the island's parts hide with no fade (they would
+   otherwise flash in at the top), and only the X fades in */
+.mi.is-instant .mi-island::before,
+.mi.is-instant .mi-island::after,
+.mi.is-instant .mi-clasp,
+.mi.is-instant .mi-cord,
+.mi.is-instant .mi-ring,
+.mi.is-instant .mi-seal,
+.mi.is-instant .mi-text {
+  transition: none;
+}
+.mi.is-open.is-instant .mi-menu {
+  animation: mi-fade-in 0.3s ease both;
+}
+@keyframes mi-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.mi.is-open .mi-island {
+  pointer-events: none;
+} /* taps pass through to the menu... */
+.mi.is-open .mi-menu {
+  pointer-events: auto;
+} /* ...except on the X itself */
+.mi.is-open .mi-idle,
+.mi.is-away .mi-idle {
+  animation: none;
+} /* the X holds still */
+
+@media (prefers-reduced-motion: reduce) {
+  .mi-idle {
+    animation: none;
+  }
+  .mi-bars i {
+    transition: none;
+  }
+  .mi-menu {
+    transition: none;
+  }
+  .mi.is-open.is-instant .mi-menu {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Inside pages: just the round menu button, floating top-right —
+   the reference's own spot: a 48px button, 16px from the right
+   edge and 20px from the top. It sits above the open menu too,
+   so its bars morph into the X in place.
+   ============================================================ */
+.mi--compact {
+  height: 0;
+  margin: 0;
+  position: static;
+}
+.mi-fab {
+  position: fixed;
+  top: 20px;
+  right: 16px;
+  z-index: 70;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  pointer-events: auto;
+}
+/* rendered at page level, so it must be hidden on desktop explicitly —
+   inside pages there use the full header */
+@media (min-width: 1024px) {
+  .mi-fab {
+    display: none;
+  }
+}
+/* On inside pages the menu is opened from the icon on the breadcrumb line,
+   so the floating button only exists as the X while the menu is open: it
+   fades in with the menu and out as it closes. */
+.mi-fab:not(.is-open) {
+  opacity: 0;
+  pointer-events: none;
+}

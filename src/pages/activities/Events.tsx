@@ -2,19 +2,26 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Calendar, Users, FileText, Clock, ExternalLink, Filter, HelpCircle, MapPin, Sparkles } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-import { ACTIVITY_EVENTS, EVENT_CATEGORIES, ACTIVITY_EVENT_PHOTOS, ActivityEvent } from "../../data/activityEventsData";
+import { useActivityEvents } from "../../hooks/useActivityEvents";
 
 export default function Events() {
+  const content = useActivityEvents();
+  // The id of the category being shown, or "all".
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
+  const { categories, events, list, gallery } = content;
+  const selected = categories.find(c => c.id === selectedCategory);
   const filteredEvents = selectedCategory === "all"
-    ? ACTIVITY_EVENTS
-    : ACTIVITY_EVENTS.filter(event => event.category === selectedCategory);
+    ? events
+    : events.filter(event => event.categoryId === selectedCategory);
+  // A category the events no longer use still counts zero rather than vanishing.
+  const countFor = (id: string) =>
+    content.counts?.[id] ?? events.filter(e => e.categoryId === id).length;
 
   return (
     <SubPageLayout
-      title="Campus Events"
-      subtitle="Academic Portal — Activities"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="activities"
       activeItemLabel="Events"
     >
@@ -25,14 +32,13 @@ export default function Events() {
           <div className="relative z-10 max-w-3xl space-y-4">
             <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-md text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em]">
               <Sparkles size={12} className="animate-pulse" />
-              <span>Co-Curricular Hub</span>
+              <span>{content.banner.badge}</span>
             </span>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">
-              Symposia, Contests & Initiatives
+              {content.banner.heading}
             </h2>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-medium">
-              CKPIPSR encourages an interactive environment with academic quizzes, healthcare campaigns, 
-              awareness sessions, and collaborative national activities to shape professional pharmacy leaders.
+              {content.banner.body}
             </p>
           </div>
         </div>
@@ -41,36 +47,31 @@ export default function Events() {
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-slate-700 font-serif font-bold text-base">
             <Filter size={18} className="text-[#D4AF37]" />
-            <span>Filter by Category</span>
+            <span>{content.filter.label}</span>
           </div>
-          
+
           <div className="flex flex-wrap gap-2.5">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all duration-200 ${
-                selectedCategory === "all"
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all duration-200 ${selectedCategory === "all"
                   ? "bg-[#123a1a] text-[#D4AF37] border-transparent shadow-md"
                   : "bg-white hover:bg-slate-50 text-slate-600 border-slate-200"
-              }`}
+                }`}
             >
-              All ({ACTIVITY_EVENTS.length})
+              {content.filter.allLabel} ({events.length})
             </button>
-            {EVENT_CATEGORIES.map(category => {
-              const count = ACTIVITY_EVENTS.filter(e => e.category === category).length;
-              return (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all duration-200 ${
-                    selectedCategory === category
-                      ? "bg-[#123a1a] text-[#D4AF37] border-transparent shadow-md"
-                      : "bg-white hover:bg-slate-50 text-slate-600 border-slate-200"
+            {categories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all duration-200 ${selectedCategory === category.id
+                    ? "bg-[#123a1a] text-[#D4AF37] border-transparent shadow-md"
+                    : "bg-white hover:bg-slate-50 text-slate-600 border-slate-200"
                   }`}
-                >
-                  {category} ({count})
-                </button>
-              );
-            })}
+              >
+                {category.label} ({countFor(category.id)})
+              </button>
+            ))}
           </div>
         </div>
 
@@ -78,23 +79,27 @@ export default function Events() {
         <div className="space-y-8">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <h3 className="font-serif font-bold text-xl sm:text-2xl text-slate-900">
-              {selectedCategory === "all" ? "All Activity Events" : `${selectedCategory}s`}
+              {selectedCategory === "all"
+                ? list.allHeading
+                : list.filteredHeading.replaceAll("{category}", selected?.label ?? "")}
             </h3>
             <span className="text-xs font-mono font-bold text-slate-400">
-              Showing {filteredEvents.length} of {ACTIVITY_EVENTS.length}
+              {list.showingLabel
+                .replaceAll("{count}", String(filteredEvents.length))
+                .replaceAll("{total}", String(events.length))}
             </span>
           </div>
 
           <AnimatePresence mode="popLayout">
             {filteredEvents.length > 0 ? (
-              <motion.div 
+              <motion.div
                 layout
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
                 {filteredEvents.map((event, idx) => (
                   <motion.div
                     layout
-                    key={event.title}
+                    key={`${idx}-${event.title}`}
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
@@ -143,7 +148,7 @@ export default function Events() {
 
                       {event.report && (
                         <a
-                          href={`https://ckpipsr.ac.in/documents/activities/events/${encodeURIComponent(event.report)}.pdf`}
+                          href={event.reportUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#D4AF37] hover:text-[#123a1a] transition-colors group/link pt-1"
@@ -158,15 +163,15 @@ export default function Events() {
                 ))}
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-center py-20 bg-slate-50/50 rounded-2xl border border-slate-200/60"
               >
                 <HelpCircle size={44} className="mx-auto text-slate-300 mb-4" />
-                <h4 className="text-lg font-serif font-bold text-slate-700">No Events Listed</h4>
+                <h4 className="text-lg font-serif font-bold text-slate-700">{content.empty.title}</h4>
                 <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-sm mx-auto font-medium">
-                  There are no current events registered under the selected category at this time.
+                  {content.empty.body}
                 </p>
               </motion.div>
             )}
@@ -177,16 +182,16 @@ export default function Events() {
         <div className="space-y-6 pt-8 border-t border-slate-100">
           <div className="space-y-1">
             <h3 className="font-serif font-bold text-2xl text-slate-900">
-              Campus Event Chronicles
+              {gallery.heading}
             </h3>
             <p className="text-sm font-medium text-slate-500">
-              A chronological photo feed documenting the interactive celebrations, workshops, and student assemblies.
+              {gallery.subtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {ACTIVITY_EVENT_PHOTOS.map((photoUrl, idx) => (
-              <div 
+            {gallery.photos.map((photoUrl, idx) => (
+              <div
                 key={idx}
                 className="group relative aspect-video sm:aspect-square bg-slate-100 rounded-2xl overflow-hidden border-[4px] border-white shadow-md hover:shadow-xl transition-all duration-300"
               >
