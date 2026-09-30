@@ -161,12 +161,12 @@ export default function Footer() {
             <ul className="mt-5 space-y-3 text-[13px] text-[#4d5f50]">
               <li className="flex gap-2.5">
                 <MapPin size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
-                <span>Opposite Surat Airport, Behind DPS School, Near Malvan Mandir, Dumas Road, Surat - 395007, Gujarat, India</span>
+                <span>Near Malvan Mandir, Dumas Road, Via Magdalla Port, Surat, Gujarat 395007</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Phone size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
                 <span>
-                  <a href="tel:+916355065636" className="hover:text-[#1C592F] transition-colors">+91 63550 65636 | +91 90990 63116 </a>
+                  <a href="tel:+912612728282" className="hover:text-[#1C592F] transition-colors">+91 261 272 8282</a>
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
