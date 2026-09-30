@@ -158,16 +158,16 @@ const CATEGORY_DISPLAY_MAP: Record<string, string> = {
 function formatPathToTitle(pathname: string): string {
   const parts = pathname.replace(/^\/|\/$/g, "").split("/");
   if (parts.length === 0 || parts[0] === "") return "Home";
-  
+
   const lastSegment = parts[parts.length - 1];
   const formatted = lastSegment
     .split("-")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-    
+
   if (parts.length > 1) {
     const parentSegment = parts[0];
-    const parentFormatted = CATEGORY_DISPLAY_MAP[parentSegment] || 
+    const parentFormatted = CATEGORY_DISPLAY_MAP[parentSegment] ||
       parentSegment.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     return `${formatted} | ${parentFormatted}`;
   }
@@ -255,7 +255,7 @@ export default function SEO(props: SEOProps) {
         "longitude": "72.7411"
       },
       "telephone": "+91-261-2728282",
-      "email": "info@ckpipsr.ac.in",
+      "email": "ckpipsr@gmail.com",
       "sameAs": [
         "https://ckpipsr.ac.in",
         "https://www.facebook.com/ckpipsr",
@@ -278,8 +278,8 @@ export default function SEO(props: SEOProps) {
   let currentLink = "https://ckpipsr.ac.in";
   pathSegments.forEach((segment, idx) => {
     currentLink += `/${segment}`;
-    const name = idx === 0 && CATEGORY_DISPLAY_MAP[segment] 
-      ? CATEGORY_DISPLAY_MAP[segment] 
+    const name = idx === 0 && CATEGORY_DISPLAY_MAP[segment]
+      ? CATEGORY_DISPLAY_MAP[segment]
       : segment.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     breadcrumbItems.push({
       "@type": "ListItem",

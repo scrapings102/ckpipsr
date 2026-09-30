@@ -880,17 +880,24 @@ interface NavItemDesktopProps {
  */
 /** Long section names sit on two short lines ("Research &" / "Innovation"),
  *  which frees room for CET's spacing between menus. */
+const shortBarNames: Record<string, string> = {
+  'Research & Innovation': 'Research',
+  'Accreditation & Ranking': 'Accreditation',
+  'Students Corner': 'Students',
+};
+
 function navLines(name: string): [string, string] | null {
-  if (name.length <= 12 || !name.includes(' ')) return null;
-  const mid = name.length / 2;
+  const barName = shortBarNames[name] || name;
+  if (barName.length <= 12 || !barName.includes(' ')) return null;
+  const mid = barName.length / 2;
   let at = -1;
-  for (let i = 0; i < name.length; i++)
+  for (let i = 0; i < barName.length; i++)
     if (
-      name[i] === ' ' &&
+      barName[i] === ' ' &&
       (at === -1 || Math.abs(i - mid) < Math.abs(at - mid))
     )
       at = i;
-  return [name.slice(0, at), name.slice(at + 1)];
+  return [barName.slice(0, at), barName.slice(at + 1)];
 }
 
 const navMorph = { switching: false, dir: 1, fromHeight: 0, lastIndex: -1 };
@@ -985,9 +992,10 @@ function NavItemDesktop({
         type='button'
         onClick={onToggle}
         aria-expanded={isActive}
-        className={`flex items-center gap-1 text-[11.5px] min-[1360px]:text-[12px] 2xl:text-[13px] font-sans font-bold py-2 px-0.5 min-[1400px]:px-1 2xl:px-1.5 transition-all duration-200 relative whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] shrink-0 hover:text-[#D4AF37]] bg-transparent ${isActive ? 'text-[#D4AF37]' : 'text-white hover:text-[#D4AF37]'}`}
+        className={`flex items-center gap-1 text-[11px] min-[1360px]:text-[11.5px] 2xl:text-[12.5px] font-sans font-bold py-2 px-0.5 min-[1400px]:px-1 2xl:px-1.5 transition-all duration-200 relative whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] shrink-0 bg-transparent ${isActive ? 'text-[#D4AF37]' : 'text-white hover:text-[#D4AF37]'}`}
       >
         {(() => {
+          const barName = shortBarNames[item.name] || item.name;
           const lines = navLines(item.name);
           return lines ? (
             <span className='leading-[1.1] text-left'>
@@ -996,7 +1004,7 @@ function NavItemDesktop({
               {lines[1]}
             </span>
           ) : (
-            <span>{item.name}</span>
+            <span>{barName}</span>
           );
         })()}
         <ChevronDown

@@ -424,7 +424,7 @@ export function getFacultyDetails(member: {
       "Actively guides student research and innovation cohorts.",
       "Participates in university academic and curriculum development committees."
     ],
-    email: detailed?.email || member.email || "info@ckpipsr.ac.in",
+    email: detailed?.email || member.email || "ckpipsr@gmail.com",
     contactNumber: detailed?.contactNumber || "+91 261 2723967 Ext. 101",
     officeLocation: detailed?.officeLocation || "Academic Block, CKPIPSR Campus",
     specializations: detailed?.specializations || ["Pharmaceutical Research", "Academic Pedagogy", "Formulation Science"]

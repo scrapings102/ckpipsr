@@ -10,10 +10,10 @@ interface Message {
 }
 
 const FAQ_RESPONSES: Record<string, string> = {
-  "admissions": "🎓 **Admissions 2026-27:**\nAdmission is open for professional pharmacy programs. \n\n• **Courses Offered:** B.Pharm (Bachelor of Pharmacy), M.Pharm (Master of Pharmacy), and Pharm.D (Doctor of Pharmacy).\n• **Eligibility:** 12th HSC Science stream (PCB/PCM).\n• **Admission Route:** Conducted via Gujarat centralized admission process (ACPC) and Veer Narmad South Gujarat University (VNSGU) structures.\n• **Admissions Helpline:** +91 261 2723967\n• **Email:** info@ckpipsr.ac.in\n\nClick 'Apply Now' in the header to get started!",
+  "admissions": "🎓 **Admissions 2026-27:**\nAdmission is open for professional pharmacy programs. \n\n• **Courses Offered:** B.Pharm (Bachelor of Pharmacy), M.Pharm (Master of Pharmacy), and Pharm.D (Doctor of Pharmacy).\n• **Eligibility:** 12th HSC Science stream (PCB/PCM).\n• **Admission Route:** Conducted via Gujarat centralized admission process (ACPC) and Veer Narmad South Gujarat University (VNSGU) structures.\n• **Admissions Helpline:** +91 261 2723967\n• **Email:** ckpipsr@gmail.com\n\nClick 'Apply Now' in the header to get started!",
   "academics": "📚 **Academic Programs:**\nWe offer premier, VNSGU-affiliated professional pharmacy courses:\n\n1. **B.Pharm (4 Years):** Standard graduate program in pharmacy practice, pharmaceutical chemistry, and pharmaceutical analysis.\n2. **M.Pharm (2 Years):** Specializations in Pharmaceutics, Pharmaceutical Quality Assurance, and Pharmacology.\n3. **Pharm.D (6 Years):** Intensive clinical doctorate program in hospital pharmacy, clinical pharmacotherapy, and ward rounds.",
   "research": "💡 **Incubation & SSIP cell:**\n• **SSIP Cell:** Affiliated with the Student Start-up & Innovation Policy of Gujarat state.\n• **Startup Funding:** Grants up to ₹2.5 Lakhs available for innovative pharmaceutical research and medical formulation prototype projects.\n• **Scholarships:** Financial aid is accessible through schemes like MYSY (Mukhyamantri Yuva Swavalamban Yojana), the Digital Gujarat Scholarship Portal, and specialized trust aids.",
-  "location": "📍 **Campus & Contact:**\n• **Location:** Dumas Road, Near Malvan Mandir, Surat, Gujarat, 395007.\n• **Phone:** +91 261 2723967\n• **Email:** info@ckpipsr.ac.in\n• **Visiting Hours:** 9:00 AM - 4:30 PM (Monday - Saturday)"
+  "location": "📍 **Campus & Contact:**\n• **Location:** Dumas Road, Near Malvan Mandir, Surat, Gujarat, 395007.\n• **Phone:** +91 261 2723967\n• **Email:** ckpipsr@gmail.com\n• **Visiting Hours:** 9:00 AM - 4:30 PM (Monday - Saturday)"
 };
 
 export default function ChatbotButton() {
@@ -155,7 +155,7 @@ export default function ChatbotButton() {
                     </div>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsOpen(false)}
                   className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
                 >
@@ -166,16 +166,15 @@ export default function ChatbotButton() {
               {/* Chat Message Box */}
               <div ref={scrollRef} data-lenis-prevent="true" className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4 bg-slate-50 relative">
                 {messages.map((msg, i) => (
-                  <div 
-                    key={i} 
+                  <div
+                    key={i}
                     className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
                   >
-                    <div 
-                      className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed whitespace-pre-line shadow-xs border ${
-                        msg.sender === "user" 
-                          ? "bg-[#3B3131] text-white border-transparent rounded-tr-none" 
+                    <div
+                      className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed whitespace-pre-line shadow-xs border ${msg.sender === "user"
+                          ? "bg-[#3B3131] text-white border-transparent rounded-tr-none"
                           : "bg-white text-slate-800 border-slate-100 rounded-tl-none"
-                      }`}
+                        }`}
                     >
                       {msg.text}
                     </div>
@@ -196,28 +195,28 @@ export default function ChatbotButton() {
 
               {/* Quick Options */}
               <div className="px-4 py-2 border-t border-slate-100 bg-white flex flex-wrap gap-1.5">
-                <button 
+                <button
                   onClick={() => handleSendMessage("Admissions Inquiry", true)}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
                 >
                   <GraduationCap size={12} className="text-[#D4AF37]" />
                   <span>Admissions</span>
                 </button>
-                <button 
+                <button
                   onClick={() => handleSendMessage("Academic Programs", true)}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
                 >
                   <BookOpen size={12} className="text-[#D4AF37]" />
                   <span>Programs</span>
                 </button>
-                <button 
+                <button
                   onClick={() => handleSendMessage("Scholarships & SSIP", true)}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
                 >
                   <Sparkles size={11} className="text-[#D4AF37]" />
                   <span>SSIP / Startup</span>
                 </button>
-                <button 
+                <button
                   onClick={() => handleSendMessage("Contact & Location", true)}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
                 >
@@ -227,7 +226,7 @@ export default function ChatbotButton() {
               </div>
 
               {/* Text Input Footer */}
-              <form 
+              <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (inputValue.trim()) {
@@ -236,14 +235,14 @@ export default function ChatbotButton() {
                 }}
                 className="p-3 border-t border-slate-100 bg-white flex items-center gap-2"
               >
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask any question about college..."
                   className="flex-1 px-3.5 py-2 bg-slate-100 border border-transparent hover:border-slate-200 focus:border-[#D4AF37] focus:bg-white text-xs text-slate-800 rounded-xl focus:outline-none transition-all leading-normal font-sans"
                 />
-                <button 
+                <button
                   type="submit"
                   disabled={!inputValue.trim()}
                   className="p-2 bg-[#0c2411] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#113a1b] text-white rounded-xl transition-all cursor-pointer shadow-xs shrink-0"
@@ -268,7 +267,7 @@ export default function ChatbotButton() {
             aria-label="Chat with assistant"
           >
             {isOpen ? <X size={20} className="sm:w-6 sm:h-6" /> : <MessageSquare size={20} className="sm:w-6 sm:h-6" />}
-            
+
             {/* Symmetrical live pulsating notification dot indicator */}
             {!isOpen && (
               <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">

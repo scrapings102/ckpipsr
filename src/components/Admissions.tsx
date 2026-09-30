@@ -51,14 +51,14 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
   };
 
   return (
-    <section 
+    <section
       ref={(el) => {
         if (el) {
           (revealRef as React.MutableRefObject<HTMLElement>).current = el;
           (containerRef as React.MutableRefObject<HTMLDivElement>).current = el as HTMLDivElement;
         }
       }}
-      id="admissions" 
+      id="admissions"
       className="py-24 md:py-36 bg-[#0c2411] text-white relative overflow-hidden border-t border-white/10"
     >
       {/* Decorative overlay backgrounds */}
@@ -80,7 +80,7 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
 
       <div className="relative z-10 max-w-[1360px] mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-20 items-center">
-          
+
           {/* COLUMN A: Dynamic Call to Actions */}
           <div className="lg:col-span-12 xl:col-span-5 flex flex-col items-start text-left">
             <motion.div
@@ -91,7 +91,7 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
               className="w-full"
             >
               {/* Category indicator badge */}
-              <div 
+              <div
                 onClick={onOpenAdmissions}
                 className="flex items-center gap-2.5 mb-6 cursor-pointer hover:opacity-80 transition-opacity"
               >
@@ -107,14 +107,14 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
               <h2 className="text-4xl md:text-5.5xl font-serif text-white font-bold leading-[1.12] tracking-tight mb-6">
                 Begin your journey to <span className="italic font-light text-[#D4AF37] font-serif block sm:inline">leadership</span>.
               </h2>
-              
+
               <p className="text-white/75 leading-relaxed text-[14.5px] md:text-base mb-10 font-sans font-light">
                 Join a legacy of pharmacy professionals, healthcare innovators, researchers, and industry leaders. Admissions through Gujarat Technological University (GTU) centralized admission systems, along with our dedicated institutional assistance desks, are now fully open.
               </p>
 
               {/* Action buttons stack */}
               <div className="flex flex-col sm:flex-row items-center gap-5 w-full">
-                <button 
+                <button
                   onClick={() => {
                     if (onOpenAdmissions) {
                       onOpenAdmissions();
@@ -124,7 +124,7 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                 >
                   Apply Online Now
                 </button>
-                
+
                 <button className="flex items-center gap-3.5 text-xs font-bold uppercase tracking-widest text-white hover:text-[#D4AF37] transition-all group w-full sm:w-auto justify-center cursor-pointer select-none">
                   <span>Download Prospectus</span>
                   <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-[#D4AF37] group-hover:border-transparent group-hover:text-[#0c2411] transition-all group-hover:scale-105">
@@ -179,11 +179,10 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                   return (
                     <div
                       key={faq.id}
-                      className={`rounded-2xl border transition-all duration-350 relative overflow-hidden select-none ${
-                        isOpen 
-                          ? 'bg-[#112815] border-[#D4AF37]/60 shadow-md ring-1 ring-[#D4AF37]/20' 
+                      className={`rounded-2xl border transition-all duration-350 relative overflow-hidden select-none ${isOpen
+                          ? 'bg-[#112815] border-[#D4AF37]/60 shadow-md ring-1 ring-[#D4AF37]/20'
                           : 'bg-[#112815]/40 border-white/10 hover:border-[#D4AF37]/40 hover:bg-[#112815]/60'
-                      }`}
+                        }`}
                     >
                       {/* Accordion Header */}
                       <button
@@ -191,18 +190,17 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                         className="w-full text-left py-4.5 px-5 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
                       >
                         <div className="flex items-center gap-3">
-                          <HelpCircle 
-                            size={16} 
-                            className={`shrink-0 transition-colors duration-300 ${isOpen ? 'text-[#D4AF37]' : 'text-white/40'}`} 
+                          <HelpCircle
+                            size={16}
+                            className={`shrink-0 transition-colors duration-300 ${isOpen ? 'text-[#D4AF37]' : 'text-white/40'}`}
                           />
                           <span className={`font-sans text-[13.5px] md:text-[14.5px] font-semibold tracking-wide transition-colors duration-300 ${isOpen ? 'text-white' : 'text-white/80'}`}>
                             {faq.question}
                           </span>
                         </div>
 
-                        <div className={`p-1.5 rounded-full border shrink-0 transition-all duration-300 ${
-                          isOpen ? 'border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] rotate-180' : 'border-white/10 text-white/40'
-                        }`}>
+                        <div className={`p-1.5 rounded-full border shrink-0 transition-all duration-300 ${isOpen ? 'border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] rotate-180' : 'border-white/10 text-white/40'
+                          }`}>
                           <ChevronDown size={14} className="stroke-[2.5]" />
                         </div>
                       </button>
@@ -236,11 +234,11 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                 <span className="font-sans text-[11px] font-light text-white/50">
                   Have specific queries regarding fee structures or management seats?
                 </span>
-                <a 
-                  href="mailto:info@ckpipsr.org"
+                <a
+                  href="mailto:ckpipsr@gmail.com"
                   className="font-mono text-[10px] font-bold text-[#D4AF37] hover:underline block mt-1 hover:text-white uppercase tracking-wider"
                 >
-                  Contact Registry Desk — info@ckpipsr.org
+                  Contact Registry Desk — ckpipsr@gmail.com
                 </a>
               </div>
 
