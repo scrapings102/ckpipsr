@@ -10,14 +10,27 @@ gsap.registerPlugin(ScrollTrigger);
 interface FAQItem {
   id: number;
   question: string;
-  answer: string;
+  answer: React.ReactNode;
 }
 
 const FAQ_DATA: FAQItem[] = [
   {
     id: 1,
     question: "How do I secure admission to the Pharmacy program?",
-    answer: "Admissions to our D.Pharm, B.Pharm and M Pharm programs are conducted according to the eligibility criteria, merit guidelines, and centralized admission procedures prescribed by the relevant state admission authorities and Pharmacy Council of India (PCI) regulations."
+    answer: (
+      <>
+        Admissions to our D.Pharm, B.Pharm and M.Pharm (Pharmaceutics) programs are conducted according to the eligibility criteria, merit guidelines, and centralized admission committee for professional courses (
+        <a
+          href="https://gujacpc.admissions.nic.in/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#D4AF37] underline hover:text-[#f3e098] transition-colors"
+        >
+          ACPC
+        </a>
+        ).
+      </>
+    )
   },
   {
     id: 2,
@@ -135,9 +148,7 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
 
               {/* Fast fact badges line */}
               <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-2 gap-4">
-                <div className="flex flex-col items-start">
-                  <span className="font-sans text-[11px] font-semibold text-white/50 uppercase tracking-widest">GUJARAT GTU AFFILIATED</span>
-                  <span className="font-serif text-[20px] font-bold text-[#D4AF37] tracking-wide mt-1">CKPIPSR - Surat</span>
+                <div className="flex flex-col items-start">                  <span className="font-serif text-[20px] font-bold text-[#D4AF37] tracking-wide mt-1">CKPIPSR - Surat</span>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-sans text-[11px] font-semibold text-white/50 uppercase tracking-widest">SSIP STARTUP AID</span>
@@ -180,8 +191,8 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                     <div
                       key={faq.id}
                       className={`rounded-2xl border transition-all duration-350 relative overflow-hidden select-none ${isOpen
-                          ? 'bg-[#112815] border-[#D4AF37]/60 shadow-md ring-1 ring-[#D4AF37]/20'
-                          : 'bg-[#112815]/40 border-white/10 hover:border-[#D4AF37]/40 hover:bg-[#112815]/60'
+                        ? 'bg-[#112815] border-[#D4AF37]/60 shadow-md ring-1 ring-[#D4AF37]/20'
+                        : 'bg-[#112815]/40 border-white/10 hover:border-[#D4AF37]/40 hover:bg-[#112815]/60'
                         }`}
                     >
                       {/* Accordion Header */}

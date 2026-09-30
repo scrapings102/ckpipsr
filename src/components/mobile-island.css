@@ -5,13 +5,16 @@
 
 .mi {
   /* sizes scale with the screen, within limits */
-  --mi-h: clamp(58px, 17.2vw, 67px); /* capsule height (+20%) */
-  --mi-dot: clamp(40px, 12.9vw, 50px); /* seal + menu button (+20%) */
+  --mi-h: clamp(66px, 19vw, 76px);
+  --mi-dot: clamp(50px, 15vw, 62px);
+  /* seal + menu button (+20%) */
   position: relative;
   width: 100%;
   height: calc(42px + var(--mi-h));
-  margin-top: -12px; /* reach the true top edge of the screen */
-  pointer-events: none; /* only the island itself takes taps */
+  margin-top: -12px;
+  /* reach the true top edge of the screen */
+  pointer-events: none;
+  /* only the island itself takes taps */
 }
 
 .mi-rig {
@@ -19,24 +22,30 @@
   left: 0;
   right: 0;
   top: 0;
-  margin: 0 auto; /* centred without the `translate` property,
+  margin: 0 auto;
+  /* centred without the `translate` property,
                                  which pre-2022 Android Chrome lacks */
-  width: min(384px, calc(100% - 16px)); /* +20% */
+  width: min(384px, calc(100% - 16px));
+  /* +20% */
   height: 100%;
   transform-origin: 50% 0;
   will-change: transform;
 }
+
 .mi-idle {
   position: absolute;
   inset: 0;
   transform-origin: 50% 0;
   animation: mi-idle 3.9s ease-in-out infinite;
 }
+
 @keyframes mi-idle {
+
   0%,
   100% {
     transform: rotate(-0.7deg);
   }
+
   50% {
     transform: rotate(0.7deg);
   }
@@ -49,12 +58,15 @@
   position: absolute;
   transition: opacity 0.3s ease;
 }
+
 .mi-l {
   left: 22%;
 }
+
 .mi-r {
   left: 78%;
 }
+
 .mi-clasp {
   top: -1px;
   width: 14px;
@@ -64,6 +76,7 @@
   background: var(--mi-clasp);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
+
 .mi-cord {
   top: 6px;
   width: 1.6px;
@@ -72,6 +85,7 @@
   border-radius: 1px;
   background: var(--mi-cord);
 }
+
 .mi-ring {
   top: 37px;
   width: 9px;
@@ -94,11 +108,13 @@
   gap: 14px;
   padding: 0 8px;
   border-radius: 999px;
-  z-index: 0; /* own stacking context for the surface layer */
+  z-index: 0;
+  /* own stacking context for the surface layer */
   pointer-events: auto;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+
 /* the capsule's surface, on its own layer so it can fade out while the
    menu is open (a gradient background cannot be transitioned) */
 .mi-island::before {
@@ -114,6 +130,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   transition: opacity 0.3s ease;
 }
+
 /* soft glass highlight along the top */
 .mi-island::after {
   content: '';
@@ -137,11 +154,12 @@
   overflow: hidden;
   background: #fff;
   padding: 2px;
-  box-shadow: 0 0 0 2px var(--mi-ring);
-  border: 0; /* no reliance on a CSS reset */
+  border: 1.2px solid #D4AF37;
+  box-shadow: 0 0 0 1.2px var(--mi-ring), 0 0 8px rgba(212, 175, 55, 0.35);
   cursor: pointer;
   transition: opacity 0.3s ease;
 }
+
 .mi-seal:active {
   transform: scale(0.94);
 }
@@ -153,6 +171,7 @@
   line-height: 1;
   transition: opacity 0.3s ease;
 }
+
 .mi-title {
   color: #fff;
   font-family: var(--font-sans);
@@ -163,6 +182,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .mi-sub {
   margin-top: 4px;
   color: var(--mi-status);
@@ -190,15 +210,17 @@
     0 6px 16px -4px var(--mi-button-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   border: 0;
-  padding: 0; /* no reliance on a CSS reset */
+  padding: 0;
+  /* no reliance on a CSS reset */
   cursor: pointer;
   /* --mi-dx / --mi-dy move it to the reference's corner while the menu is open */
-  transform: translate(var(--mi-dx, 0px), var(--mi-dy, 0px))
-    scale(var(--mi-press, 1));
+  transform: translate(var(--mi-dx, 0px), var(--mi-dy, 0px)) scale(var(--mi-press, 1));
 }
+
 .mi-menu:active {
   --mi-press: 0.92;
 }
+
 .mi-bars {
   position: relative;
   width: 21px;
@@ -207,6 +229,7 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
 .mi-bars i {
   display: block;
   height: 3px;
@@ -217,13 +240,16 @@
     transform 0.3s ease,
     opacity 0.3s ease;
 }
+
 /* open: top and bottom rotate into an X, the middle fades out */
 .mi-menu.is-open .mi-bars i:nth-child(1) {
   transform: translateY(6px) rotate(45deg);
 }
+
 .mi-menu.is-open .mi-bars i:nth-child(2) {
   opacity: 0;
 }
+
 .mi-menu.is-open .mi-bars i:nth-child(3) {
   transform: translateY(-6px) rotate(-45deg);
 }
@@ -254,6 +280,7 @@
     transform 0.45s cubic-bezier(0.76, 0, 0.24, 1),
     opacity 0.3s ease;
 }
+
 .mi.is-away .mi-menu {
   opacity: 0;
   pointer-events: none;
@@ -270,38 +297,51 @@
 .mi.is-instant .mi-text {
   transition: none;
 }
+
 .mi.is-open.is-instant .mi-menu {
   animation: mi-fade-in 0.3s ease both;
 }
+
 @keyframes mi-fade-in {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
+
 .mi.is-open .mi-island {
   pointer-events: none;
-} /* taps pass through to the menu... */
+}
+
+/* taps pass through to the menu... */
 .mi.is-open .mi-menu {
   pointer-events: auto;
-} /* ...except on the X itself */
+}
+
+/* ...except on the X itself */
 .mi.is-open .mi-idle,
 .mi.is-away .mi-idle {
   animation: none;
-} /* the X holds still */
+}
+
+/* the X holds still */
 
 @media (prefers-reduced-motion: reduce) {
   .mi-idle {
     animation: none;
   }
+
   .mi-bars i {
     transition: none;
   }
+
   .mi-menu {
     transition: none;
   }
+
   .mi.is-open.is-instant .mi-menu {
     animation: none;
   }
@@ -318,6 +358,7 @@
   margin: 0;
   position: static;
 }
+
 .mi-fab {
   position: fixed;
   top: 20px;
@@ -328,6 +369,7 @@
   margin: 0;
   pointer-events: auto;
 }
+
 /* rendered at page level, so it must be hidden on desktop explicitly —
    inside pages there use the full header */
 @media (min-width: 1024px) {
@@ -335,6 +377,7 @@
     display: none;
   }
 }
+
 /* On inside pages the menu is opened from the icon on the breadcrumb line,
    so the floating button only exists as the X while the menu is open: it
    fades in with the menu and out as it closes. */

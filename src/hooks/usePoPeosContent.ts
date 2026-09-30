@@ -55,13 +55,13 @@ const OUTCOMES: [string, string][] = [
 ];
 
 export const DEFAULT_PO_PEOS: PoPeosContent = {
-  pageTitle: "PO and PEOs",
+  pageTitle: "Program Educational Objectives & Outcomes (PO & PEOs)",
   pageSubtitle:
-    "Program Educational Objectives (PEOs) & Program Outcomes (POs) defining our Outcome-Based Education (OBE) framework.",
+    "Defining the core Program Educational Objectives (PEOs) and Program Outcomes (POs) under our Outcome-Based Education (OBE) framework.",
   peos: {
     eyebrow: "Strategic Goals",
     headingLead: "Program Educational",
-    headingAccent: "Objectives",
+    headingAccent: "Objectives (PEOs)",
     intro:
       "Core objectives describing the professional accomplishments graduates are expected to attain within 3 to 5 years after graduation.",
     footnote: "Institutional Mandate",
@@ -73,14 +73,14 @@ export const DEFAULT_PO_PEOS: PoPeosContent = {
   },
   pos: {
     eyebrow: "Graduate Attributes",
-    headingLead: "Program",
-    headingAccent: "Outcomes",
+    headingLead: "Program Outcomes",
+    headingAccent: "(POs)",
     note: '"Defining the core competencies and skills of our pharmacy graduates."',
     watermark: "PO Matrix",
     items: OUTCOMES.map(([title, description], i) => ({ num: `PO${i + 1}`, title, description })),
   },
   cta: {
-    headingLead: "Our Commitment to",
+    headingLead: "Commitment to Excellence in",
     headingAccent: "Outcome-Based Education",
     body: "We continuously measure and refine our academic processes to ensure every student reaches their full potential as a pharmaceutical professional.",
   },
@@ -108,7 +108,27 @@ export function usePoPeosContent(): PoPeosContent {
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (cancelled || !body) return;
-        if (isUsable(body.poPeos)) setContent(body.poPeos);
+        if (isUsable(body.poPeos)) {
+          const data = { ...body.poPeos };
+          if (!data.pageTitle || data.pageTitle === "PO And PEO's" || data.pageTitle === "PO and PEOs") {
+            data.pageTitle = "Program Educational Objectives & Outcomes (PO & PEOs)";
+          }
+          if (!data.peos?.headingLead || data.peos.headingLead === "PO And PEO's") {
+            data.peos = {
+              ...data.peos,
+              headingLead: "Program Educational",
+              headingAccent: "Objectives (PEOs)",
+            };
+          }
+          if (!data.pos?.headingLead || data.pos.headingLead === "PO And PEO's") {
+            data.pos = {
+              ...data.pos,
+              headingLead: "Program Outcomes",
+              headingAccent: "(POs)",
+            };
+          }
+          setContent(data);
+        }
       })
       // The page does not depend on the API being up.
       .catch(() => undefined);

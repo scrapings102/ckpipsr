@@ -29,7 +29,7 @@ export default function CkpcmcLogo({ className = 'h-12 w-auto', showText = true 
       {/* Outer Ring */}
       <circle cx="50" cy="50" r="46" stroke="#112815" strokeWidth="3" fill="#EAEFEA" />
       <circle cx="50" cy="50" r="41" stroke="#1C592F" strokeWidth="1" strokeDasharray="2 2" />
-      
+
       {/* Circular teeth representing precision & research */}
       {[...Array(24)].map((_, i) => {
         const angle = (i * 360) / 24;
@@ -49,7 +49,7 @@ export default function CkpcmcLogo({ className = 'h-12 w-auto', showText = true 
 
       {/* Inner circle border */}
       <circle cx="50" cy="50" r="28" stroke="#112815" strokeWidth="2" fill="#D9E4D8" />
-      
+
       {/* Mortar & Pestle + Pharmaceutical symbol */}
       <path
         d="M32 50 C32 64, 68 64, 68 50 L36 50 Z"

@@ -1549,7 +1549,7 @@ function NavContent({
         style={{
           // IPSR: 58px (CET/CMC 64px) so the two-line institute name sits inside the
           // bar instead of over the strip below; everything scales from this value
-          ['--ckp-bar-h' as any]: isScrolled ? '46px' : '62px',
+          ['--ckp-bar-h' as any]: isScrolled ? '56px' : '62px',
           ['--ckp-overhang' as any]: isScrolled ? '0px' : '54px',
         }}
       >
@@ -3150,11 +3150,11 @@ export default function Navbar({
               ? { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
               : { duration: 0.1, ease: 'easeIn' }
           }
-          className={`${isSubPage ? 'relative mx-auto w-full' : 'fixed left-1/2 -translate-x-1/2 w-[98%] max-w-[1720px]'} z-50 ${menuOpen || ckpMenuLayer ? (isSubPage ? '' : 'max-lg:top-2 sm:max-lg:top-3 max-lg:z-[70]') : ''} ${isSubPage
-              ? ''
-              : isScrolled
-                ? 'top-2 sm:top-3'
-                : 'top-2 sm:top-3 lg:top-14 xl:top-16 min-[1361px]:top-[72px]'
+          className={`${isSubPage ? 'relative mx-auto w-full' : 'fixed left-1/2 -translate-x-1/2 w-[98%] max-w-[1720px]'} z-50 ${menuOpen || ckpMenuLayer ? (isSubPage ? '' : 'max-lg:top-4 sm:max-lg:top-5 max-lg:z-[70]') : ''} ${isSubPage
+            ? ''
+            : isScrolled
+              ? 'top-4 sm:top-5 lg:top-6'
+              : 'top-5 sm:top-6 lg:top-20 xl:top-24 min-[1361px]:top-[92px]'
             }`}
         >
           <div className='w-full rounded-[26px] sm:rounded-[32px] bg-transparent flex flex-col relative overflow-visible'>
@@ -3174,8 +3174,8 @@ export default function Navbar({
             {!isSubPage && (
               <div
                 className={`bg-gradient-to-r from-[#0C1E03] via-[#163807] to-[#0C1E03] border-b-2 border-[#D4AF37] border-t border-[#D4AF37]/35 text-white/90 hidden xl:block relative z-10 w-full overflow-hidden transition-all duration-300 rounded-b-[26px] sm:rounded-b-[32px] shadow-[0_18px_40px_-22px_rgba(0,0,0,0.6)] ckp-strip-edge ${isScrolled
-                    ? 'h-0 py-0 opacity-0 border-t-0 border-b-0'
-                    : 'min-h-[32px] py-1 px-4 sm:px-6 lg:px-8 xl:px-10 opacity-100'
+                  ? 'h-0 py-0 opacity-0 border-t-0 border-b-0'
+                  : 'min-h-[32px] py-1 px-4 sm:px-6 lg:px-8 xl:px-10 opacity-100'
                   }`}
               >
                 {/* three columns, as on CET: the admissions chip sits on the strip's true
@@ -3543,7 +3543,7 @@ function OverlayMenu({
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         onClick={handleClose}
         aria-label='Close menu'
-        className='absolute top-4 right-4 md:top-6 md:right-6 z-[80] flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#112815] text-white hover:bg-[#D4AF37] hover:text-[#112815] border border-[#D4AF37]/50 hover:border-transparent transition-all duration-300 active:scale-95 cursor-pointer group/close shadow-[0_4px_25px_rgba(0,0,0,0.3)] backdrop-blur-md'
+        className='hidden lg:flex absolute top-4 right-4 md:top-6 md:right-6 z-[80] items-center gap-2 px-4 py-2.5 rounded-full bg-[#112815] text-white hover:bg-[#D4AF37] hover:text-[#112815] border border-[#D4AF37]/50 hover:border-transparent transition-all duration-300 active:scale-95 cursor-pointer group/close shadow-[0_4px_25px_rgba(0,0,0,0.3)] backdrop-blur-md'
       >
         <span className='font-sans text-[10px] font-bold uppercase tracking-[0.15em] transition-colors duration-300 text-white group-hover/close:text-[#112815]'>
           Close
