@@ -2,7 +2,7 @@ import React, { useEffect, lazy, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MapPin, Phone, Mail, ArrowUpRight } from 'lucide-react';
 import CkpcmcLogo from './CkpcmcLogo';
-import GreekFacade from './GreekFacade';
+import CampusEngraving from './CampusEngraving';
 import './ckpipsr-footer.css';
 import { courseHref, useCourses, visibleCourses } from '../hooks/useCourses';
 
@@ -125,16 +125,22 @@ export default function Footer() {
           <div className="relative mx-auto max-w-[1580px] px-6 pt-12 text-center sm:px-10 lg:px-16 lg:pt-16">
             <div className={`ckpf-write ${seen ? 'is-written' : ''}`}>
               <p className="ckpf-script" aria-label="Until we meet on campus">
-                Until we meet <br className="sm:hidden" />on campus
+                <span className="ckpf-inner">Until we meet <br className="sm:hidden" />on campus</span>
               </p>
               {/* hand-drawn marker squiggle; draws in after the writing finishes */}
-              <svg className="ckpf-underline" viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <path pathLength={1} d="M 2 10 C 14 3 22 3 30 9 C 38 15 46 14 54 7 C 60 2 66 4 70 10 C 76 17 86 14 98 9" />
-              </svg>
+              <span className="ckpf-uwin" aria-hidden="true">
+                <span className="ckpf-inner">
+                  <svg className="ckpf-underline" viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                    <path pathLength={1} d="M 2 10 C 14 3 22 3 30 9 C 38 15 46 14 54 7 C 60 2 66 4 70 10 C 76 17 86 14 98 9" />
+                  </svg>
+                </span>
+              </span>
             </div>
           </div>
 
-          <GreekFacade drawn={seen} />
+          <div className="ckpc-footer">
+            <CampusEngraving drawn={seen} />
+          </div>
         </div>
       )}
 
@@ -173,7 +179,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail size={14} className="shrink-0 text-[#2c7a47]" aria-hidden="true" />
-                <a href="mailto:info@ckpipsr.ac.in" className="hover:text-[#1C592F] transition-colors">info@ckpipsr.ac.in</a>
+                <a href="mailto:ckpipsr@gmail.com" className="hover:text-[#1C592F] transition-colors">ckpipsr@gmail.com</a>
               </li>
             </ul>
           </div>

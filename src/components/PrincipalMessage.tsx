@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Quote, Feather, User, ArrowRight, Landmark, X, FileText, Award, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const PrincipalMessage = () => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string } | null>(null);
 
@@ -44,7 +46,7 @@ export const PrincipalMessage = () => {
           </div>
 
           {/* ── BOTTOM-RIGHT GEOMETRIC CORNER ACCENT ── */}
-          <div className="absolute bottom-0 right-0 z-0 w-44 h-44 sm:w-60 sm:h-60 pointer-events-none overflow-hidden">
+          <div className="absolute bottom-0 right-0 z-0 w-20 h-20 sm:w-28 sm:h-28 pointer-events-none overflow-hidden">
             <div
               className="absolute inset-0 bg-[#123b1a]"
               style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
@@ -135,18 +137,30 @@ export const PrincipalMessage = () => {
             </div>
 
             {/* Principal Name & Role */}
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-full bg-[#251E1C] text-white flex items-center justify-center shrink-0 shadow-sm">
-                <User size={20} />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-[#251E1C] text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <User size={20} />
+                </div>
+                <div>
+                  <h4 className="font-sans font-bold text-slate-900 text-xl sm:text-2xl tracking-tight leading-tight">
+                    {principalData.name}
+                  </h4>
+                  <p className="text-slate-500 font-mono text-[10.5px] sm:text-[11.5px] font-bold uppercase tracking-wider mt-0.5">
+                    {principalData.role} <span className="text-[#D4AF37] font-normal">|</span> {principalData.credentials}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-sans font-bold text-slate-900 text-xl sm:text-2xl tracking-tight leading-tight">
-                  {principalData.name}
-                </h4>
-                <p className="text-slate-500 font-mono text-[10.5px] sm:text-[11.5px] font-bold uppercase tracking-wider mt-0.5">
-                  {principalData.role} <span className="text-[#D4AF37] font-normal">|</span> {principalData.credentials}
-                </p>
-              </div>
+
+              {/* Action Button: Open Principal Subpage */}
+              <button
+                type="button"
+                onClick={() => navigate('/about-us/principal')}
+                className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 bg-[#123b1a] hover:bg-[#1b4d24] text-white rounded-full font-sans font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group cursor-pointer border border-[#D4AF37]/30 shrink-0 self-start sm:self-auto mt-2 sm:mt-0"
+              >
+                <span>Read Full Message</span>
+                <ArrowRight size={15} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform duration-300" />
+              </button>
             </div>
           </div>
 

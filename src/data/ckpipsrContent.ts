@@ -213,13 +213,31 @@ Object.keys(categoryDisplayNames).forEach((key) => {
 export function getCkpipsrPage(pathname: string): { page: ContentPage; categoryLabel: string } | null {
   const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
   const parts = cleanPath.split("/");
-  if (parts.length < 2) return null;
+  
+  let categorySlug = "";
+  let pageSlug = "";
 
-  const categorySlug = parts[0].toLowerCase();
-  const pageSlug = parts.slice(1).join("/").toLowerCase();
+  if (parts.length < 2) {
+    categorySlug = "about-us";
+    pageSlug = cleanPath.toLowerCase();
+  } else {
+    categorySlug = parts[0].toLowerCase();
+    pageSlug = parts.slice(1).join("/").toLowerCase();
+  }
+
+  // Handle common alias slugs for Principal
+  if (["principal", "the-principal", "principal-message", "principal-s-message", "principals-message"].includes(pageSlug)) {
+    const page = scrapedData["About"]?.find((p) => p.Page === "Principal");
+    if (page) {
+      return {
+        page,
+        categoryLabel: categoryDisplayNames["About"] || "About Us"
+      };
+    }
+  }
 
   const jsonKey = Object.keys(categoryUrlPrefixes).find(
-    (key) => categoryUrlPrefixes[key] === categorySlug
+    (key) => categoryUrlPrefixes[key] === categorySlug || key.toLowerCase() === categorySlug
   );
 
   if (!jsonKey) return null;

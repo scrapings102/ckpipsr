@@ -145,17 +145,6 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                   </div>
                 </button>
               </div>
-
-              {/* Fast fact badges line */}
-              <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-2 gap-4">
-                <div className="flex flex-col items-start">                  <span className="font-serif text-[20px] font-bold text-[#D4AF37] tracking-wide mt-1">CKPIPSR - Surat</span>
-                </div>
-                <div className="flex flex-col items-start">
-                  <span className="font-sans text-[11px] font-semibold text-white/50 uppercase tracking-widest">SSIP STARTUP AID</span>
-                  <span className="font-serif text-[20px] font-bold text-emerald-400 tracking-wide mt-1">Industrial cell</span>
-                </div>
-              </div>
-
             </motion.div>
           </div>
 

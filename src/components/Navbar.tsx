@@ -284,7 +284,6 @@ const landingNavItems = [
   { name: "Principal's Message", id: 'principal-message', icon: FileText },
   { name: 'Courses Offered', id: 'courses', icon: BookOpen },
   { name: 'Campus Life', id: 'campus-life', icon: Building2 },
-  { name: 'Faculty', id: 'faculty', icon: Users },
   { name: 'Blogs & Magazine', id: 'blogs-magazine', icon: Sparkles },
   { name: 'Admissions', id: 'admissions', icon: UserCheck },
 ];
@@ -1678,7 +1677,7 @@ function NavContent({
               </span>
               <span className='ckp-sph__sep'>|</span>
               <span className='ckp-sph__aff'>
-                Affiliated to GTU | Approved by PCI
+                Affiliated to GTU | Approved by PCI & QCI
               </span>
             </div>
             <div className='ckp-sph__tr'>
@@ -1954,6 +1953,91 @@ function BottomNavItem({
   );
 }
 
+function getSlugGroup(slug: string): string {
+  const s = slug.toLowerCase().trim();
+  if (
+    [
+      'principal',
+      'the-principal',
+      'principal-message',
+      'principals-message',
+      'principal-s-message',
+    ].includes(s)
+  ) {
+    return 'principal';
+  }
+  if (['founder', 'the-founder'].includes(s)) {
+    return 'founder';
+  }
+  if (['trust', 'the-trust', 'about-trust'].includes(s)) {
+    return 'trust';
+  }
+  if (['vision-mission', 'vision-and-mission'].includes(s)) {
+    return 'vision-mission';
+  }
+  if (['po-peos', 'po-and-peos'].includes(s)) {
+    return 'po-peos';
+  }
+  if (
+    ['deans-faculty', 'deans-and-faculty', 'deans-and-faculty-in-charges'].includes(
+      s,
+    )
+  ) {
+    return 'deans-faculty';
+  }
+  if (['courses', 'course-syllabus', 'syllabus'].includes(s)) {
+    return 'syllabus';
+  }
+  if (['timetables', 'timetable'].includes(s)) {
+    return 'timetables';
+  }
+  if (['scholarships', 'scholorships'].includes(s)) {
+    return 'scholarships';
+  }
+  if (['hobby-club', 'hobbyclub'].includes(s)) {
+    return 'hobby-club';
+  }
+  if (['alumni', 'alumni-association'].includes(s)) {
+    return 'alumni';
+  }
+  if (['student-help-desk', 'help-desk'].includes(s)) {
+    return 'help-desk';
+  }
+  return s;
+}
+
+export function isPathMatching(
+  currentPath: string,
+  targetPath: string,
+): boolean {
+  if (!currentPath || !targetPath) return false;
+  if (currentPath === targetPath) return true;
+
+  const cleanCurrent = currentPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+  const cleanTarget = targetPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+
+  if (cleanCurrent === cleanTarget) return true;
+
+  const currentSegments = cleanCurrent.split('/');
+  const targetSegments = cleanTarget.split('/');
+
+  const currentLast = currentSegments[currentSegments.length - 1];
+  const targetLast = targetSegments[targetSegments.length - 1];
+
+  if (
+    currentLast &&
+    targetLast &&
+    getSlugGroup(currentLast) === getSlugGroup(targetLast)
+  ) {
+    return true;
+  }
+
+  if (cleanTarget !== '' && cleanCurrent.startsWith(cleanTarget)) return true;
+  if (cleanCurrent !== '' && cleanTarget.startsWith(cleanCurrent)) return true;
+
+  return false;
+}
+
 function getActiveCategory(pathname: string): string {
   const cleanPath = pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
   if (!cleanPath) return 'About Us';
@@ -1992,7 +2076,7 @@ function getActiveCategory(pathname: string): string {
     if (
       items.some((item) => {
         const itemClean = item.path.replace(/^\/+|\/+$/g, '').toLowerCase();
-        return itemClean === cleanPath || cleanPath.startsWith(itemClean);
+        return isPathMatching(cleanPath, itemClean);
       })
     ) {
       return category;
@@ -2145,8 +2229,16 @@ const GlassDock = ({
     });
     tabsRef.current = tabs;
 
-    const idx = tabs.findIndex((t) => t.value === String(activeValue));
-    const activeIdx = idx >= 0 ? idx : 0;
+    let activeIdx = pills.findIndex(
+      (el) => el.getAttribute('data-active') === 'true',
+    );
+    if (activeIdx === -1 && activeValue) {
+      const activeStr = String(activeValue);
+      activeIdx = tabs.findIndex(
+        (t) => t.value === activeStr || isPathMatching(activeStr, t.value),
+      );
+    }
+    if (activeIdx === -1) activeIdx = 0;
     if (tabs[activeIdx] && !isDraggingRef.current) {
       const w = tabs[activeIdx].width * 1.1;
       const xOffset = (w - tabs[activeIdx].width) / 2;
@@ -2610,10 +2702,10 @@ function BottomScrollNav({
 
               <LayoutGroup id='subpage-nav'>
                 {subPageItems.map((item) => {
-                  const isActive =
-                    location.pathname === item.path ||
-                    (location.pathname.startsWith(item.path) &&
-                      item.path !== '/');
+                  const isActive = isPathMatching(
+                    location.pathname,
+                    item.path,
+                  );
                   const SubIcon = getIconForLabel(item.label);
                   return (
                     <GlassPillBtn
@@ -3188,7 +3280,7 @@ export default function Navbar({
                     </div>
                     <span className='text-white/20'>|</span>
                     <span className='text-white/80 font-medium min-w-0 truncate'>
-                      Affiliated to GTU | Approved by PCI
+                      Affiliated to GTU | Approved by PCI & QCI
                     </span>
                   </div>
 

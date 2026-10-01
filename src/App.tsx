@@ -10,7 +10,7 @@ import { AboutSection } from "./components/About";
 import { PrincipalMessage } from "./components/PrincipalMessage";
 import Courses from "./components/Courses";
 import CampusLife from "./components/CampusLife";
-import Faculty from "./components/Faculty";
+
 import BlogsAndMagazine from "./components/BlogsAndMagazine";
 import Admissions from "./components/Admissions";
 import Footer from "./components/Footer";
@@ -93,6 +93,7 @@ const Committee = React.lazy(() => import("./pages/tnp/Committee"));
 const Training = React.lazy(() => import("./pages/tnp/Training"));
 
 const DynamicSubPage = React.lazy(() => import("./pages/DynamicSubPage"));
+const SearchPage = React.lazy(() => import("./pages/Search"));
 const Events = React.lazy(() => import("./pages/activities/Events"));
 
 export default function App() {
@@ -159,9 +160,9 @@ export default function App() {
   return (
     <>
       {showPreloader && !isSubPage && (
-        <Preloader 
-          onExitStart={handlePreloaderExitStart} 
-          onComplete={handlePreloaderComplete} 
+        <Preloader
+          onExitStart={handlePreloaderExitStart}
+          onComplete={handlePreloaderComplete}
         />
       )}
 
@@ -174,9 +175,9 @@ export default function App() {
 
         {!isSubPage ? (
           <>
-            <Hero 
-              loaded={heroLoaded} 
-              isSubPage={false} 
+            <Hero
+              loaded={heroLoaded}
+              isSubPage={false}
               onQuotesComplete={handleQuotesComplete}
               onOpenAdmissions={() => setShowAdmissionsPopup(true)}
             />
@@ -186,7 +187,7 @@ export default function App() {
               <PrincipalMessage />
               <Courses />
               <CampusLife />
-              <Faculty />
+
               <BlogsAndMagazine />
               <Admissions onOpenAdmissions={() => setShowAdmissionsPopup(true)} />
             </main>
@@ -201,27 +202,38 @@ export default function App() {
               <Routes>
                 <Route path="/about/profile" element={<Profile />} />
                 <Route path="/about-us/profile" element={<Profile />} />
-                
+
                 <Route path="/about/vision-mission" element={<VisionMission />} />
                 <Route path="/about-us/vision-and-mission" element={<VisionMission />} />
-                
+
                 <Route path="/about/po-peos" element={<POAndPEOs />} />
                 <Route path="/about-us/po-peos" element={<POAndPEOs />} />
-                
+
                 <Route path="/about/founder" element={<Founder />} />
                 <Route path="/about-us/the-founder" element={<Founder />} />
-                
+
                 <Route path="/about/trust" element={<Trust />} />
                 <Route path="/about-us/the-trust" element={<Trust />} />
                 <Route path="/about/about-trust" element={<Trust />} />
                 <Route path="/about-us/about-trust" element={<Trust />} />
-                
+
                 <Route path="/about/governing-body" element={<GoverningBody />} />
                 <Route path="/about-us/governing-body" element={<GoverningBody />} />
-                
+
                 <Route path="/about/principal" element={<Principal />} />
                 <Route path="/about-us/principal" element={<Principal />} />
-                
+                <Route path="/about/the-principal" element={<Principal />} />
+                <Route path="/about-us/the-principal" element={<Principal />} />
+                <Route path="/about/principal-message" element={<Principal />} />
+                <Route path="/about-us/principal-message" element={<Principal />} />
+                <Route path="/about/principal-s-message" element={<Principal />} />
+                <Route path="/about-us/principal-s-message" element={<Principal />} />
+                <Route path="/about/principals-message" element={<Principal />} />
+                <Route path="/about-us/principals-message" element={<Principal />} />
+                <Route path="/principal" element={<Principal />} />
+                <Route path="/the-principal" element={<Principal />} />
+                <Route path="/principal-message" element={<Principal />} />
+
                 <Route path="/about/deans-faculty" element={<DeansAndFaculty />} />
                 <Route path="/about-us/deans-and-faculty-in-charges" element={<DeansAndFaculty />} />
 
@@ -240,7 +252,7 @@ export default function App() {
                 <Route path="/academics/approvals" element={<Approvals />} />
                 <Route path="/academics/faculties" element={<Faculties />} />
                 <Route path="/academics/resources" element={<Resources />} />
-                
+
                 {/* Resource detailed routes */}
                 <Route path="/resources/laboratories" element={<Laboratories />} />
                 <Route path="/academics/resources-laboratories" element={<Laboratories />} />
@@ -254,7 +266,7 @@ export default function App() {
                 <Route path="/academics/resources-central-facilities" element={<CentralFacilities />} />
                 <Route path="/academics/resources-ev-charging-station" element={<EVChargingStation />} />
                 <Route path="/academics/resources-medicinal-garden" element={<MedicinalGarden />} />
-                
+
                 {/* Students Corner */}
                 <Route path="/students-corner/courses" element={<CourseSyllabus />} />
                 <Route path="/students/courses" element={<CourseSyllabus />} />
@@ -289,7 +301,7 @@ export default function App() {
                 <Route path="/students/helpdesk" element={<StudentHelpDesk />} />
                 <Route path="/help-desk" element={<StudentHelpDesk />} />
                 <Route path="/helpdesk" element={<StudentHelpDesk />} />
-                
+
                 {/* Cells & Committees */}
                 <Route path="/cells/arc" element={<ARC />} />
                 <Route path="/cells/anti-ragging-committee" element={<ARC />} />
@@ -344,7 +356,7 @@ export default function App() {
                 <Route path="/research/about-research" element={<AboutResearch />} />
                 <Route path="/rni/research/about" element={<AboutResearch />} />
                 <Route path="/rni/about" element={<AboutResearch />} />
-                
+
                 <Route path="/research-and-innovation/research-publications" element={<ResearchPublications />} />
                 <Route path="/research-and-innovation/publications" element={<ResearchPublications />} />
                 <Route path="/research-and-innovation/research/publications" element={<ResearchPublications />} />
@@ -353,7 +365,7 @@ export default function App() {
                 <Route path="/rni/research/publications" element={<ResearchPublications />} />
                 <Route path="/rni/publications" element={<ResearchPublications />} />
                 <Route path="/rni/research-publications" element={<ResearchPublications />} />
-                
+
                 <Route path="/research-and-innovation/research-patents" element={<Patents />} />
                 <Route path="/research-and-innovation/patents" element={<Patents />} />
                 <Route path="/research-and-innovation/research/patents" element={<Patents />} />
@@ -362,7 +374,7 @@ export default function App() {
                 <Route path="/rni/research/patents" element={<Patents />} />
                 <Route path="/rni/patents" element={<Patents />} />
                 <Route path="/rni/research-patents" element={<Patents />} />
-                
+
                 <Route path="/research-and-innovation/research-books" element={<Books />} />
                 <Route path="/research-and-innovation/books" element={<Books />} />
                 <Route path="/research-and-innovation/research/books" element={<Books />} />
@@ -371,7 +383,7 @@ export default function App() {
                 <Route path="/rni/research/books" element={<Books />} />
                 <Route path="/rni/books" element={<Books />} />
                 <Route path="/rni/research-books" element={<Books />} />
-                
+
                 <Route path="/research-and-innovation/research-doctoral-studies" element={<DoctoralStudies />} />
                 <Route path="/research-and-innovation/doctoral-studies" element={<DoctoralStudies />} />
                 <Route path="/research-and-innovation/research/doctoral-studies" element={<DoctoralStudies />} />
@@ -380,7 +392,7 @@ export default function App() {
                 <Route path="/rni/research/doctoral-studies" element={<DoctoralStudies />} />
                 <Route path="/rni/doctoral-studies" element={<DoctoralStudies />} />
                 <Route path="/rni/research-doctoral-studies" element={<DoctoralStudies />} />
-                
+
                 <Route path="/research-and-innovation/research-pg-projects" element={<PGProjects />} />
                 <Route path="/research-and-innovation/pg-projects" element={<PGProjects />} />
                 <Route path="/research-and-innovation/research/pg-projects" element={<PGProjects />} />
@@ -389,7 +401,7 @@ export default function App() {
                 <Route path="/rni/research/pg-projects" element={<PGProjects />} />
                 <Route path="/rni/pg-projects" element={<PGProjects />} />
                 <Route path="/rni/research-pg-projects" element={<PGProjects />} />
-                
+
                 <Route path="/research-and-innovation/research-grants" element={<Grants />} />
                 <Route path="/research-and-innovation/grants" element={<Grants />} />
                 <Route path="/research-and-innovation/research/grants" element={<Grants />} />
@@ -398,7 +410,7 @@ export default function App() {
                 <Route path="/rni/research/grants" element={<Grants />} />
                 <Route path="/rni/grants" element={<Grants />} />
                 <Route path="/rni/research-grants" element={<Grants />} />
-                
+
                 <Route path="/research-and-innovation/research-consultancy" element={<Consultancy />} />
                 <Route path="/research-and-innovation/consultancy" element={<Consultancy />} />
                 <Route path="/research-and-innovation/research/consultancy" element={<Consultancy />} />
@@ -407,7 +419,7 @@ export default function App() {
                 <Route path="/rni/research/consultancy" element={<Consultancy />} />
                 <Route path="/rni/consultancy" element={<Consultancy />} />
                 <Route path="/rni/research-consultancy" element={<Consultancy />} />
-                
+
                 <Route path="/research-and-innovation/research-ethics" element={<Ethics />} />
                 <Route path="/research-and-innovation/ethics" element={<Ethics />} />
                 <Route path="/research-and-innovation/research/ethics" element={<Ethics />} />
@@ -416,7 +428,7 @@ export default function App() {
                 <Route path="/rni/research/ethics" element={<Ethics />} />
                 <Route path="/rni/ethics" element={<Ethics />} />
                 <Route path="/rni/research-ethics" element={<Ethics />} />
-                
+
                 <Route path="/research-and-innovation/research-mous" element={<MOUs />} />
                 <Route path="/research-and-innovation/mous" element={<MOUs />} />
                 <Route path="/research-and-innovation/research/mous" element={<MOUs />} />
@@ -425,7 +437,7 @@ export default function App() {
                 <Route path="/rni/research/mous" element={<MOUs />} />
                 <Route path="/rni/mous" element={<MOUs />} />
                 <Route path="/rni/research-mous" element={<MOUs />} />
-                
+
                 <Route path="/research-and-innovation/ssip-about" element={<AboutSSIP />} />
                 <Route path="/research-and-innovation/about-ssip" element={<AboutSSIP />} />
                 <Route path="/research-and-innovation/ssip" element={<AboutSSIP />} />
@@ -440,27 +452,27 @@ export default function App() {
                 <Route path="/ssip/about" element={<AboutSSIP />} />
                 <Route path="/ssip" element={<AboutSSIP />} />
                 <Route path="/about-ssip" element={<AboutSSIP />} />
-                
+
                 <Route path="/research-and-innovation/iic" element={<IIC />} />
                 <Route path="/research/iic" element={<IIC />} />
                 <Route path="/rni/iic" element={<IIC />} />
                 <Route path="/iic" element={<IIC />} />
-                
+
                 <Route path="/iqac/about" element={<AboutIQAC />} />
                 <Route path="/iqac/about-iqac" element={<AboutIQAC />} />
                 <Route path="/iqac" element={<AboutIQAC />} />
                 <Route path="/about-iqac" element={<AboutIQAC />} />
                 <Route path="/about/iqac" element={<AboutIQAC />} />
-                
+
                 <Route path="/iqac/composition" element={<IQACComposition />} />
                 <Route path="/iqac/iqac-composition" element={<IQACComposition />} />
                 <Route path="/composition" element={<IQACComposition />} />
-                
+
                 <Route path="/iqac/initiatives" element={<IQACInitiatives />} />
                 <Route path="/iqac/iqac-initiatives" element={<IQACInitiatives />} />
                 <Route path="/iqac/iqac-initiatives-and-activities" element={<IQACInitiatives />} />
                 <Route path="/initiatives" element={<IQACInitiatives />} />
-                
+
                 <Route path="/iqac/moms" element={<MoMsAndATR />} />
                 <Route path="/iqac/moms-and-atr" element={<MoMsAndATR />} />
                 <Route path="/iqac/mom" element={<MoMsAndATR />} />
@@ -468,48 +480,51 @@ export default function App() {
                 <Route path="/iqac/minutes-and-atr" element={<MoMsAndATR />} />
                 <Route path="/moms-and-atr" element={<MoMsAndATR />} />
                 <Route path="/moms" element={<MoMsAndATR />} />
-                
+
                 <Route path="/iqac/aishe" element={<AISHE />} />
                 <Route path="/aishe" element={<AISHE />} />
-                
+
                 <Route path="/iqac/nirf" element={<NIRF />} />
                 <Route path="/nirf" element={<NIRF />} />
-                
+
                 <Route path="/iqac/idp" element={<IDP />} />
                 <Route path="/idp" element={<IDP />} />
                 <Route path="/iqac/institutional-development-plan" element={<IDP />} />
                 <Route path="/institutional-development-plan" element={<IDP />} />
-                
+
                 <Route path="/iqac/rti" element={<RTI />} />
                 <Route path="/rti" element={<RTI />} />
                 <Route path="/iqac/right-to-information" element={<RTI />} />
                 <Route path="/right-to-information" element={<RTI />} />
-                
+
                 <Route path="/tnp/placements" element={<Placements />} />
                 <Route path="/placements" element={<Placements />} />
                 <Route path="/tnp/placement" element={<Placements />} />
                 <Route path="/placement" element={<Placements />} />
                 <Route path="/training-and-placement/placements" element={<Placements />} />
                 <Route path="/training-and-placement/placement" element={<Placements />} />
-                
+
                 <Route path="/tnp/visits" element={<Visits />} />
                 <Route path="/visits" element={<Visits />} />
                 <Route path="/training-and-placement/visits" element={<Visits />} />
                 <Route path="/tnp/industrial-visits" element={<Visits />} />
                 <Route path="/industrial-visits" element={<Visits />} />
-                
+
                 <Route path="/tnp/committee" element={<Committee />} />
                 <Route path="/training-and-placement/committee" element={<Committee />} />
                 <Route path="/tnp-committee" element={<Committee />} />
-                
+
                 <Route path="/tnp/training" element={<Training />} />
                 <Route path="/training" element={<Training />} />
                 <Route path="/training-and-placement/training" element={<Training />} />
                 <Route path="/tnp/industrial-training" element={<Training />} />
                 <Route path="/industrial-training" element={<Training />} />
-                
+
                 {/* Activities / Events */}
                 <Route path="/activities/events" element={<Events />} />
+
+                {/* Site search. The navbar's box sends every query here. */}
+                <Route path="/search" element={<SearchPage />} />
 
                 {/* All other dynamic routes handled by DynamicSubPage */}
                 <Route path="*" element={<DynamicSubPage />} />
@@ -517,7 +532,7 @@ export default function App() {
             </React.Suspense>
           </main>
         )}
-        
+
         {/* Render Footer always */}
         <Footer />
       </SmoothScroll>

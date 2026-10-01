@@ -234,3 +234,72 @@
 .ckpf.ckpf-inner {
     border-top: 1px solid rgba(18, 58, 26, .10);
 }
+
+/* ===== Farewell + campus drawing (scripts/campus_engraving_gen.py) =====
+   The farewell and its underline are now written with sliding windows instead of
+   clip-path / stroke-dash, which repainted on every frame. The rules below win over
+   the older ones above by coming later; nothing above is edited. */
+.ckpf-write .ckpf-script { clip-path: none; }
+.ckpf-write.is-written .ckpf-script { clip-path: none; }
+.ckpf-write .ckpf-underline path { stroke-dashoffset: 0; }
+.ckpf-write.is-written .ckpf-underline path { transition: none; }
+
+/* ── Farewell: written from the left, then underlined — sliding only ────────
+   The words sit in a window that slides in from the left while the text inside
+   slides back by the same amount, so it stays still and is uncovered; the
+   underline has a window of its own. Replaces the clip-path / stroke-dash
+   animations, which repainted the text and squiggle on every frame; sliding
+   never repaints, so both stay sharp. The window's side padding leaves room
+   for the script's flourishes, as the old -6% inset did. */
+.ckpf-write .ckpf-script{
+  padding: 0 .58em; margin: 0 -.5em;
+  overflow: hidden;
+  transform: translateX(-100%);
+  will-change: transform;
+}
+.ckpf-script > .ckpf-inner{
+  display: inline-block;
+  transform: translateX(calc(100% + 1.16em));
+  will-change: transform;
+}
+.ckpf-uwin{
+  display: block;
+  width: clamp(150px, 22vw, 320px);
+  height: clamp(12px, 1.4vw, 18px);
+  /* the marker's thick stroke spills a little above and below its box: room for
+     it inside the window, with the margin taken back so nothing moves */
+  padding: 6px 4px;
+  margin: -2px auto -6px;
+  box-sizing: content-box;
+  overflow: hidden;
+  transform: translateX(-100%);
+  will-change: transform;
+}
+.ckpf-uwin > .ckpf-inner{
+  display: block; width: 100%; height: 100%;
+  transform: translateX(calc(100% + 8px));
+  will-change: transform;
+}
+.ckpf-uwin .ckpf-underline{ width: clamp(150px, 22vw, 320px); height: clamp(12px, 1.4vw, 18px); margin: 0; }
+
+.ckpf-write.is-written .ckpf-script, .ckpf-write.is-written .ckpf-script > .ckpf-inner{
+  transform: translateX(0);
+  transition: transform 1.4s cubic-bezier(.55, .1, .45, 1) .1s;
+}
+.ckpf-write.is-written .ckpf-uwin, .ckpf-write.is-written .ckpf-uwin > .ckpf-inner{
+  transform: translateX(0);
+  transition: transform .5s cubic-bezier(.65, 0, .35, 1) 1.4s;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ckpf-write .ckpf-script, .ckpf-script > .ckpf-inner, .ckpf-uwin, .ckpf-uwin > .ckpf-inner{ transform: none; transition: none !important; }
+}
+
+/* the green-to-gold lettering now lives on the text inside the sliding window, so it stays still while uncovered */
+.ckpf-write .ckpf-script { background: none; color: inherit; }
+.ckpf-script > .ckpf-inner {
+  padding: 0 .08em;
+  background: linear-gradient(90deg, #1C592F 0%, #2c7a47 55%, #D4AF37 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}

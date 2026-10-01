@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { 
-  Clock, 
-  BookOpen, 
-  Download, 
   ExternalLink, 
-  Eye, 
-  X, 
   CalendarDays
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
@@ -21,12 +16,13 @@ export interface TimetableEntry {
   classroom: string;
   effectiveFrom: string;
   pdfUrl: string;
-  subjects: {
+  driveUrl?: string;
+  subjects?: {
     code: string;
     name: string;
     type: "Theory" | "Practical" | "Both";
   }[];
-  scheduleOverview: {
+  scheduleOverview?: {
     time: string;
     mondayToWednesday: string;
     thursdayToSaturday: string;
@@ -44,7 +40,8 @@ const TIMETABLES_DATA: TimetableEntry[] = [
     yearLevel: "Third Year B.Pharm",
     classroom: "Classroom LH-03 (Second Floor)",
     effectiveFrom: "January 2023",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/645df68184c86.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1XzSNb18w0mOWZh02uVllIeTEZgjZHRMy/view?usp=sharing",
+    driveUrl: "https://drive.google.com/file/d/1XzSNb18w0mOWZh02uVllIeTEZgjZHRMy/view?usp=sharing",
     subjects: [
       { code: "BP601T", name: "Medicinal Chemistry III", type: "Both" },
       { code: "BP602T", name: "Pharmacology III", type: "Both" },
@@ -71,7 +68,8 @@ const TIMETABLES_DATA: TimetableEntry[] = [
     yearLevel: "Final Year B.Pharm",
     classroom: "Classroom LH-04 (Second Floor)",
     effectiveFrom: "January 2023",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/645df68184c86.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1aaxP_SeBZ7mn006x739cdG8y7qRHCoQ7/view?usp=sharing",
+    driveUrl: "https://drive.google.com/file/d/1aaxP_SeBZ7mn006x739cdG8y7qRHCoQ7/view?usp=sharing",
     subjects: [
       { code: "BP801T", name: "Biostatistics & Research Methodology", type: "Theory" },
       { code: "BP802T", name: "Social & Preventive Pharmacy", type: "Theory" },
@@ -97,7 +95,8 @@ const TIMETABLES_DATA: TimetableEntry[] = [
     yearLevel: "Second Year B.Pharm",
     classroom: "Classroom LH-02 (First Floor)",
     effectiveFrom: "January 2023",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/645df68184c86.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1HGsLJ_SUIMG94BPV4Di9hwYbAtxiUart/view?usp=sharing",
+    driveUrl: "https://drive.google.com/file/d/1HGsLJ_SUIMG94BPV4Di9hwYbAtxiUart/view?usp=sharing",
     subjects: [
       { code: "BP401T", name: "Pharmaceutical Organic Chemistry III", type: "Theory" },
       { code: "BP402T", name: "Medicinal Chemistry I", type: "Both" },
@@ -123,7 +122,8 @@ const TIMETABLES_DATA: TimetableEntry[] = [
     yearLevel: "First Year B.Pharm",
     classroom: "Classroom LH-01 (Ground Floor)",
     effectiveFrom: "January 2023",
-    pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/645df68184c86.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1ajpw8MLdAYk0ZHLp6inJNCCCjKYXkreN/view?usp=sharing",
+    driveUrl: "https://drive.google.com/file/d/1ajpw8MLdAYk0ZHLp6inJNCCCjKYXkreN/view?usp=sharing",
     subjects: [
       { code: "BP201T", name: "Human Anatomy and Physiology II", type: "Both" },
       { code: "BP202T", name: "Pharmaceutical Organic Chemistry I", type: "Both" },
@@ -144,9 +144,7 @@ const TIMETABLES_DATA: TimetableEntry[] = [
 ];
 
 export default function Timetables() {
-  const [activeCardId, setActiveCardId] = useState<string>("tt-2022-23-even-sem-6");
-  const [activeModalEntry, setActiveModalEntry] = useState<TimetableEntry | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery] = useState<string>("");
 
   const filteredEntries = TIMETABLES_DATA.filter((entry) => {
     if (!searchQuery) return true;
@@ -187,11 +185,9 @@ export default function Timetables() {
           </p>
         </div>
 
-        {/* ── CARD GRID EXACTLY MATCHING USER PROVIDED DESIGN ── */}
+        {/* ── CARD GRID MATCHING DESIGN ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {filteredEntries.map((card) => {
-            const isActive = activeCardId === card.id;
-
             return (
               <motion.div
                 key={card.id}
@@ -199,12 +195,7 @@ export default function Timetables() {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.3 }}
-                onClick={() => setActiveCardId(card.id)}
-                className={`relative bg-white rounded-2xl sm:rounded-3xl border transition-all duration-300 p-6 sm:p-7 flex flex-col items-center justify-between text-center cursor-pointer select-none overflow-hidden ${
-                  isActive
-                    ? "border-slate-200/90 shadow-[0_12px_30px_rgba(0,0,0,0.08)] border-b-4 border-b-[#1a5d2e]"
-                    : "border-slate-200/80 shadow-xs hover:shadow-lg hover:border-slate-300"
-                }`}
+                className="relative bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-lg hover:border-slate-300 transition-all duration-300 p-6 sm:p-7 flex flex-col items-center justify-between text-center select-none overflow-hidden"
               >
                 {/* Top Calendar Icon in Pale Mint Circle */}
                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#eaf5ec] border border-[#d2ead7] flex items-center justify-center text-[#1a5d2e] mb-4 shadow-2xs">
@@ -237,179 +228,22 @@ export default function Timetables() {
                   {card.semester}
                 </div>
 
-                {/* Explore Action Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveCardId(card.id);
-                    setActiveModalEntry(card);
-                  }}
+                {/* Explore Action Button: Opens Google Drive File in New Tab */}
+                <a
+                  href={card.driveUrl || card.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full mt-3 py-2 sm:py-2.5 px-4 rounded-xl border border-[#2e7d32] text-[#1a5d2e] hover:bg-[#1a5d2e] hover:text-white font-sans font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-2xs hover:shadow-md cursor-pointer group"
                 >
                   <ExternalLink size={14} className="stroke-[2.2] group-hover:scale-110 transition-transform" />
                   <span>Explore</span>
-                </button>
+                </a>
               </motion.div>
             );
           })}
         </div>
-
-        {/* ── MODAL POPUP FOR DETAILED EXPLORE VIEW ── */}
-        <AnimatePresence>
-          {activeModalEntry && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setActiveModalEntry(null)}
-                className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
-              />
-
-              {/* Modal Card */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                className="relative z-10 w-full max-w-3xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-200"
-              >
-                {/* Modal Header */}
-                <div className="bg-[#1a5d2e] p-5 sm:p-6 text-white flex items-start justify-between gap-4 border-b border-emerald-700">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white text-[#1a5d2e] font-mono text-xs font-bold uppercase tracking-wider">
-                        Semester {activeModalEntry.semester}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-mono text-xs font-semibold uppercase">
-                        {activeModalEntry.term} Term • {activeModalEntry.academicYear}
-                      </span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
-                      {activeModalEntry.yearLevel} Timetable
-                    </h3>
-                    <p className="text-xs text-white/80 font-sans">
-                      {activeModalEntry.program} • {activeModalEntry.classroom}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveModalEntry(null)}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-                    aria-label="Close modal"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-
-                {/* Modal Scrollable Content */}
-                <div className="p-5 sm:p-6 overflow-y-auto space-y-6 max-h-[calc(90vh-140px)]">
-                  {/* Schedule Details */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-serif font-bold text-base text-slate-900 flex items-center gap-2">
-                        <Clock size={16} className="text-[#1a5d2e]" />
-                        <span>Weekly Class & Lab Schedule Routine</span>
-                      </h4>
-                      <span className="text-[11px] font-mono text-slate-500">Effective: {activeModalEntry.effectiveFrom}</span>
-                    </div>
-
-                    <div className="rounded-xl border border-slate-200 overflow-hidden text-xs font-sans">
-                      <div className="grid grid-cols-12 bg-slate-100 p-2.5 font-mono font-bold text-slate-700 border-b border-slate-200 uppercase text-[11px]">
-                        <div className="col-span-3">Time Slot</div>
-                        <div className="col-span-5">Mon – Wed</div>
-                        <div className="col-span-4">Thu – Sat</div>
-                      </div>
-                      <div className="divide-y divide-slate-100">
-                        {activeModalEntry.scheduleOverview.map((slot, sIdx) => {
-                          const isBreak = slot.mondayToWednesday.includes("Lunch");
-                          return (
-                            <div
-                              key={sIdx}
-                              className={`grid grid-cols-12 p-2.5 items-center transition-colors ${
-                                isBreak ? "bg-amber-50/60 font-medium text-amber-900" : sIdx % 2 === 0 ? "bg-white" : "bg-slate-50/60"
-                              }`}
-                            >
-                              <div className="col-span-3 font-mono font-semibold text-slate-600 text-[11px]">
-                                {slot.time}
-                              </div>
-                              <div className="col-span-5 text-slate-800 pr-2">
-                                {slot.mondayToWednesday}
-                              </div>
-                              <div className="col-span-4 text-slate-700">
-                                {slot.thursdayToSaturday}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Course Subjects */}
-                  <div className="space-y-3">
-                    <h4 className="font-serif font-bold text-base text-slate-900 flex items-center gap-2">
-                      <BookOpen size={16} className="text-[#1a5d2e]" />
-                      <span>Registered Course Modules (PCI / GTU Scheme)</span>
-                    </h4>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {activeModalEntry.subjects.map((subject) => (
-                        <div
-                          key={subject.code}
-                          className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2"
-                        >
-                          <div className="min-w-0">
-                            <span className="font-mono text-[10px] font-bold text-[#1a5d2e] bg-[#eaf5ec] px-1.5 py-0.5 rounded">
-                              {subject.code}
-                            </span>
-                            <h5 className="font-serif font-bold text-xs text-slate-800 truncate mt-1">
-                              {subject.name}
-                            </h5>
-                          </div>
-                          <span className="px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-700 text-[10px] font-mono font-semibold shrink-0">
-                            {subject.type}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Modal Footer */}
-                <div className="p-4 sm:p-5 bg-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-xs text-slate-500 font-mono">
-                    Official Document ID: <span className="font-bold text-slate-700">CKPIPSR-TT-{activeModalEntry.academicYear}-S{activeModalEntry.semester}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setActiveModalEntry(null)}
-                      className="px-4 py-2 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-mono text-xs font-bold transition-all border border-slate-300 cursor-pointer"
-                    >
-                      Close
-                    </button>
-                    <a
-                      href={activeModalEntry.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1a5d2e] hover:bg-[#144723] text-white font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-sm cursor-pointer"
-                    >
-                      <Download size={14} />
-                      <span>Download PDF</span>
-                      <ExternalLink size={12} />
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
       </div>
     </SubPageLayout>
   );
 }
+

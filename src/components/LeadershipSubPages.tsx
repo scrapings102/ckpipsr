@@ -540,25 +540,10 @@ export function PrincipalLayout({
   page?: ContentPage;
   content?: PrincipalContent;
 }) {
-  const navigate = useNavigate();
   const { portrait, message, signature } = content;
 
   return (
     <div className="w-full animate-fadeIn">
-      {/* Top Navigation Row */}
-      <div className="flex flex-wrap items-center justify-between pb-6 mb-4 sm:mb-6 gap-4">
-        <button
-          onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 text-xs font-mono font-bold tracking-wider text-[#C49A2C] hover:text-[#112815] transition-colors uppercase cursor-pointer"
-        >
-          <ArrowLeft size={14} className="stroke-[2.5]" />
-          <span>BACK TO HOME</span>
-        </button>
-        <div className="text-[11px] font-mono font-semibold tracking-wider text-slate-400 uppercase">
-          ABOUT US / PRINCIPAL'S MESSAGE
-        </div>
-      </div>
-
       {/* Main 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
@@ -675,105 +660,64 @@ export function PrincipalLayout({
  * the panel's stored tabs and bios are simply not drawn.
  */
 export function DeansLayout({ content = DEFAULT_DEANS }: { content?: DeansContent }) {
+  const pdfUrl = "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e2bf456dbbc.pdf";
   // "Deans & Portfolio In-charges": the last word is set in gold.
   const titleSplit = content.intro.title.lastIndexOf(" ");
   const titleLead = titleSplit > 0 ? content.intro.title.slice(0, titleSplit + 1) : content.intro.title;
   const titleAccent = titleSplit > 0 ? content.intro.title.slice(titleSplit + 1) : "";
 
   return (
-    <div className="space-y-12 animate-fadeIn">
-      {/* Intro section - Premium Banner (Compact & Refined) */}
-      <section className="relative group overflow-hidden rounded-2xl sm:rounded-3xl">
-        <div className="absolute inset-0 bg-[#123a1a] group-hover:scale-105 transition-transform duration-1000" />
+    <div className="space-y-10 animate-fadeIn max-w-4xl mx-auto">
+      {/* Intro section - Premium Banner */}
+      <section className="relative group overflow-hidden rounded-2xl sm:rounded-3xl shadow-md">
+        <div className="absolute inset-0 bg-[#123a1a] transition-transform duration-1000" />
         <div className="absolute top-0 right-0 w-[24rem] h-[24rem] bg-[#D4AF37]/10 rounded-full blur-[60px] -mr-20 -mt-20 pointer-events-none" />
 
-        <div className="relative z-10 p-5 sm:p-8 space-y-4">
+        <div className="relative z-10 p-6 sm:p-10 space-y-4 text-center sm:text-left">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4AF37]/20 border border-[#D4AF37]/30 rounded-full text-[#D4AF37] text-[9px] font-black uppercase tracking-[0.15em]">
               <Users size={12} />
-              <span>{content.intro.badge}</span>
+              <span>{content.intro.badge || "Academic Council"}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white tracking-tight leading-tight">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white tracking-tight leading-tight">
               {titleLead}
               {titleAccent && <span className="text-[#D4AF37]">{titleAccent}</span>}
             </h3>
-            <div className="h-1 w-16 bg-[#D4AF37] rounded-full" />
+            <div className="h-1 w-16 bg-[#D4AF37] rounded-full mx-auto sm:mx-0" />
           </div>
-          <p className="text-emerald-100/90 text-xs sm:text-sm leading-relaxed max-w-3xl font-medium font-sans">
-            {content.intro.body}
+          <p className="text-emerald-100/90 text-xs sm:text-sm leading-relaxed max-w-2xl font-medium font-sans">
+            {content.intro.body || "Academic Council & Portfolio In-charges committee for the current academic session."}
           </p>
         </div>
       </section>
 
-      {/* Directory Grid - Refined Compact Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {content.members.map((faculty, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: (idx % 4) * 0.06 }}
-            className="group bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-[#D4AF37]/30 transition-all duration-300 flex flex-col justify-between w-full min-w-0"
+      {/* PDF View / Download Section */}
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-lg text-center space-y-6">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#123a1a]/5 border border-[#123a1a]/15 flex items-center justify-center text-[#123a1a] mx-auto">
+          <FileText size={36} className="text-[#123a1a]" />
+        </div>
+
+        <div className="space-y-2 max-w-lg mx-auto">
+          <h4 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
+            Deans & Faculty In-Charges Document
+          </h4>
+          <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed">
+            Click the button below to view or download the official committee document for Deans and Faculty In-charges.
+          </p>
+        </div>
+
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#123a1a] hover:bg-[#1a5d2e] text-[#D4AF37] hover:text-white font-mono font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-md hover:shadow-xl cursor-pointer group"
           >
-            <div className="space-y-3 min-w-0">
-              {/* Compact Image Container */}
-              <div className="relative aspect-[4/3.8] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 group-hover:border-[#D4AF37]/50 shadow-inner">
-                <img
-                  src={faculty.image || avatarFor(faculty.name)}
-                  alt={faculty.name}
-                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => swapToAvatar(e, faculty.name)}
-                />
-              </div>
-
-              {/* Role Badge placed cleanly below image */}
-              <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#123a1a] text-[#D4AF37] text-[10px] font-black uppercase tracking-wider shadow-sm min-w-0">
-                  <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-pulse shrink-0" />
-                  <span className="break-words leading-tight">{faculty.role}</span>
-                </span>
-              </div>
-
-              {/* Details */}
-              <div className="space-y-1 min-w-0">
-                <h4 className="text-base sm:text-lg font-serif font-bold text-slate-900 group-hover:text-[#123a1a] transition-colors leading-snug break-words">
-                  {faculty.name}
-                </h4>
-                <p className="text-[10px] sm:text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider font-mono break-words">
-                  {faculty.qualification}
-                </p>
-                {faculty.portfolio && (
-                  <p className="text-xs text-slate-500 leading-relaxed pt-1 font-sans break-words">
-                    {faculty.portfolio}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between gap-2 min-w-0">
-              {/* No address, no button: a bare mailto: would open an empty mail. */}
-              {faculty.email ? (
-                <a
-                  href={`mailto:${faculty.email}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#123a1a]/5 hover:bg-[#123a1a] text-[#123a1a] hover:text-[#D4AF37] font-bold text-[10px] sm:text-[11px] uppercase tracking-wider rounded-xl transition-all cursor-pointer min-w-0"
-                  title={`Email ${faculty.name}`}
-                >
-                  <Mail size={13} className="shrink-0" />
-                  <span className="truncate">Contact Desk</span>
-                </a>
-              ) : (
-                <span />
-              )}
-              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 font-mono text-[10px] font-bold shrink-0">
-                {idx + 1}
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            <FileText size={18} className="group-hover:scale-110 transition-transform" />
+            <span>View Deans & Faculty PDF</span>
+            <ExternalLink size={14} className="stroke-[2.2]" />
+          </a>
+        </div>
       </div>
     </div>
   );

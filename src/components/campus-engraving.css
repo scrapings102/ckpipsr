@@ -1,0 +1,42 @@
+/* The CKP building in the footer (scripts/campus_engraving_gen.py).
+   Two layers, the drawing and its pen lines, each split into a left and a right
+   half. Each half sits in a window that slides out from the entrance while its
+   content slides back by exactly the same amount, so the drawing stays still
+   and is uncovered from the centre to both sides. Only translations animate:
+   layers are painted once at full sharpness, kept on the GPU, and never
+   repainted — no hitch or blur on any device. It replays each time the footer
+   returns to view (the hidden state has no animation, so leaving resets it). */
+
+.ckpc-footer{
+  margin-top: clamp(14px, 2.2vw, 30px);
+  height: clamp(180px, 22.8vw, 300px);          /* 20% larger than 150px / 19vw / 250px */
+}
+.ckpc-art{ position: relative; width: 100%; height: 100%; }
+.ckpc-half{ position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; will-change: transform; }
+.ckpc-half.l{ left: 0; transform: translateX(100%); }
+.ckpc-half.r{ left: 50%; transform: translateX(-100%); }
+.ckpc-half > .ckpc-inner{ position: absolute; top: 0; bottom: 0; width: 200%; will-change: transform; }
+.ckpc-half.l > .ckpc-inner{ left: 0;     transform: translateX(-50%); clip-path: inset(0 50% 0 0); }
+.ckpc-half.r > .ckpc-inner{ left: -100%; transform: translateX(50%);  clip-path: inset(0 0 0 50%); }
+.ckpc-layer{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: block; object-fit: contain; object-position: 50% 100%;
+  user-select: none; -webkit-user-drag: none; pointer-events: none;
+}
+.ckpc-ink{ position: absolute; inset: 0; will-change: opacity; }
+.ckpc-fill{ position: absolute; inset: 0; }
+
+/* revealed: the pen lines open first; the drawing follows 0.4s behind; the ink
+   fades once everything has stopped moving */
+.is-drawn .ckpc-half, .is-drawn .ckpc-half > .ckpc-inner{
+  transform: translateX(0);
+  transition: transform 1.9s cubic-bezier(.4, 0, .2, 1) var(--at, .1s);
+}
+.is-drawn .ckpc-fill{ --at: .5s; }
+.is-drawn .ckpc-ink{ opacity: 0; transition: opacity .9s ease 2.6s; }
+
+@media (prefers-reduced-motion: reduce){
+  .ckpc-half, .ckpc-half > .ckpc-inner{ transform: none; }
+  .is-drawn .ckpc-half, .is-drawn .ckpc-half > .ckpc-inner{ transition: none; }
+  .ckpc-ink{ opacity: 0; }
+}

@@ -2,14 +2,22 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown, ExternalLink, FileText } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-import { SYLLABUS, type SyllabusSemester } from "../../data/syllabus";
+import {
+    useCourseSyllabusContent,
+    type CourseSyllabusContent,
+    type SyllabusIcon,
+    type SyllabusSemester,
+} from "../../hooks/useCourseSyllabusContent";
 
 /**
- * 3D/Pharma Graphic Banner Illustrations for Semester Cards (Sem 1 to 8)
+ * 3D/Pharma Graphic Banner Illustrations for Semester Cards.
+ *
+ * Which one a semester gets is chosen in the panel, not fixed to its number, so
+ * a ninth semester is as well drawn as the first.
  */
-function SemesterBannerIllustration({ index }: { index: number }) {
-    switch (index) {
-        case 0: // Sem 1: Beakers & Molecules
+function SemesterBannerIllustration({ icon }: { icon: SyllabusIcon }) {
+    switch (icon) {
+        case "Beakers": // Beakers & Molecules
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="160" cy="40" r="30" fill="url(#blue-grad-1)" opacity="0.15" />
@@ -35,7 +43,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     </defs>
                 </svg>
             );
-        case 1: // Sem 2: Chemical Bonds & Molecules
+        case "Bonds": // Chemical Bonds & Molecules
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="150" cy="40" r="32" fill="#E0F2FE" opacity="0.4" />
@@ -51,7 +59,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     <line x1="110" y1="40" x2="124" y2="48" stroke="#7DD3FC" strokeWidth="2" />
                 </svg>
             );
-        case 2: // Sem 3: Capsules & Pills
+        case "Capsules": // Capsules & Pills
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="155" cy="40" r="32" fill="#FFE4E6" opacity="0.5" />
@@ -67,7 +75,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     </g>
                 </svg>
             );
-        case 3: // Sem 4: Laboratory Flasks & Green Leaves
+        case "Flask": // Laboratory Flasks & Green Leaves
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="150" cy="42" r="30" fill="#DCFCE7" opacity="0.5" />
@@ -78,7 +86,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     <path d="M168 25C175 18 185 20 185 32C176 33 170 27 168 25Z" fill="#4ADE80" />
                 </svg>
             );
-        case 4: // Sem 5: Microscope
+        case "Microscope": // Microscope
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="150" cy="40" r="30" fill="#F1F5F9" opacity="0.6" />
@@ -89,7 +97,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     <rect x="130" y="48" width="24" height="4" fill="#1E293B" />
                 </svg>
             );
-        case 5: // Sem 6: Mortar & Pestle with Herbal Leaves
+        case "Mortar": // Mortar & Pestle with Herbal Leaves
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="150" cy="42" r="30" fill="#FEF3C7" opacity="0.5" />
@@ -100,7 +108,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     <path d="M172 38C180 34 186 40 184 48C176 46 174 42 172 38Z" fill="#4ADE80" />
                 </svg>
             );
-        case 6: // Sem 7: Test Tubes with Leaves
+        case "TestTubes": // Test Tubes with Leaves
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
                     <circle cx="150" cy="40" r="30" fill="#E0F2FE" opacity="0.5" />
@@ -114,7 +122,7 @@ function SemesterBannerIllustration({ index }: { index: number }) {
                     <path d="M172 20C180 14 188 18 184 28C176 27 174 22 172 20Z" fill="#16A34A" />
                 </svg>
             );
-        case 7: // Sem 8: Stack of Textbooks & Leaves
+        case "Books": // Stack of Textbooks & Leaves
         default:
             return (
                 <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-85">
@@ -137,16 +145,16 @@ function SemesterBannerIllustration({ index }: { index: number }) {
 
 function SemesterTimelineCard({
     sem,
+    table,
     open,
     onToggle,
 }: {
     sem: SyllabusSemester;
+    table: CourseSyllabusContent["table"];
     open: boolean;
     onToggle: () => void;
 }) {
-    const count = sem.subjects.length;
-    const withPdf = sem.subjects.filter((s) => s.pdf).length;
-    const panelId = `syllabus-sem-${sem.semester}`;
+    const panelId = `syllabus-sem-${sem.number}`;
 
     return (
         <div className="relative flex items-start gap-3 sm:gap-6 group">
@@ -158,7 +166,7 @@ function SemesterTimelineCard({
                         : "bg-[#F7F3E8] text-slate-800 border border-amber-200/80 hover:bg-[#F0EADA]"
                 }`}
             >
-                {sem.semester}
+                {sem.number}
             </div>
 
             {/* ── Right Semester Card ── */}
@@ -175,20 +183,20 @@ function SemesterTimelineCard({
                         {/* Title & Metadata */}
                         <div className="min-w-0 z-10 py-0.5">
                             <span className="block text-[11px] font-bold tracking-[0.18em] text-[#B8933E] uppercase mb-1">
-                                SEMESTER {sem.semester}
+                                {sem.kicker}
                             </span>
                             <span className="block font-serif font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
                                 {sem.title}
                             </span>
                             <span className="block text-xs text-slate-500 font-medium mt-1">
-                                {count} {count === 1 ? "Subject" : "Subjects"} • {withPdf} {withPdf === 1 ? "PDF" : "PDFs"}
+                                {sem.countLabel}
                             </span>
                         </div>
 
                         {/* Right Decorative Graphic & Expand Chevron */}
                         <div className="flex items-center gap-3 sm:gap-4 shrink-0 z-10">
                             <div className="hidden sm:block w-36 sm:w-44 h-14 sm:h-16 pointer-events-none overflow-hidden rounded-xl">
-                                <SemesterBannerIllustration index={sem.semester - 1} />
+                                <SemesterBannerIllustration icon={sem.icon} />
                             </div>
                             <motion.div
                                 animate={{ rotate: open ? 180 : 0 }}
@@ -216,10 +224,10 @@ function SemesterTimelineCard({
                                 <table className="w-full text-left border-collapse min-w-[580px]">
                                     <thead>
                                         <tr className="bg-slate-100/70 border-b border-slate-200/80 text-slate-500 font-bold text-[11px] uppercase tracking-wider">
-                                            <th className="py-3 px-4 sm:px-6 w-12 text-center">#</th>
-                                            <th className="py-3 px-4 sm:px-6 w-36 sm:w-44">Subject Code</th>
-                                            <th className="py-3 px-4 sm:px-6">Subject Name</th>
-                                            <th className="py-3 px-4 sm:px-6 w-36 sm:w-44 text-right sm:text-center">Action</th>
+                                            <th className="py-3 px-4 sm:px-6 w-12 text-center">{table.number}</th>
+                                            <th className="py-3 px-4 sm:px-6 w-36 sm:w-44">{table.code}</th>
+                                            <th className="py-3 px-4 sm:px-6">{table.name}</th>
+                                            <th className="py-3 px-4 sm:px-6 w-36 sm:w-44 text-right sm:text-center">{table.action}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 font-sans text-sm">
@@ -246,13 +254,13 @@ function SemesterTimelineCard({
                                                             className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                                                         >
                                                             <FileText size={15} className="text-red-500 shrink-0" />
-                                                            <span>Open PDF</span>
+                                                            <span>{table.openLabel}</span>
                                                             <ExternalLink size={13} className="text-blue-500 shrink-0" />
                                                         </a>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 opacity-60 select-none">
                                                             <FileText size={15} className="text-slate-400 shrink-0" />
-                                                            <span>Open PDF</span>
+                                                            <span>{table.openLabel}</span>
                                                             <ExternalLink size={13} className="text-slate-300 shrink-0" />
                                                         </span>
                                                     )}
@@ -271,42 +279,43 @@ function SemesterTimelineCard({
 }
 
 export default function CourseSyllabus() {
-    // Accordion state: Semester 1 open by default
-    const [open, setOpen] = useState<Set<number>>(() => new Set([SYLLABUS.semesters[0]?.semester || 1]));
+    const content = useCourseSyllabusContent();
+
+    // Accordion state: the first semester open by default. It is set once, so a
+    // reader who has closed it does not have it reopened when the panel saves.
+    const [open, setOpen] = useState<Set<number> | null>(null);
+    const openSet = open ?? new Set([content.semesters[0]?.number ?? 1]);
 
     const toggle = (n: number) =>
-        setOpen((prev) => {
-            const next = new Set(prev);
+        setOpen(() => {
+            const next = new Set(openSet);
             if (next.has(n)) next.delete(n);
             else next.add(n);
             return next;
         });
 
-    const total = SYLLABUS.semesters.reduce((a, s) => a + s.subjects.length, 0);
-
     return (
         <SubPageLayout
-            title="Course Syllabus"
-            subtitle={`${SYLLABUS.programme} syllabus, semester by semester — ${total} subjects across ${SYLLABUS.semesters.length} semesters.`}
+            title={content.pageTitle}
+            subtitle={content.pageSubtitle}
             category="students-corner"
             activeItemLabel="Course Syllabus"
         >
             <div className="max-w-4xl mx-auto py-2 space-y-6">
-                <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                    Tap any semester below to view its subjects. Click <span className="text-blue-600 font-semibold">Open PDF</span> to view or download the detailed syllabus module.
-                </p>
+                <p className="text-sm text-slate-600 leading-relaxed mb-6">{content.intro}</p>
 
                 {/* ── Timeline Container with Vertical Line ── */}
                 <div className="relative space-y-6 sm:space-y-7">
                     {/* Vertical connecting line running down behind step numbers */}
                     <div className="absolute left-[19px] sm:left-[21px] top-6 bottom-6 w-[2px] bg-amber-200/60 pointer-events-none" />
 
-                    {SYLLABUS.semesters.map((sem) => (
+                    {content.semesters.map((sem) => (
                         <SemesterTimelineCard
-                            key={sem.semester}
+                            key={sem.number}
                             sem={sem}
-                            open={open.has(sem.semester)}
-                            onToggle={() => toggle(sem.semester)}
+                            table={content.table}
+                            open={openSet.has(sem.number)}
+                            onToggle={() => toggle(sem.number)}
                         />
                     ))}
                 </div>
