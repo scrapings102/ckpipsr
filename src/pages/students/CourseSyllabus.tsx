@@ -279,20 +279,26 @@ function SemesterTimelineCard({
 }
 
 export default function CourseSyllabus() {
-    const content = useCourseSyllabusContent();
+    const { bPharm, dPharm } = useCourseSyllabusContent();
+    const [selectedCourse, setSelectedCourse] = useState<"B.Pharm" | "D.Pharm">("B.Pharm");
 
-    // Accordion state: the first semester open by default. It is set once, so a
-    // reader who has closed it does not have it reopened when the panel saves.
-    const [open, setOpen] = useState<Set<number> | null>(null);
-    const openSet = open ?? new Set([content.semesters[0]?.number ?? 1]);
+    const content = selectedCourse === "B.Pharm" ? bPharm : dPharm;
 
-    const toggle = (n: number) =>
-        setOpen(() => {
-            const next = new Set(openSet);
-            if (next.has(n)) next.delete(n);
-            else next.add(n);
-            return next;
+    // Accordion state per course
+    const [openMap, setOpenMap] = useState<Record<string, Set<number>>>({});
+    const currentOpenSet = openMap[selectedCourse] ?? new Set([content.semesters[0]?.number ?? 1]);
+
+    const toggle = (n: number) => {
+        setOpenMap((prev) => {
+            const nextSet = new Set(currentOpenSet);
+            if (nextSet.has(n)) nextSet.delete(n);
+            else nextSet.add(n);
+            return {
+                ...prev,
+                [selectedCourse]: nextSet,
+            };
         });
+    };
 
     return (
         <SubPageLayout
@@ -302,6 +308,34 @@ export default function CourseSyllabus() {
             activeItemLabel="Course Syllabus"
         >
             <div className="max-w-4xl mx-auto py-2 space-y-6">
+                {/* ── COURSE SELECTION BUTTONS ── */}
+                <div className="flex justify-center mb-6">
+                    <div className="inline-flex p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/80 shadow-inner gap-1">
+                        <button
+                            type="button"
+                            onClick={() => setSelectedCourse("B.Pharm")}
+                            className={`px-6 py-2.5 rounded-xl font-sans text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                                selectedCourse === "B.Pharm"
+                                    ? "bg-[#0c2411] text-white shadow-md"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+                            }`}
+                        >
+                            B. Pharm
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedCourse("D.Pharm")}
+                            className={`px-6 py-2.5 rounded-xl font-sans text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                                selectedCourse === "D.Pharm"
+                                    ? "bg-[#0c2411] text-white shadow-md"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+                            }`}
+                        >
+                            D. Pharm
+                        </button>
+                    </div>
+                </div>
+
                 <p className="text-sm text-slate-600 leading-relaxed mb-6">{content.intro}</p>
 
                 {/* ── Timeline Container with Vertical Line ── */}
@@ -311,10 +345,10 @@ export default function CourseSyllabus() {
 
                     {content.semesters.map((sem) => (
                         <SemesterTimelineCard
-                            key={sem.number}
+                            key={`${selectedCourse}-${sem.number}`}
                             sem={sem}
                             table={content.table}
-                            open={openSet.has(sem.number)}
+                            open={currentOpenSet.has(sem.number)}
                             onToggle={() => toggle(sem.number)}
                         />
                     ))}

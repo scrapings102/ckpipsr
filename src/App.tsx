@@ -17,6 +17,7 @@ import Footer from "./components/Footer";
 import NewsBlogs from "./components/NewsBlogs";
 import ChatbotButton from "./components/ChatbotButton";
 import AdmissionsPopup from "./components/AdmissionsPopup";
+import { useAdmissionsPopupContent } from "./hooks/useAdmissionsPopupContent";
 
 // Lazy-loaded Subpages
 const Profile = React.lazy(() => import("./pages/about/Profile"));
@@ -106,6 +107,24 @@ export default function App() {
   const [showAdmissionsPopup, setShowAdmissionsPopup] = useState(false);
   const hasShownAutoPopupRef = useRef(false);
 
+  // The popup's own settings decide whether it opens at all, so it must wait
+  // for the real ones. Acting on the bundled fallback would pop it up on a site
+  // where an editor had switched it off.
+  const { content: admissionsPopup, isLoading: popupLoading } = useAdmissionsPopupContent();
+
+  /**
+   * Every control that opens the popup goes through here — the announcement-bar
+   * badge, the hero and the admissions band.
+   *
+   * A switched-off popup stays switched off: the click does nothing, and the
+   * site says nothing about it. Whether a badge is pointing at a popup nobody
+   * can see is an editor's problem, and the panel is where it can be seen.
+   */
+  const handleOpenAdmissions = () => {
+    if (!popupLoading && !admissionsPopup.isEnabled) return;
+    setShowAdmissionsPopup(true);
+  };
+
   const handlePreloaderExitStart = () => {
     setHeroLoaded(true);
     setNavbarReady(true);
@@ -115,17 +134,29 @@ export default function App() {
     setShowPreloader(false);
     setHeroLoaded(true);
     setNavbarReady(true);
-    if (!hasShownAutoPopupRef.current && !isSubPage) {
-      hasShownAutoPopupRef.current = true;
-      setTimeout(() => {
-        setShowAdmissionsPopup(true);
-      }, 1200);
-    }
   };
 
   const handleQuotesComplete = () => {
     setNavbarReady(true);
   };
+
+  /**
+   * Opens the popup once, on the homepage, after its own delay.
+   *
+   * This waits on two things that finish in no fixed order: the intro playing
+   * out, and the settings arriving. Opening from whichever happens to come
+   * last is why this is an effect rather than a line in the preloader's
+   * callback — the callback fired while the settings were still in flight, so
+   * the guard that reads them refused, and nothing came back to try again.
+   */
+  useEffect(() => {
+    if (isSubPage || showPreloader || popupLoading) return;
+    if (hasShownAutoPopupRef.current || !admissionsPopup.isEnabled) return;
+
+    hasShownAutoPopupRef.current = true;
+    const timer = setTimeout(() => setShowAdmissionsPopup(true), admissionsPopup.autoOpenDelayMs);
+    return () => clearTimeout(timer);
+  }, [isSubPage, showPreloader, popupLoading, admissionsPopup.isEnabled, admissionsPopup.autoOpenDelayMs]);
 
   // Reset navbar visibility if switching back to subpages/home, and safety fallback
   useEffect(() => {
@@ -171,7 +202,7 @@ export default function App() {
         <ChatbotButton />
 
         {/* Header bar container with animations */}
-        <Navbar isReady={navbarReady} onOpenAdmissions={() => setShowAdmissionsPopup(true)} />
+        <Navbar isReady={navbarReady} onOpenAdmissions={handleOpenAdmissions} />
 
         {!isSubPage ? (
           <>
@@ -179,7 +210,7 @@ export default function App() {
               loaded={heroLoaded}
               isSubPage={false}
               onQuotesComplete={handleQuotesComplete}
-              onOpenAdmissions={() => setShowAdmissionsPopup(true)}
+              onOpenAdmissions={handleOpenAdmissions}
             />
             <main>
               <AboutSection />
@@ -189,7 +220,7 @@ export default function App() {
               <CampusLife />
 
               <BlogsAndMagazine />
-              <Admissions onOpenAdmissions={() => setShowAdmissionsPopup(true)} />
+              <Admissions onOpenAdmissions={handleOpenAdmissions} />
             </main>
           </>
         ) : (
@@ -537,7 +568,11 @@ export default function App() {
         <Footer />
       </SmoothScroll>
 
-      <AdmissionsPopup isOpen={showAdmissionsPopup && !showPreloader} onClose={() => setShowAdmissionsPopup(false)} />
+      <AdmissionsPopup
+        isOpen={showAdmissionsPopup && !showPreloader}
+        onClose={() => setShowAdmissionsPopup(false)}
+        content={admissionsPopup}
+      />
     </>
   );
 }

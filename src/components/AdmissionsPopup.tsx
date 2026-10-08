@@ -1,18 +1,19 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ExternalLink } from "lucide-react";
-import { useLenis } from "../context/LenisContext";
+import { useNavigate } from "react-router-dom";
 import { useModalScrollLock } from "../hooks/useModalScrollLock";
+import type { AdmissionsPopupContent } from "../hooks/useAdmissionsPopupContent";
 
 interface AdmissionsPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  /** The popup's own settings, which the page has already waited for. */
+  content: AdmissionsPopupContent;
 }
 
-const ADMISSION_IMG = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80";
-
-export default function AdmissionsPopup({ isOpen, onClose }: AdmissionsPopupProps) {
-  const lenis = useLenis();
+export default function AdmissionsPopup({ isOpen, onClose, content }: AdmissionsPopupProps) {
+  const navigate = useNavigate();
   useModalScrollLock(isOpen);
 
   // Close modal on Escape key press
@@ -31,6 +32,24 @@ export default function AdmissionsPopup({ isOpen, onClose }: AdmissionsPopupProp
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
+
+  /**
+   * The button used to swallow its own click, so whatever target was set had no
+   * effect. An address off the site opens in a new tab; anything site-relative
+   * is a route, so it closes the popup and navigates in place.
+   */
+  const handleCtaClick = () => {
+    const href = content.ctaHref?.trim();
+    if (!href) return;
+
+    if (content.ctaIsExternal) {
+      window.open(href, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    onClose();
+    navigate(href);
+  };
 
   return (
     <AnimatePresence>
@@ -69,8 +88,8 @@ export default function AdmissionsPopup({ isOpen, onClose }: AdmissionsPopupProp
             {/* FULL BACKGROUND IMAGE */}
             <div className="absolute inset-0 w-full h-full">
               <img
-                src={ADMISSION_IMG}
-                alt="Admissions 2026-27"
+                src={content.image}
+                alt={content.alt}
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -87,19 +106,17 @@ export default function AdmissionsPopup({ isOpen, onClose }: AdmissionsPopupProp
             {/* Floating content: Apply Now Button & minimal text info */}
             <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 flex flex-col items-center justify-end z-10 text-center">
               <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.25em] text-[#D4AF37] uppercase mb-4 sm:mb-5">
-                Admissions Open 2026-27
+                {content.eyebrow}
               </span>
               <h3 className="font-serif font-bold text-lg sm:text-xl text-white tracking-wide hidden">
-                C.K. Pithawalla Institute
+                {content.title}
               </h3>
               
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                }}
+                onClick={handleCtaClick}
                 className="w-full bg-[#D4AF37] text-[#0c2411] hover:bg-white hover:text-[#0c2411] py-3 sm:py-3.5 px-5 rounded-xl text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer shadow-[0_12px_25px_rgba(212,175,55,0.25)] hover:shadow-[0_16px_35px_rgba(255,255,255,0.3)] active:scale-95 hover:scale-[1.02]"
               >
-                <span>Apply Now</span>
+                <span>{content.ctaLabel}</span>
                 <ExternalLink size={12} className="stroke-[2.5]" />
               </button>
             </div>

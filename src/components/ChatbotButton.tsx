@@ -1,117 +1,102 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageSquare, X, Send, GraduationCap, MapPin, BookOpen, Sparkles, ArrowUp } from "lucide-react";
+import { MessageSquare, X, Send, GraduationCap, MapPin, BookOpen, Sparkles, ArrowUp, RotateCcw } from "lucide-react";
 import { useLenis } from "../context/LenisContext";
 
 interface Message {
   sender: "bot" | "user";
   text: string;
   time: string;
+  failed?: boolean;
 }
 
-const FAQ_RESPONSES: Record<string, string> = {
-  "admissions": "🎓 **Admissions 2026-27:**\nAdmission is open for professional pharmacy programs. \n\n• **Courses Offered:** B.Pharm (Bachelor of Pharmacy), M.Pharm (Master of Pharmacy), and Pharm.D (Doctor of Pharmacy).\n• **Eligibility:** 12th HSC Science stream (PCB/PCM).\n• **Admission Route:** Conducted via Gujarat centralized admission process (ACPC) and Veer Narmad South Gujarat University (VNSGU) structures.\n• **Admissions Helpline:** +91 261 2723967\n• **Email:** ckpipsr@gmail.com\n\nClick 'Apply Now' in the header to get started!",
-  "academics": "📚 **Academic Programs:**\nWe offer premier, VNSGU-affiliated professional pharmacy courses:\n\n1. **B.Pharm (4 Years):** Standard graduate program in pharmacy practice, pharmaceutical chemistry, and pharmaceutical analysis.\n2. **M.Pharm (2 Years):** Specializations in Pharmaceutics, Pharmaceutical Quality Assurance, and Pharmacology.\n3. **Pharm.D (6 Years):** Intensive clinical doctorate program in hospital pharmacy, clinical pharmacotherapy, and ward rounds.",
-  "research": "💡 **Incubation & SSIP cell:**\n• **SSIP Cell:** Affiliated with the Student Start-up & Innovation Policy of Gujarat state.\n• **Startup Funding:** Grants up to ₹2.5 Lakhs available for innovative pharmaceutical research and medical formulation prototype projects.\n• **Scholarships:** Financial aid is accessible through schemes like MYSY (Mukhyamantri Yuva Swavalamban Yojana), the Digital Gujarat Scholarship Portal, and specialized trust aids.",
-  "location": "📍 **Campus & Contact:**\n• **Location:** Dumas Road, Near Malvan Mandir, Surat, Gujarat, 395007.\n• **Phone:** +91 261 2723967\n• **Email:** ckpipsr@gmail.com\n• **Visiting Hours:** 9:00 AM - 4:30 PM (Monday - Saturday)"
+// Quick-start chips. Plain questions, sent exactly like anything the visitor
+// types — the chatbot does not know these are chips rather than typing.
+const QUICK_OPTIONS: { label: string; icon: typeof GraduationCap; question: string }[] = [
+  { label: "Admissions", icon: GraduationCap, question: "Tell me about admissions." },
+  { label: "Programs", icon: BookOpen, question: "What pharmacy courses are offered?" },
+  { label: "SSIP / Startup", icon: Sparkles, question: "Tell me about the SSIP and startup cell." },
+  { label: "Contact", icon: MapPin, question: "What is the campus address and contact number?" },
+];
+
+const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+const WELCOME: Message = {
+  sender: "bot",
+  text: "👋 Welcome to CKPIPSR! I'm the campus assistant — ask me about admissions, courses, fees, or anything else about the college.",
+  time: now(),
 };
+
+const OFFLINE_REPLY =
+  "I couldn't reach the campus assistant just now. Please try again in a moment, or call +91 63550 65636.";
 
 export default function ChatbotButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const lenis = useLenis();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      sender: "bot",
-      text: "👋 Welcome to CKPIPSR virtual helpdesk! I'm your interactive assistant. How can I guide you today?",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // One id for the life of this tab's chat: the backend uses it to keep the
+  // last few turns of context. A fresh one is only drawn on Reset, below.
+  const sessionId = useRef(crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowBackToTop(true);
-      } else {
-        setShowBackToTop(false);
-      }
-    };
+    const handleScroll = () => setShowBackToTop(window.scrollY > 300);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleBackToTop = () => {
-    if (lenis) {
-      lenis.scrollTo(0, { duration: 0.95 });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    if (lenis) lenis.scrollTo(0, { duration: 0.95 });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, isTyping]);
 
-  const handleSendMessage = (text: string, isFaq = false) => {
-    if (!text.trim()) return;
+  const handleSendMessage = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || isTyping) return;
 
-    const userMsg: Message = {
-      sender: "user",
-      text,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, { sender: "user", text: trimmed, time: now() }]);
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      let botText = "";
-      if (isFaq) {
-        const key = text.toLowerCase();
-        if (key.includes("admission")) botText = FAQ_RESPONSES.admissions;
-        else if (key.includes("academic") || key.includes("program") || key.includes("course")) botText = FAQ_RESPONSES.academics;
-        else if (key.includes("research") || key.includes("ssip") || key.includes("startup")) botText = FAQ_RESPONSES.research;
-        else if (key.includes("contact") || key.includes("location")) botText = FAQ_RESPONSES.location;
-      } else {
-        // Simple keyword routing
-        const query = text.toLowerCase();
-        if (query.includes("admission") || query.includes("apply") || query.includes("seat") || query.includes("fees") || query.includes("hsc") || query.includes("vnsgu")) {
-          botText = FAQ_RESPONSES.admissions;
-        } else if (query.includes("course") || query.includes("program") || query.includes("bca") || query.includes("bba") || query.includes("bcom") || query.includes("commerce") || query.includes("class")) {
-          botText = FAQ_RESPONSES.academics;
-        } else if (query.includes("research") || query.includes("ssip") || query.includes("startup") || query.includes("mysy") || query.includes("grant") || query.includes("scholarship")) {
-          botText = FAQ_RESPONSES.research;
-        } else if (query.includes("address") || query.includes("map") || query.includes("where") || query.includes("number") || query.includes("phone") || query.includes("location") || query.includes("contact")) {
-          botText = FAQ_RESPONSES.location;
-        } else if (query.includes("hello") || query.includes("hi") || query.includes("hey")) {
-          botText = "Hello! Nice to meet you. Please select one of the topics below or type any question regarding CKPCMC admissions, programs, or campus details!";
-        } else {
-          botText = "Thank you for reaching out! For detailed queries regarding eligibility, fees, or administrative processes, please contact our helpdesk at **+91 261 2723967** or email **info@ckpcmc.ac.in** directly.";
-        }
-      }
-
-      const botMsg: Message = {
-        sender: "bot",
-        text: botText,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setMessages((prev) => [...prev, botMsg]);
+    try {
+      const res = await fetch("/chatbot-api/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed, session_id: sessionId.current }),
+      });
+      const data = await res.json();
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: data.response || OFFLINE_REPLY, time: now(), failed: !res.ok },
+      ]);
+    } catch {
+      setMessages((prev) => [...prev, { sender: "bot", text: OFFLINE_REPLY, time: now(), failed: true }]);
+    } finally {
       setIsTyping(false);
-    }, 750);
+    }
+  };
+
+  const handleReset = () => {
+    fetch("/chatbot-api/clear_history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId.current }),
+    }).catch(() => undefined);
+    sessionId.current = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+    setMessages([{ ...WELCOME, time: now() }]);
   };
 
   return (
     <>
       {/* Floating Buttons Column */}
-      <div id="chatbot-wrapper" className="fixed bottom-[78px] sm:bottom-[84px] md:bottom-[96px] xl:bottom-10 right-4 sm:right-8 md:right-10 z-50 flex flex-col items-end gap-3 pointer-events-auto">
+      <div id="chatbot-wrapper" className="fixed bottom-[78px] sm:bottom-[84px] md:bottom-[96px] xl:bottom-10 right-4 sm:right-8 md:right-10 z-50 flex flex-col items-end gap-3">
         {/* Back to top button */}
         <AnimatePresence>
           {showBackToTop && (
@@ -121,7 +106,7 @@ export default function ChatbotButton() {
               exit={{ scale: 0, opacity: 0, y: 10 }}
               transition={{ type: "spring", stiffness: 400, damping: 28 }}
               onClick={handleBackToTop}
-              className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 hover:bg-white text-[#0c2411] hover:text-[#D4AF37] rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] border border-slate-200 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 hover:bg-white text-[#0c2411] hover:text-[#D4AF37] rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(12,36,17,0.25)] transition-colors cursor-pointer"
               aria-label="Back to top"
             >
               <ArrowUp size={16} className="sm:w-5 sm:h-5 stroke-[2.5]" />
@@ -137,7 +122,7 @@ export default function ChatbotButton() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
               transition={{ type: "spring", stiffness: 350, damping: 28 }}
-              className="w-[92vw] sm:w-[380px] h-[420px] sm:h-[520px] max-h-[62vh] sm:max-h-[75vh] bg-white rounded-3xl border border-slate-100 shadow-[0_24px_60px_rgba(27,21,21,0.18)] overflow-hidden overscroll-contain flex flex-col font-sans mb-1"
+              className="w-[92vw] sm:w-[380px] h-[420px] sm:h-[520px] max-h-[62vh] sm:max-h-[75vh] bg-white rounded-3xl border border-slate-100 shadow-[0_24px_60px_rgba(12,36,17,0.25)] flex flex-col overflow-hidden"
               onWheel={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}
             >
@@ -155,26 +140,37 @@ export default function ChatbotButton() {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={handleReset}
+                    className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                    aria-label="Start a new conversation"
+                    title="Start a new conversation"
+                  >
+                    <RotateCcw size={16} />
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                    aria-label="Close"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
 
               {/* Chat Message Box */}
               <div ref={scrollRef} data-lenis-prevent="true" className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4 bg-slate-50 relative">
                 {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
-                  >
+                  <div key={i} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
                     <div
-                      className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed whitespace-pre-line shadow-xs border ${msg.sender === "user"
+                      className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed whitespace-pre-line shadow-xs border ${
+                        msg.sender === "user"
                           ? "bg-[#3B3131] text-white border-transparent rounded-tr-none"
-                          : "bg-white text-slate-800 border-slate-100 rounded-tl-none"
-                        }`}
+                          : msg.failed
+                            ? "bg-amber-50 text-amber-900 border-amber-100 rounded-tl-none"
+                            : "bg-white text-slate-800 border-slate-100 rounded-tl-none"
+                      }`}
                     >
                       {msg.text}
                     </div>
@@ -195,43 +191,24 @@ export default function ChatbotButton() {
 
               {/* Quick Options */}
               <div className="px-4 py-2 border-t border-slate-100 bg-white flex flex-wrap gap-1.5">
-                <button
-                  onClick={() => handleSendMessage("Admissions Inquiry", true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
-                >
-                  <GraduationCap size={12} className="text-[#D4AF37]" />
-                  <span>Admissions</span>
-                </button>
-                <button
-                  onClick={() => handleSendMessage("Academic Programs", true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
-                >
-                  <BookOpen size={12} className="text-[#D4AF37]" />
-                  <span>Programs</span>
-                </button>
-                <button
-                  onClick={() => handleSendMessage("Scholarships & SSIP", true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
-                >
-                  <Sparkles size={11} className="text-[#D4AF37]" />
-                  <span>SSIP / Startup</span>
-                </button>
-                <button
-                  onClick={() => handleSendMessage("Contact & Location", true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-bold font-sans transition-all border border-slate-200 cursor-pointer"
-                >
-                  <MapPin size={11} className="text-[#D4AF37]" />
-                  <span>Contact</span>
-                </button>
+                {QUICK_OPTIONS.map(({ label, icon: Icon, question }) => (
+                  <button
+                    key={label}
+                    onClick={() => handleSendMessage(question)}
+                    disabled={isTyping}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 hover:bg-[#D4AF37]/10 hover:text-[#0c2411] text-slate-700 text-[10px] font-semibold border border-slate-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Icon size={12} className="text-[#D4AF37]" />
+                    <span>{label}</span>
+                  </button>
+                ))}
               </div>
 
               {/* Text Input Footer */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (inputValue.trim()) {
-                    handleSendMessage(inputValue);
-                  }
+                  if (inputValue.trim()) handleSendMessage(inputValue);
                 }}
                 className="p-3 border-t border-slate-100 bg-white flex items-center gap-2"
               >
@@ -240,12 +217,12 @@ export default function ChatbotButton() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask any question about college..."
-                  className="flex-1 px-3.5 py-2 bg-slate-100 border border-transparent hover:border-slate-200 focus:border-[#D4AF37] focus:bg-white text-xs text-slate-800 rounded-xl focus:outline-none transition-all leading-normal font-sans"
+                  className="flex-1 px-3.5 py-2 bg-slate-100 border border-transparent hover:border-slate-200 focus:border-[#D4AF37] focus:bg-white text-xs text-slate-800 rounded-xl outline-none transition-colors"
                 />
                 <button
                   type="submit"
-                  disabled={!inputValue.trim()}
-                  className="p-2 bg-[#0c2411] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#113a1b] text-white rounded-xl transition-all cursor-pointer shadow-xs shrink-0"
+                  disabled={!inputValue.trim() || isTyping}
+                  className="p-2 bg-[#0c2411] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#113a1b] text-white rounded-xl transition-all cursor-pointer"
                 >
                   <Send size={14} />
                 </button>
@@ -263,7 +240,7 @@ export default function ChatbotButton() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(!isOpen)}
-            className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0c2411] hover:bg-[#113a1b] text-white rounded-full flex items-center justify-center shadow-[0_12px_40px_rgba(12,36,17,0.3)] border-2 border-[#D4AF37]/50 transition-all cursor-pointer relative"
+            className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0c2411] hover:bg-[#113a1b] text-white rounded-full flex items-center justify-center shadow-[0_12px_40px_rgba(12,36,17,0.35)] transition-colors cursor-pointer"
             aria-label="Chat with assistant"
           >
             {isOpen ? <X size={20} className="sm:w-6 sm:h-6" /> : <MessageSquare size={20} className="sm:w-6 sm:h-6" />}

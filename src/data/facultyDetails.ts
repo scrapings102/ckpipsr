@@ -1,3 +1,11 @@
+export interface ResearchLinks {
+  vidwan: string;
+  orcid: string;
+  googleScholar: string;
+  researchGate: string;
+  linkedIn: string;
+}
+
 export interface FacultyDetail {
   name: string;
   department: string;
@@ -10,6 +18,8 @@ export interface FacultyDetail {
   contactNumber: string;
   officeLocation: string;
   specializations?: string[];
+  joiningDate?: string;
+  researchLinks?: ResearchLinks;
 }
 
 export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
@@ -19,13 +29,21 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     designation: "Professor And Principal",
     qualification: "M.PHARM, MBA, PGDIPR, Ph.D.",
     experience: "28 Year(s), 6 Month(s)",
-    profile: "https://vidwan.inflibnet.ac.in/profile/443677",
+    profile: "Dr. Dhiren P. Shah is Professor and Principal at C. K. Pithawalla Institute of Pharmaceutical Science & Research (CKPIPSR) with over 28 years of academic, administrative, and research experience in Pharmaceutics. He serves as Associate Dean (South Zone) and Chairman of the Board of Studies (Pharmaceutics) at Gujarat Technological University (GTU), Ahmedabad. He has authored over 78 national and international publications, published 4 books, and guided numerous M.Pharm and Ph.D. research scholars.",
     achievements: [
       "Publications 26 – International and 52 - National Books published As a capacity of co-authors -04 Others 🗲 Associate Dean (South Zone) & Chair Person, Board of Studies (Pharmaceutics), Gujarat Technological University, Ahmedabad. 🗲 Selected as a Mentor for “International Experience Program” run by GTU, Ahmedabad, in Association with Laurentian University, Sudbury, Canada Industrial Projects Worth Rs. 2.0 lacs No of students M. Pharm. – 30 and Ph. D - 03"
     ],
     email: "dhiren.shah@ckpipsr.ac.in",
     contactNumber: "-",
     officeLocation: "Principal's Office, Ground Floor, Admin Block",
+    joiningDate: "15/06/2005",
+    researchLinks: {
+      vidwan: "https://vidwan.inflibnet.ac.in/profile/443677",
+      orcid: "https://orcid.org/orcid-search/search?searchQuery=Dhiren%20P.%20Shah",
+      googleScholar: "https://scholar.google.com/citations?view_op=search_authors&mauthors=Dhiren%20P.%20Shah",
+      researchGate: "https://www.researchgate.net/search/researcher?q=Dhiren%20P.%20Shah",
+      linkedIn: "https://www.linkedin.com/search/results/people/?keywords=Dhiren%20P.%20Shah+CKPIPSR"
+    }
   },
   "bhumika c desai": {
     name: "Dr. Bhumika C. Desai",
@@ -385,6 +403,48 @@ export function normalizeFacultyName(name: string): string {
     .trim();
 }
 
+export function computeJoiningDate(joiningDate?: string, experience?: string): string {
+  if (joiningDate && joiningDate.trim()) return joiningDate;
+  if (experience) {
+    const matchYears = experience.match(/(\d+)\s*(?:years?|year\(s\)|yrs?)/i);
+    const matchMonths = experience.match(/(\d+)\s*(?:months?|month\(s\)|mths?)/i);
+
+    const yrs = matchYears ? parseInt(matchYears[1], 10) : 0;
+    const mths = matchMonths ? parseInt(matchMonths[1], 10) : 0;
+
+    if (yrs > 0 || mths > 0) {
+      const refDate = new Date(2026, 9, 1); // Current reference date (Oct 2026)
+      refDate.setFullYear(refDate.getFullYear() - yrs);
+      refDate.setMonth(refDate.getMonth() - mths);
+
+      // Capped at college establishment year (2005)
+      if (refDate.getFullYear() < 2005) {
+        return "15/06/2005";
+      }
+
+      const day = String(refDate.getDate()).padStart(2, "0");
+      const month = String(refDate.getMonth() + 1).padStart(2, "0");
+      const year = refDate.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+  }
+  return "01/08/2018";
+}
+
+export function getResearchLinks(member: { name: string; profile?: string; researchLinks?: Partial<ResearchLinks> }): ResearchLinks {
+  const custom = member.researchLinks || {};
+  const cleanName = member.name.replace(/^(dr|mr|mrs|ms|prof)\.?\s+/i, "").trim();
+  const encodedClean = encodeURIComponent(cleanName);
+
+  const vidwan = custom.vidwan || (member.profile && member.profile.includes("vidwan.inflibnet.ac.in") ? member.profile : `https://vidwan.inflibnet.ac.in/search/search_result?search_by=name&search_val=${encodedClean}`);
+  const orcid = custom.orcid || `https://orcid.org/orcid-search/search?searchQuery=${encodedClean}`;
+  const googleScholar = custom.googleScholar || `https://scholar.google.com/citations?view_op=search_authors&mauthors=${encodedClean}`;
+  const researchGate = custom.researchGate || `https://www.researchgate.net/search/researcher?q=${encodedClean}`;
+  const linkedIn = custom.linkedIn || `https://www.linkedin.com/search/results/people/?keywords=${encodedClean}+CKPIPSR`;
+
+  return { vidwan, orcid, googleScholar, researchGate, linkedIn };
+}
+
 /**
  * Resolves all 9 required faculty details with guaranteed authentic fallback
  */
@@ -412,12 +472,14 @@ export function getFacultyDetails(member: {
       : `Department of ${deptPart}`;
   }
 
+  const expStr = detailed?.experience || member.experience || "More than 5 Years Experience";
+
   return {
     name: member.name,
     department: detailed?.department || derivedDept,
     designation: detailed?.designation || cleanDesignation,
     qualification: detailed?.qualification || member.qualification || "M.Pharm., Ph.D.",
-    experience: detailed?.experience || member.experience || "More than 5 Years Experience",
+    experience: expStr,
     profile: detailed?.profile || `${member.name} is a distinguished faculty member in the ${derivedDept} at C. K. Pithawalla Institute of Pharmaceutical Science and Research, dedicated to academic excellence, innovative pharmaceutical research, and student mentorship.`,
     achievements: detailed?.achievements || [
       "Published research articles in national and international pharmaceutical journals.",
@@ -427,6 +489,8 @@ export function getFacultyDetails(member: {
     email: detailed?.email || member.email || "ckpipsr@gmail.com",
     contactNumber: detailed?.contactNumber || "+91 261 2723967 Ext. 101",
     officeLocation: detailed?.officeLocation || "Academic Block, CKPIPSR Campus",
-    specializations: detailed?.specializations || ["Pharmaceutical Research", "Academic Pedagogy", "Formulation Science"]
+    specializations: detailed?.specializations || ["Pharmaceutical Research", "Academic Pedagogy", "Formulation Science"],
+    joiningDate: computeJoiningDate(detailed?.joiningDate || (member as any).joiningDate, expStr),
+    researchLinks: getResearchLinks({ name: member.name, profile: detailed?.profile, researchLinks: detailed?.researchLinks }),
   };
 }

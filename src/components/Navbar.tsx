@@ -593,10 +593,6 @@ const dropdownDetails: Record<
     desc: 'B.Pharm semester syllabus, subject codes & syllabus PDFs',
     icon: BookOpen,
   },
-  'Hobby Club': {
-    desc: 'Creative, cultural, sports & student hobby activities',
-    icon: Compass,
-  },
   Alumni: {
     desc: 'CKPIPSRAA network, committee & alumni registration',
     icon: GraduationCap,
@@ -1994,9 +1990,6 @@ function getSlugGroup(slug: string): string {
   if (['scholarships', 'scholorships'].includes(s)) {
     return 'scholarships';
   }
-  if (['hobby-club', 'hobbyclub'].includes(s)) {
-    return 'hobby-club';
-  }
   if (['alumni', 'alumni-association'].includes(s)) {
     return 'alumni';
   }
@@ -2137,9 +2130,6 @@ const getShortName = (name: string): string => {
     Courses: 'Courses',
     'Course Syllabus': 'Syllabus',
     Scholorships: 'Scholarships',
-    'E-Library': 'E-Library',
-    'Educational Videos': 'Videos',
-    'Hobby Club': 'Hobby Club',
     Alumni: 'Alumni',
     'Student Help Desk': 'Help Desk',
     ARC: 'Anti-Ragging',

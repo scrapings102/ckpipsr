@@ -398,6 +398,162 @@ export const DEFAULT_COURSE_SYLLABUS: CourseSyllabusContent = {
   "pdfCount": 25
 };
 
+export const DEFAULT_BPHARM_SYLLABUS = DEFAULT_COURSE_SYLLABUS;
+
+export const DEFAULT_DPHARM_SYLLABUS: CourseSyllabusContent = {
+  "pageTitle": "Course Syllabus",
+  "pageSubtitle": "D.Pharm syllabus, year by year — 21 subjects across 2 years.",
+  "programme": "D.Pharm",
+  "intro": "Tap any year below to view its subjects. Click Open PDF to view or download the detailed syllabus module.",
+  "table": {
+    "number": "#",
+    "code": "Subject Code",
+    "name": "Subject Name",
+    "action": "Action",
+    "openLabel": "Open PDF"
+  },
+  "counts": {
+    "subject": "{count} Subject",
+    "subjects": "{count} Subjects",
+    "pdf": "{count} PDF",
+    "pdfs": "{count} PDFs",
+    "separator": " • "
+  },
+  "semesterKicker": "Year {number}",
+  "semesters": [
+    {
+      "number": 1,
+      "title": "1st Year D.Pharm (Part I)",
+      "icon": "Beakers",
+      "subjects": [
+        {
+          "code": "ER20-11T",
+          "name": "Pharmaceutics - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-12T",
+          "name": "Pharmaceutical Chemistry - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-13T",
+          "name": "Pharmacognosy - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-14T",
+          "name": "Human Anatomy and Physiology - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-15T",
+          "name": "Social Pharmacy - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-11P",
+          "name": "Pharmaceutics - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-12P",
+          "name": "Pharmaceutical Chemistry - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-13P",
+          "name": "Pharmacognosy - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-14P",
+          "name": "Human Anatomy and Physiology - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-15P",
+          "name": "Social Pharmacy - Practical",
+          "pdf": ""
+        }
+      ],
+      "kicker": "Year 1",
+      "countLabel": "10 Subjects • 0 PDFs",
+      "subjectCount": 10,
+      "pdfCount": 0
+    },
+    {
+      "number": 2,
+      "title": "2nd Year D.Pharm (Part II)",
+      "icon": "Capsules",
+      "subjects": [
+        {
+          "code": "ER20-21T",
+          "name": "Pharmacology - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-22T",
+          "name": "Community Pharmacy & Management - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-23T",
+          "name": "Biochemistry & Clinical Pathology - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-24T",
+          "name": "Pharmacotherapeutics - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-25T",
+          "name": "Hospital & Clinical Pharmacy - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-26T",
+          "name": "Pharmacy Law & Ethics - Theory",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-21P",
+          "name": "Pharmacology - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-22P",
+          "name": "Community Pharmacy & Management - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-23P",
+          "name": "Biochemistry & Clinical Pathology - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-24P",
+          "name": "Pharmacotherapeutics - Practical",
+          "pdf": ""
+        },
+        {
+          "code": "ER20-25P",
+          "name": "Hospital & Clinical Pharmacy - Practical",
+          "pdf": ""
+        }
+      ],
+      "kicker": "Year 2",
+      "countLabel": "11 Subjects • 0 PDFs",
+      "subjectCount": 11,
+      "pdfCount": 0
+    }
+  ],
+  "subjectCount": 21,
+  "semesterCount": 2,
+  "pdfCount": 0
+};
+
 function isUsable(value: unknown): value is CourseSyllabusContent {
   if (typeof value !== "object" || value === null) return false;
   const c = value as Partial<CourseSyllabusContent>;
@@ -409,8 +565,14 @@ function isUsable(value: unknown): value is CourseSyllabusContent {
   );
 }
 
-export function useCourseSyllabusContent(): CourseSyllabusContent {
-  const [content, setContent] = useState<CourseSyllabusContent>(DEFAULT_COURSE_SYLLABUS);
+export interface CourseSyllabi {
+  bPharm: CourseSyllabusContent;
+  dPharm: CourseSyllabusContent;
+}
+
+export function useCourseSyllabusContent(): CourseSyllabi {
+  const [bPharm, setBPharm] = useState<CourseSyllabusContent>(DEFAULT_COURSE_SYLLABUS);
+  const [dPharm, setDPharm] = useState<CourseSyllabusContent>(DEFAULT_DPHARM_SYLLABUS);
 
   useEffect(() => {
     let cancelled = false;
@@ -419,7 +581,8 @@ export function useCourseSyllabusContent(): CourseSyllabusContent {
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (cancelled || !body) return;
-        if (isUsable(body.courseSyllabus)) setContent(body.courseSyllabus);
+        if (isUsable(body.courseSyllabus)) setBPharm(body.courseSyllabus);
+        if (isUsable(body.dPharmSyllabus)) setDPharm(body.dPharmSyllabus);
       })
       // The page does not depend on the API being up.
       .catch(() => undefined);
@@ -429,5 +592,6 @@ export function useCourseSyllabusContent(): CourseSyllabusContent {
     };
   }, []);
 
-  return content;
+  return { bPharm, dPharm };
 }
+

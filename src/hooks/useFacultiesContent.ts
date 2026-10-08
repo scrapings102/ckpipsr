@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { withPreview } from "./previewToken";
 import { STAFF_MEMBERS } from "../data/scrapedData";
-import { getFacultyDetails } from "../data/facultyDetails";
+import { getFacultyDetails, type ResearchLinks } from "../data/facultyDetails";
 
 /**
  * Academics → Faculties.
@@ -39,6 +39,8 @@ export interface FacultyProfileDetails {
   achievements: string[];
   email: string;
   contactNumber: string;
+  joiningDate?: string;
+  researchLinks?: ResearchLinks;
 }
 
 export interface FacultiesContent {
@@ -62,8 +64,8 @@ export const DEFAULT_FACULTIES: FacultiesContent = {
     return {
       name: member.name,
       designation: member.designation,
-      qualification: member.qualification,
-      experience: member.experience,
+      qualification: member.qualification || d.qualification,
+      experience: member.experience || d.experience || "5+ Years Experience",
       areaOfInterest: member.area_of_interest,
       email: member.email,
       image: member.image_url,
@@ -76,6 +78,8 @@ export const DEFAULT_FACULTIES: FacultiesContent = {
         achievements: d.achievements,
         email: d.email,
         contactNumber: d.contactNumber,
+        joiningDate: d.joiningDate,
+        researchLinks: d.researchLinks,
       },
     };
   }),

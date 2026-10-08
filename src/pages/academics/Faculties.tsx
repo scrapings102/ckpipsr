@@ -7,19 +7,21 @@ import {
   Heart,
   ChevronRight,
   X,
-  Phone,
   Building2,
   ExternalLink,
   User,
   Link2,
   Trophy,
   FileText,
-  Sparkles
+  Sparkles,
+  Calendar,
+  Star
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useModalScrollLock } from "../../hooks/useModalScrollLock";
 import { cdn } from "../../utils/image";
 import { useFacultiesContent, type FacultyMember } from "../../hooks/useFacultiesContent";
+import { computeJoiningDate, getResearchLinks } from "../../data/facultyDetails";
 
 /** What the profile window draws, after falling back to the card. */
 interface FacultyDetail {
@@ -32,6 +34,12 @@ interface FacultyDetail {
   achievements: string[];
   email: string;
   contactNumber: string;
+  joiningDate?: string;
+}
+
+function isAssistantProfessor(member: FacultyMember, details?: FacultyDetail): boolean {
+  const desig = (details?.designation || member.designation || "").toLowerCase();
+  return desig.includes("assistant professor");
 }
 
 /**
@@ -56,6 +64,7 @@ function getFacultyDetails(member: FacultyMember): FacultyDetail {
     achievements: Array.isArray(d.achievements) ? d.achievements : [],
     email: d.email || member.email,
     contactNumber: d.contactNumber || "",
+    joiningDate: computeJoiningDate(d.joiningDate || (member as any).joiningDate, d.experience || member.experience),
   };
 }
 
@@ -73,6 +82,13 @@ function formatDepartment(dept: string): string {
 function formatContactNumber(num?: string): string {
   if (!num || num.includes("00000") || num.trim() === "-") return "-";
   return num;
+}
+
+function formatExpBadge(exp?: string): string {
+  if (!exp || !exp.trim()) return "5+ Years Exp.";
+  const clean = exp.trim();
+  if (clean.toLowerCase().includes("exp")) return clean;
+  return `${clean} Exp.`;
 }
 
 export default function Faculties() {
@@ -131,17 +147,13 @@ export default function Faculties() {
             <p className="text-slate-600 max-w-3xl text-lg leading-relaxed font-medium">
               {content.intro.body}
             </p>
-            <div className="inline-flex items-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Click on any faculty card below to view their detailed academic profile, achievements, and contact details.</span>
-            </div>
           </div>
         </section>
 
         {/* Faculty Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {teachingStaff.map((member, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -162,14 +174,14 @@ export default function Faculties() {
               <div>
                 {/* Clean Image Container with Interactive Overlay */}
                 <div className="relative aspect-[4/3.8] w-full overflow-hidden bg-slate-100">
-                  <img 
-                    src={member.image ? cdn(member.image, 800, 90) : `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=123a1a&color=D4AF37&size=512`} 
-                    alt={member.name} 
+                  <img
+                    src={member.image ? cdn(member.image, 800, 90) : `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=123a1a&color=D4AF37&size=512`}
+                    alt={member.name}
                     className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     onError={(e) => {
-                       (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=123a1a&color=D4AF37&size=512`;
+                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=123a1a&color=D4AF37&size=512`;
                     }}
                   />
                   {/* Subtle Hover Action Pill */}
@@ -183,41 +195,42 @@ export default function Faculties() {
 
                 {/* Content Area - All information placed below image */}
                 <div className="p-4 sm:p-5 flex flex-col gap-3 min-w-0">
-                  {/* Qualification & Experience Badges */}
+                  {/* Experience Badge */}
                   <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                    {member.qualification && (
-                    <span className="px-2 py-0.5 rounded-md bg-[#123a1a]/5 border border-[#123a1a]/10 text-[9px] sm:text-[10px] font-bold text-[#123a1a] uppercase tracking-wider font-mono break-words">
-                      {member.qualification.split(',')[0]}
+                    <span className="px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[9px] sm:text-[10px] font-bold text-[#B8933E] uppercase tracking-wider font-mono shrink-0">
+                      {formatExpBadge(member.experience || getFacultyDetails(member).experience)}
                     </span>
-                    )}
-                    {member.experience && (
-                      <span className="px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[9px] sm:text-[10px] font-bold text-[#B8933E] uppercase tracking-wider font-mono shrink-0">
-                        {member.experience} Exp
-                      </span>
-                    )}
                   </div>
 
                   {/* Name and Designation */}
                   <div className="space-y-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-snug group-hover:text-[#123a1a] transition-colors break-words">
-                      {member.name}
+                    <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-snug group-hover:text-[#123a1a] transition-colors break-words flex items-center gap-1.5 flex-wrap">
+                      <span>{member.name}</span>
+                      {isAssistantProfessor(member) && (
+                        <span title="Assistant Professor (*)" aria-label="Assistant Professor">
+                          <Star
+                            size={16}
+                            className="text-[#D4AF37] fill-[#D4AF37] shrink-0 inline-block"
+                          />
+                        </span>
+                      )}
                     </h3>
                     {member.designation && (
-                    <p className="text-[10px] sm:text-[11px] font-bold text-[#967320] uppercase tracking-wider font-mono break-words">
-                      {member.designation}
-                    </p>
+                      <p className="text-[10px] sm:text-[11px] font-bold text-[#967320] uppercase tracking-wider font-mono break-words">
+                        {member.designation}
+                      </p>
                     )}
                   </div>
 
                   {/* Academic Qualifications & Interest */}
                   <div className="space-y-2 pt-2 border-t border-slate-100 text-xs min-w-0">
                     {member.qualification && (
-                    <div className="flex items-start gap-2 text-slate-600 min-w-0">
-                      <GraduationCap size={14} className="text-[#123a1a] shrink-0 mt-0.5" />
-                      <p className="leading-relaxed text-[11px] sm:text-xs font-medium break-words min-w-0 flex-1">
-                        {member.qualification}
-                      </p>
-                    </div>
+                      <div className="flex items-start gap-2 text-slate-600 min-w-0">
+                        <GraduationCap size={14} className="text-[#123a1a] shrink-0 mt-0.5" />
+                        <p className="leading-relaxed text-[11px] sm:text-xs font-medium break-words min-w-0 flex-1">
+                          {member.qualification}
+                        </p>
+                      </div>
                     )}
                     {member.areaOfInterest && (
                       <div className="flex items-start gap-2 text-slate-500 min-w-0">
@@ -244,27 +257,27 @@ export default function Faculties() {
 
         {/* Global Research Stats */}
         <div className="bg-[#123a1a] rounded-[4rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
-           <div className="absolute inset-0 opacity-10 mix-blend-soft-light">
-              <img src="/images/hero/college_campus.jpg" alt="College Campus" className="w-full h-full object-cover" />
-           </div>
-           
-           <div className="relative z-10 space-y-12">
-              <div className="space-y-4">
-                <h3 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight">{content.research.title}</h3>
-                <p className="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
-                   {content.research.body}
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                 {content.research.stats.map((stat, sIdx) => (
-                   <div key={sIdx} className="bg-white/5 backdrop-blur-md px-8 py-8 rounded-[2rem] border border-white/10 group hover:bg-white/10 transition-all">
-                      <span className="block text-4xl font-serif font-bold text-[#D4AF37] mb-2">{stat.value}</span>
-                      <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{stat.label}</span>
-                   </div>
-                 ))}
-              </div>
-           </div>
+          <div className="absolute inset-0 opacity-10 mix-blend-soft-light">
+            <img src="/images/hero/college_campus.jpg" alt="College Campus" className="w-full h-full object-cover" />
+          </div>
+
+          <div className="relative z-10 space-y-12">
+            <div className="space-y-4">
+              <h3 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight">{content.research.title}</h3>
+              <p className="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
+                {content.research.body}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {content.research.stats.map((stat, sIdx) => (
+                <div key={sIdx} className="bg-white/5 backdrop-blur-md px-8 py-8 rounded-[2rem] border border-white/10 group hover:bg-white/10 transition-all">
+                  <span className="block text-4xl font-serif font-bold text-[#D4AF37] mb-2">{stat.value}</span>
+                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -347,218 +360,259 @@ export default function Faculties() {
               >
                 {/* Main Content Layout: 2 Columns */}
                 <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[300px_1fr] gap-6 relative z-10 items-start">
-                {/* Left Card: Photo, Wave Graphic, Contact Info */}
-                <div className="bg-white rounded-3xl p-3 sm:p-4 border border-emerald-100/70 shadow-xs flex flex-col justify-between overflow-hidden">
-                  <div>
-                    {/* Faculty Photo */}
-                    <div className="w-full aspect-[4/4.5] rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 relative">
-                      <img
-                        src={
-                          selectedFaculty.member.image ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFaculty.details.name)}&background=123a1a&color=D4AF37&size=512`
-                        }
-                        alt={selectedFaculty.details.name}
-                        className="w-full h-full object-cover object-top"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFaculty.details.name)}&background=123a1a&color=D4AF37&size=512`;
-                        }}
-                      />
-                    </div>
+                  {/* Left Card: Photo, Wave Graphic, Contact Info */}
+                  <div className="bg-white rounded-3xl p-3 sm:p-4 border border-emerald-100/70 shadow-xs flex flex-col justify-between overflow-hidden">
+                    <div>
+                      {/* Faculty Photo */}
+                      <div className="w-full aspect-[4/4.5] rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 relative">
+                        <img
+                          src={
+                            selectedFaculty.member.image ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFaculty.details.name)}&background=123a1a&color=D4AF37&size=512`
+                          }
+                          alt={selectedFaculty.details.name}
+                          className="w-full h-full object-cover object-top"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFaculty.details.name)}&background=123a1a&color=D4AF37&size=512`;
+                          }}
+                        />
+                      </div>
 
-                    {/* Layered Green Wave Graphic */}
-                    <div className="w-full overflow-hidden -mt-1 -mb-1">
-                      <svg viewBox="0 0 300 70" className="w-full h-14 sm:h-16 block" preserveAspectRatio="none">
-                        <path
-                          d="M0,40 C80,65 140,15 220,42 C265,55 290,44 300,38 L300,70 L0,70 Z"
-                          fill="#9cd3b1"
-                          opacity="0.6"
-                        />
-                        <path
-                          d="M0,28 C70,52 150,10 230,34 C270,44 292,35 300,30 L300,70 L0,70 Z"
-                          fill="#247346"
-                          opacity="0.85"
-                        />
-                        <path
-                          d="M0,16 C85,40 160,2 240,24 C280,34 295,20 300,14 L300,70 L0,70 Z"
-                          fill="#134e2c"
-                        />
-                      </svg>
+                      {/* Green Box Located Below Photo with Email ID */}
+                      <div className="mt-3 rounded-2xl bg-[#123a1a] p-3.5 border border-[#1e592f] shadow-sm relative overflow-hidden text-white">
+                        {/* Wave pattern accent overlay inside green box */}
+                        <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+                          <svg viewBox="0 0 300 70" className="w-full h-full object-cover" preserveAspectRatio="none">
+                            <path d="M0,40 C80,65 140,15 220,42 C265,55 290,44 300,38 L300,70 L0,70 Z" fill="#9cd3b1" />
+                            <path d="M0,28 C70,52 150,10 230,34 C270,44 292,35 300,30 L300,70 L0,70 Z" fill="#247346" opacity="0.85" />
+                            <path d="M0,16 C85,40 160,2 240,24 C280,34 295,20 300,14 L300,70 L0,70 Z" fill="#134e2c" />
+                          </svg>
+                        </div>
+
+                        <div className="flex items-center gap-3 relative z-10">
+                          <div className="w-10 h-10 rounded-xl bg-white/10 text-[#D4AF37] flex items-center justify-center shrink-0 border border-white/15">
+                            <Mail size={18} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <span className="block text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider font-mono">
+                              EMAIL ID
+                            </span>
+                            {selectedFaculty.details.email ? (
+                              <a
+                                href={`mailto:${selectedFaculty.details.email}`}
+                                className="text-xs sm:text-[13px] font-semibold text-white hover:text-[#D4AF37] break-all leading-snug transition-colors block"
+                              >
+                                {selectedFaculty.details.email}
+                              </a>
+                            ) : (
+                              <span className="text-xs sm:text-[13px] font-semibold text-slate-300 leading-snug block">
+                                -
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Separate Academic & Research Profiles Section */}
+                      {(() => {
+                        const links = getResearchLinks(selectedFaculty.details);
+                        const profileItems = [
+                          { name: "Vidwan Profile", url: links.vidwan, badge: "V", badgeBg: "bg-[#123a1a]/10 text-[#123a1a]" },
+                          { name: "ORCID", url: links.orcid, badge: "iD", badgeBg: "bg-[#a6ce39]/20 text-[#608210]" },
+                          { name: "Google Scholar", url: links.googleScholar, badge: "GS", badgeBg: "bg-blue-100 text-blue-700" },
+                          { name: "ResearchGate", url: links.researchGate, badge: "RG", badgeBg: "bg-teal-100 text-teal-800" },
+                          { name: "LinkedIn", url: links.linkedIn, badge: "in", badgeBg: "bg-sky-100 text-sky-800" },
+                        ];
+
+                        return (
+                          <div className="mt-3.5 pt-3.5 border-t border-slate-200/80 space-y-2.5">
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                              Academic & Research Profiles
+                            </span>
+
+                            <div className="space-y-1.5">
+                              {profileItems.map((item, pIdx) => (
+                                <a
+                                  key={pIdx}
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-[#e8f5ed] border border-slate-200/80 hover:border-emerald-300 text-slate-700 hover:text-[#156f3e] text-xs font-medium transition-all group/link"
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <span className={`w-6 h-6 rounded-lg ${item.badgeBg} flex items-center justify-center text-[10px] font-bold font-mono shrink-0`}>
+                                      {item.badge}
+                                    </span>
+                                    <span className="truncate font-semibold text-[11px] sm:text-xs">
+                                      {item.name}
+                                    </span>
+                                  </div>
+                                  <ExternalLink size={13} className="text-slate-400 group-hover/link:text-[#156f3e] transition-colors shrink-0" />
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
-                  {/* Contact Information (Email & Contact No) */}
-                  <div className="p-3 pt-3 space-y-3">
-                    {/* Email Row */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                        <Mail size={18} />
+                  {/* Right Column: Profile Header + 4 Metrics + Profile Link + Achievements */}
+                  <div className="space-y-4 sm:space-y-5">
+                    {/* Top Header: FACULTY PROFILE & Name with Initials Badge */}
+                    <div className="space-y-2 pr-10 sm:pr-12 lg:pr-0">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] font-bold tracking-[0.25em] text-slate-600 uppercase">
+                          FACULTY PROFILE
+                        </span>
+                        <span className="w-12 h-[2px] bg-[#1e6f42] inline-block rounded-full" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-slate-500 font-normal">Email</p>
-                        {selectedFaculty.details.email ? (
-                        <a
-                          href={`mailto:${selectedFaculty.details.email}`}
-                          className="text-xs sm:text-[13px] font-semibold text-slate-800 hover:text-[#156f3e] break-all leading-snug transition-colors block"
+
+                      <div className="flex items-center gap-3.5 flex-wrap">
+                        <h2
+                          id="faculty-modal-title"
+                          className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#061d31] tracking-tight flex items-center gap-2 flex-wrap"
                         >
-                          {selectedFaculty.details.email}
-                        </a>
-                        ) : (
-                          <p className="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug">-</p>
-                        )}
+                          <span>{selectedFaculty.details.name}</span>
+                          {isAssistantProfessor(selectedFaculty.member, selectedFaculty.details) && (
+                            <span title="Assistant Professor (*)" aria-label="Assistant Professor">
+                              <Star
+                                size={22}
+                                className="text-[#D4AF37] fill-[#D4AF37] shrink-0 inline-block"
+                              />
+                            </span>
+                          )}
+                        </h2>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#e3f4e9] text-[#156f3e] text-xs font-bold font-mono">
+                          <GraduationCap size={15} />
+                          <span>{getFacultyInitials(selectedFaculty.details.name)}</span>
+                        </div>
+                      </div>
+
+                      {/* Joining Date below faculty name */}
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600 font-medium pt-1">
+                        <Calendar size={15} className="text-[#156f3e] shrink-0" />
+                        <span>
+                          <span className="font-semibold text-slate-700">Date of Joining:</span>{" "}
+                          {selectedFaculty.details.joiningDate || "01/08/2018"}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Divider Line */}
-                    <div className="border-t border-slate-100/90" />
+                    {/* 4 Essential Overview Metrics in a Single Card */}
+                    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:divide-x divide-slate-100">
+                        {/* Department */}
+                        <div className="flex items-center gap-3 lg:px-2 first:pl-0">
+                          <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
+                            <Building2 size={18} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-slate-500 font-medium">Department</p>
+                            <p className="text-sm font-bold text-[#156f3e] truncate">
+                              {formatDepartment(selectedFaculty.details.department) || "-"}
+                            </p>
+                          </div>
+                        </div>
 
-                    {/* Contact No Row */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                        <Phone size={18} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-slate-500 font-normal">Contact No</p>
-                        <p className="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug">
-                          {formatContactNumber(selectedFaculty.details.contactNumber)}
-                        </p>
+                        {/* Designation */}
+                        <div className="flex items-center gap-3 lg:px-3">
+                          <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
+                            <User size={18} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-slate-500 font-medium">Designation</p>
+                            <p className="text-sm font-bold text-[#156f3e] leading-snug">
+                              {selectedFaculty.details.designation || "-"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Qualification */}
+                        <div className="flex items-center gap-3 lg:px-3">
+                          <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
+                            <FileText size={18} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-slate-500 font-medium">Qualification</p>
+                            <p className="text-sm font-bold text-[#156f3e] leading-snug">
+                              {selectedFaculty.details.qualification || "-"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Experience */}
+                        <div className="flex items-center gap-3 lg:px-3">
+                          <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
+                            <Briefcase size={18} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-slate-500 font-medium">Experience</p>
+                            <p className="text-sm font-bold text-[#156f3e] leading-snug">
+                              {selectedFaculty.details.experience || "-"}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Profile Card */}
+                    {selectedFaculty.details.profile && (
+                      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs space-y-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
+                            <Link2 size={17} />
+                          </div>
+                          <h3 className="text-base font-bold text-[#061d31]">Profile</h3>
+                        </div>
+
+                        <div className="bg-[#edf5f0] text-[#061d31] px-4 py-3 rounded-xl border border-emerald-50/60">
+                          {selectedFaculty.details.profile.startsWith("http") ? (
+                            <div className="flex items-center justify-between gap-3 text-xs sm:text-sm font-medium">
+                              <span className="font-mono text-xs sm:text-[13px] text-slate-800 break-all">
+                                {selectedFaculty.details.profile}
+                              </span>
+                              <a
+                                href={selectedFaculty.details.profile}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-slate-600 hover:text-[#156f3e] p-1 rounded transition-colors shrink-0"
+                                title="Open profile in new tab"
+                              >
+                                <ExternalLink size={16} />
+                              </a>
+                            </div>
+                          ) : (
+                            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                              {selectedFaculty.details.profile}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Achievements Card */}
+                    {selectedFaculty.details.achievements.length > 0 && (
+                      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs space-y-3 relative z-10">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
+                            <Trophy size={17} />
+                          </div>
+                          <h3 className="text-base font-bold text-[#061d31]">Achievements</h3>
+                        </div>
+
+                        <div className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-normal space-y-2">
+                          {selectedFaculty.details.achievements.map((item, aIdx) => (
+                            <p key={aIdx}>{item}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-
-                {/* Right Column: Profile Header + 4 Metrics + Profile Link + Achievements */}
-                <div className="space-y-4 sm:space-y-5">
-                  {/* Top Header: FACULTY PROFILE & Name with Initials Badge */}
-                  <div className="space-y-2 pr-10 sm:pr-12 lg:pr-0">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[11px] font-bold tracking-[0.25em] text-slate-600 uppercase">
-                        FACULTY PROFILE
-                      </span>
-                      <span className="w-12 h-[2px] bg-[#1e6f42] inline-block rounded-full" />
-                    </div>
-
-                    <div className="flex items-center gap-3.5 flex-wrap">
-                      <h2
-                        id="faculty-modal-title"
-                        className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#061d31] tracking-tight"
-                      >
-                        {selectedFaculty.details.name}
-                      </h2>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#e3f4e9] text-[#156f3e] text-xs font-bold font-mono">
-                        <GraduationCap size={15} />
-                        <span>{getFacultyInitials(selectedFaculty.details.name)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4 Essential Overview Metrics in a Single Card */}
-                  <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:divide-x divide-slate-100">
-                      {/* Department */}
-                      <div className="flex items-center gap-3 lg:px-2 first:pl-0">
-                        <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                          <Building2 size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs text-slate-500 font-medium">Department</p>
-                          <p className="text-sm font-bold text-[#156f3e] truncate">
-                            {formatDepartment(selectedFaculty.details.department) || "-"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Designation */}
-                      <div className="flex items-center gap-3 lg:px-3">
-                        <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                          <User size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs text-slate-500 font-medium">Designation</p>
-                          <p className="text-sm font-bold text-[#156f3e] leading-snug">
-                            {selectedFaculty.details.designation || "-"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Qualification */}
-                      <div className="flex items-center gap-3 lg:px-3">
-                        <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                          <FileText size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs text-slate-500 font-medium">Qualification</p>
-                          <p className="text-sm font-bold text-[#156f3e] leading-snug">
-                            {selectedFaculty.details.qualification || "-"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Experience */}
-                      <div className="flex items-center gap-3 lg:px-3">
-                        <div className="w-10 h-10 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                          <Briefcase size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs text-slate-500 font-medium">Experience</p>
-                          <p className="text-sm font-bold text-[#156f3e] leading-snug">
-                            {selectedFaculty.details.experience || "-"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Profile Card */}
-                  {selectedFaculty.details.profile && (
-                  <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs space-y-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                        <Link2 size={17} />
-                      </div>
-                      <h3 className="text-base font-bold text-[#061d31]">Profile</h3>
-                    </div>
-
-                    <div className="bg-[#edf5f0] text-[#061d31] px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm font-medium border border-emerald-50/60">
-                      <span className="font-mono text-xs sm:text-[13px] text-slate-800 break-all">
-                        {selectedFaculty.details.profile}
-                      </span>
-                      {selectedFaculty.details.profile.startsWith("http") && (
-                        <a
-                          href={selectedFaculty.details.profile}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-slate-600 hover:text-[#156f3e] p-1 rounded transition-colors shrink-0"
-                          title="Open profile in new tab"
-                        >
-                          <ExternalLink size={16} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  )}
-
-                  {/* Achievements Card */}
-                  {selectedFaculty.details.achievements.length > 0 && (
-                  <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/70 shadow-xs space-y-3 relative z-10">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-[#e8f5ed] text-[#156f3e] flex items-center justify-center shrink-0">
-                        <Trophy size={17} />
-                      </div>
-                      <h3 className="text-base font-bold text-[#061d31]">Achievements</h3>
-                    </div>
-
-                    <div className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-normal space-y-2">
-                      {selectedFaculty.details.achievements.map((item, aIdx) => (
-                        <p key={aIdx}>{item}</p>
-                      ))}
-                    </div>
-                  </div>
-                  )}
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>

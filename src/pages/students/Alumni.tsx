@@ -749,29 +749,13 @@ export default function Alumni() {
                     key={index}
                     className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#1a5d2e]/40 hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
                   >
-                    <div className="flex items-start gap-3.5">
-                      {/* Small Image */}
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-emerald-100 group-hover:border-[#1a5d2e]/40 shrink-0 bg-slate-100 shadow-2xs transition-colors">
-                        <img
-                          src={member.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1a5d2e&color=ffffff&size=200`}
-                          alt={member.name}
-                          className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1a5d2e&color=ffffff&size=200`;
-                          }}
-                        />
+                    <div className="space-y-2">
+                      <div className="inline-block px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-100 text-[#1a5d2e] font-mono text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider max-w-full truncate">
+                        {member.role}
                       </div>
-
-                      {/* Role & Name */}
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="inline-block px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100 text-[#1a5d2e] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider max-w-full truncate">
-                          {member.role}
-                        </div>
-                        <h4 className="font-serif font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-[#1a5d2e] transition-colors break-words">
-                          {member.name}
-                        </h4>
-                      </div>
+                      <h4 className="font-serif font-bold text-slate-900 text-base leading-snug group-hover:text-[#1a5d2e] transition-colors break-words">
+                        {member.name}
+                      </h4>
                     </div>
 
                     {/* Designation */}
@@ -833,29 +817,13 @@ export default function Alumni() {
                     key={index}
                     className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#1a5d2e]/40 hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
                   >
-                    <div className="flex items-start gap-3.5">
-                      {/* Small Image */}
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-emerald-100 group-hover:border-[#1a5d2e]/40 shrink-0 bg-slate-100 shadow-2xs transition-colors">
-                        <img
-                          src={member.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1a5d2e&color=ffffff&size=200`}
-                          alt={member.name}
-                          className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1a5d2e&color=ffffff&size=200`;
-                          }}
-                        />
+                    <div className="space-y-2">
+                      <div className="inline-block px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-100 text-[#1a5d2e] font-mono text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider max-w-full truncate">
+                        {member.role}
                       </div>
-
-                      {/* Role & Name */}
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="inline-block px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100 text-[#1a5d2e] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider max-w-full truncate">
-                          {member.role}
-                        </div>
-                        <h4 className="font-serif font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-[#1a5d2e] transition-colors break-words">
-                          {member.name}
-                        </h4>
-                      </div>
+                      <h4 className="font-serif font-bold text-slate-900 text-base leading-snug group-hover:text-[#1a5d2e] transition-colors break-words">
+                        {member.name}
+                      </h4>
                     </div>
 
                     {/* Designation */}

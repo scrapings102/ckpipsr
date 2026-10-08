@@ -7,6 +7,7 @@ import {
   Calendar, 
   FileCheck,
   Eye,
+  Clock,
   Briefcase,
   Award,
   Factory,
@@ -17,15 +18,36 @@ import {
   Users
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { useTnpVisitsContent, type TnpVisitsTone } from "../../hooks/useTnpVisitsContent";
+
+/** The icons a summary tile can carry; the panel offers these same names. */
+const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  Calendar,
+  Building2,
+  FileCheck,
+  FileText,
+  Factory,
+  Eye,
+  ExternalLink,
+};
+
+/** A tile's colour. */
+const TILE: Record<TnpVisitsTone, string> = {
+  emerald: "bg-emerald-100 text-[#1a5d2e]",
+  blue: "bg-blue-100 text-blue-700",
+  purple: "bg-purple-100 text-purple-700",
+  amber: "bg-amber-100 text-amber-800",
+  rose: "bg-rose-100 text-rose-700",
+};
 
 export default function Visits() {
-  const pdfUrl = "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/6475bc9ca8d32.pdf";
-  const buttonName = "Industrial Visit 2016-22";
+  const content = useTnpVisitsContent();
+  const { intro, plan, quick } = content;
 
   return (
     <SubPageLayout
-      title="Visits"
-      subtitle="Training & Placement Cell – Industrial Visits, Practical Exposure & Industry Connect (2016–2022)"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="tnp"
       activeItemLabel="Visits"
     >
@@ -40,59 +62,47 @@ export default function Visits() {
               </div>
               <div>
                 <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider block">
-                  Training & Placement Cell
+                  {intro.kicker}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 leading-tight">
-                  Industrial Visits & Plant Tours
+                  {intro.heading}
                 </h2>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-[#1a5d2e] text-white border border-[#1a5d2e] shadow-xs">
-                Archive 2016–2022
+                {intro.badge}
               </span>
               <span className="text-xs font-mono font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-[#1a5d2e] border border-emerald-200">
-                Official Report
+                {intro.secondBadge}
               </span>
             </div>
           </div>
 
           <p className="text-sm sm:text-base font-sans text-slate-700 leading-relaxed font-normal">
-            Industrial visits are an integral part of the pharmaceutical curriculum at C.K. Pithawalla Institute of Pharmaceutical Science and Research. They provide students with practical insights into large-scale drug manufacturing, cGMP compliant facilities, advanced analytical instrumentation, Quality Assurance (QA) and Quality Control (QC) operations in leading pharmaceutical corporations.
+            {intro.body}
           </p>
 
-          {/* Key Metrics / Highlights */}
+          {/* Key Metrics / Highlights, as many as the panel lists */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#1a5d2e] flex items-center justify-center shrink-0">
-                <Calendar size={18} />
-              </div>
-              <div className="text-xs">
-                <strong className="text-slate-900 block font-semibold">2016 – 2022 Archive</strong>
-                <span className="text-slate-500">6-Year Industrial Tours</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                <Building2 size={18} />
-              </div>
-              <div className="text-xs">
-                <strong className="text-slate-900 block font-semibold">Pharma Manufacturing</strong>
-                <span className="text-slate-500">cGMP & Formulation Units</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                <FileCheck size={18} />
-              </div>
-              <div className="text-xs">
-                <strong className="text-slate-900 block font-semibold">Authorized Report</strong>
-                <span className="text-slate-500">Comprehensive PDF Record</span>
-              </div>
-            </div>
+            {intro.stats.map((stat, i) => {
+              const Icon = ICONS[stat.icon];
+              return (
+                <div
+                  key={i}
+                  className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3"
+                >
+                  <div className={`w-9 h-9 rounded-lg ${TILE[stat.tone]} flex items-center justify-center shrink-0`}>
+                    {Icon && <Icon size={18} />}
+                  </div>
+                  <div className="text-xs">
+                    <strong className="text-slate-900 block font-semibold">{stat.title}</strong>
+                    <span className="text-slate-500">{stat.note}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -101,14 +111,14 @@ export default function Visits() {
           <div className="flex items-center justify-between">
             <div>
               <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider block">
-                Official Report Document
+                {plan.kicker}
               </span>
               <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                Industrial Visit Reports & Documentation
+                {plan.heading}
               </h3>
             </div>
             <span className="text-xs font-sans text-slate-500 hidden sm:block">
-              Click the button below to view the official PDF document
+              {plan.hint}
             </span>
           </div>
 
@@ -129,64 +139,73 @@ export default function Visits() {
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <h4 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 group-hover:text-[#1a5d2e] transition-colors">
-                      {buttonName}
+                      {plan.title}
                     </h4>
                     <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-md bg-emerald-50 text-[#1a5d2e] border border-emerald-200">
-                      2016–2022
+                      {plan.yearChip}
                     </span>
                     <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                      Official PDF Record
+                      {plan.fileLabel}
                     </span>
                   </div>
                   
                   <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed max-w-2xl">
-                    Detailed summary and compilation of student industrial visits conducted between 2016 and 2022, covering manufacturing plant tours, R&D facility exposures, and regulatory compliance demonstrations.
+                    {plan.description}
                   </p>
                 </div>
               </div>
 
               {/* Right Action Button */}
               <div className="flex items-center gap-3 shrink-0 lg:self-center">
-                <a
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#1a5d2e] hover:bg-[#154a24] text-white text-xs sm:text-sm font-mono font-bold shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer active:scale-95 text-center"
-                >
-                  <Eye size={16} />
-                  <span>{buttonName}</span>
-                  <ExternalLink size={14} className="opacity-80" />
-                </a>
+                {plan.hasFile ? (
+                  <a
+                    href={plan.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#1a5d2e] hover:bg-[#154a24] text-white text-xs sm:text-sm font-mono font-bold shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer active:scale-95 text-center"
+                  >
+                    <Eye size={16} />
+                    <span>{plan.title}</span>
+                    <ExternalLink size={14} className="opacity-80" />
+                  </a>
+                ) : (
+                  <span className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 text-xs sm:text-sm font-mono font-bold select-none text-center">
+                    <Clock size={16} />
+                    <span>{plan.missingLabel}</span>
+                  </span>
+                )}
               </div>
 
             </div>
           </motion.div>
         </div>
 
-        {/* Quick Direct Link Access Box */}
+        {/* Quick link — only worth showing once the report links somewhere. */}
+        {plan.hasFile && (
         <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
           <div className="space-y-1">
             <h4 className="text-sm font-serif font-bold text-slate-900">
-              Direct Quick Access Link
+              {quick.title}
             </h4>
             <p className="text-xs text-slate-600">
-              Tap below to immediately open the Industrial Visit 2016-22 PDF in a new tab:
+              {quick.body}
             </p>
           </div>
 
           <div>
             <a
-              href={pdfUrl}
+              href={plan.url}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white hover:bg-emerald-50 text-slate-900 hover:text-[#1a5d2e] border border-slate-200 hover:border-emerald-300 text-xs sm:text-sm font-mono font-bold transition-all shadow-2xs cursor-pointer group"
             >
               <FileText size={16} className="text-[#1a5d2e]" />
-              <span>{buttonName}</span>
+              <span>{plan.title}</span>
               <ExternalLink size={13} className="text-slate-400 group-hover:text-[#1a5d2e]" />
             </a>
           </div>
         </div>
+        )}
 
       </div>
     </SubPageLayout>

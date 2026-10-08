@@ -134,7 +134,6 @@ const PAGE_IMAGES: Record<string, string> = {
   'Cafeteria': '/images/hero/66e154b724ef6 (1).webp',
   'Classrooms': '/images/hero/students_learning.jpg',
   'Library': '/images/hero/66e154b724ef6.webp',
-  'E-Library': '/images/hero/66e154b724ef6.webp',
   'Central Facilities': '/images/hero/college_campus.jpg',
   'EV Charging Station': '/images/hero/college_campus.jpg',
   'Medicinal Garden': '/images/hero/66e151f0d6a90.webp',
@@ -153,8 +152,6 @@ const PAGE_IMAGES: Record<string, string> = {
   'Courses': '/images/hero/students_learning.jpg',
   'Course Syllabus': '/images/hero/students_learning.jpg',
   'Scholorships': '/images/hero/646efc827452b.webp',
-  'Educational Videos': '/images/hero/students_learning.jpg',
-  'Hobby Club': '/images/hero/66e154b724ef6 (1).webp',
   'Alumni': '/images/hero/66e15283951b9.webp',
 
   // Activities & News

@@ -94,9 +94,6 @@ const PAGE_ORDER: Record<string, string[]> = {
     "Courses",
     "Course Syllabus",
     "Scholorships",
-    "E-Library",
-    "Educational Videos",
-    "Hobby Club",
     "Alumni",
     "Student Help Desk"
   ],
@@ -194,6 +191,12 @@ Object.keys(categoryDisplayNames).forEach((key) => {
       };
     });
     items = [...items, ...staffItems, ...resourceItems];
+  }
+
+  if (label === "Students Corner") {
+    items = items.filter(
+      (item) => !["E-Library", "Educational Videos", "Educational Video", "Hobby Club"].includes(item.label)
+    );
   }
 
   const orderList = PAGE_ORDER[label] || [];
