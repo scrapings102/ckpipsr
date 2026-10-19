@@ -3,8 +3,10 @@ import { withPreview } from "./previewToken";
 
 /**
  * Research & Innovation → SSIP - About: the policy, its two committees and
- * who to contact, as the page's four tabs. Committee members arrive already
- * named — from the staff page when they are linked to it.
+ * who to contact, as the page's four tabs. Committee members and contact
+ * people arrive already named, from the Faculties page when they are linked to
+ * it, and a linked contact's mobile is their Faculties mobile (blank when none
+ * is set). The campus address arrives from Contact Us.
  */
 export interface SsipCard {
   kicker: string;
@@ -283,7 +285,7 @@ export const DEFAULT_SSIP_ABOUT: SsipAboutContent = {
     people: [
       {
         badge: "Institutional Head",
-        name: "DR. DHIREN P. SHAH",
+        name: "Dr. Dhiren P. Shah",
         designation: "Principal & Professor",
         institution: "C. K. Pithawalla Institute of Pharmaceutical Science and Research, Surat",
         officeNumber: "63550 65636",
@@ -291,7 +293,7 @@ export const DEFAULT_SSIP_ABOUT: SsipAboutContent = {
       },
       {
         badge: "SSIP Coordinator",
-        name: "DR. VINODKUMAR D. RAMANI",
+        name: "Dr. Vinodkumar D. Ramani",
         designation: "Associate Professor",
         institution: "C. K. Pithawalla Institute of Pharmaceutical Science and Research, Surat",
         officeNumber: "63550 65636",
@@ -299,7 +301,7 @@ export const DEFAULT_SSIP_ABOUT: SsipAboutContent = {
       }
     ],
     addressLabel: "Campus Location:",
-    address: "C. K. Pithawalla Institute of Pharmaceutical Science & Research, Near Malvan Mandir, Surat-Dumas Road, Surat - 395007, Gujarat."
+    address: "Opposite Surat Airport, Behind DPS School, Near Malvan Mandir, Dumas Road, Surat - 395007, Gujarat, India."
   },
   note: {
     text: "Supported by Education Department, Government of Gujarat under Student Start-up and Innovation Policy.",

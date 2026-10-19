@@ -68,7 +68,7 @@ export const DEFAULT_NIRF: NirfContent = {
       "academicYear": "AY 2025-2026",
       "year": 2026,
       "description": "Official National Institutional Ranking Framework (NIRF) 2026 data submission report, pharmacy discipline metrics, faculty profiles, research outputs, and institutional transparency data.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/69afe3a4bfebf.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/69afe3a4bfebf.pdf",
       "openLabel": "Open NIRF-2026",
       "hasFile": true
     },
@@ -78,7 +78,7 @@ export const DEFAULT_NIRF: NirfContent = {
       "academicYear": "AY 2024-2025",
       "year": 2025,
       "description": "Official National Institutional Ranking Framework (NIRF) 2025 data submission report, teaching-learning resources, research publications, and graduate outcomes.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/67931ba18bc48.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/67931ba18bc48.pdf",
       "openLabel": "Open NIRF-2025",
       "hasFile": true
     },
@@ -88,7 +88,7 @@ export const DEFAULT_NIRF: NirfContent = {
       "academicYear": "AY 2023-2024",
       "year": 2024,
       "description": "Official National Institutional Ranking Framework (NIRF) 2024 data submission report detailing academic achievements, placement statistics, and infrastructure benchmarks.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/65aa5112ec024.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/65aa5112ec024.pdf",
       "openLabel": "Open NIRF-2024",
       "hasFile": true
     },
@@ -98,7 +98,7 @@ export const DEFAULT_NIRF: NirfContent = {
       "academicYear": "AY 2022-2023",
       "year": 2023,
       "description": "Official National Institutional Ranking Framework (NIRF) 2023 data submission report encompassing student strength, financial resources, and consultancy projects.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/64268088bf45f.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/64268088bf45f.pdf",
       "openLabel": "Open NIRF-2023",
       "hasFile": true
     },
@@ -108,7 +108,7 @@ export const DEFAULT_NIRF: NirfContent = {
       "academicYear": "AY 2021-2022",
       "year": 2022,
       "description": "Official National Institutional Ranking Framework (NIRF) 2022 data submission report outlining outreach, peer perception, and executive development metrics.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/6426806d3da45.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/6426806d3da45.pdf",
       "openLabel": "Open NIRF-2022",
       "hasFile": true
     },
@@ -118,7 +118,7 @@ export const DEFAULT_NIRF: NirfContent = {
       "academicYear": "AY 2020-2021",
       "year": 2021,
       "description": "Official National Institutional Ranking Framework (NIRF) 2021 data submission report covering comprehensive pharmacy institutional parameters and research output.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/642680441c5e4.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/642680441c5e4.pdf",
       "openLabel": "Open NIRF-2021",
       "hasFile": true
     }

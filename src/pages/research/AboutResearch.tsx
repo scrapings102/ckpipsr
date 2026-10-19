@@ -22,6 +22,8 @@ import {
   Hash
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
+import { telHref } from "../../utils/phone";
 import {
   useResearchAboutContent,
   type ResearchIcon
@@ -127,7 +129,7 @@ export default function AboutResearch() {
                     {content.overview.heading}
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 font-sans leading-relaxed">
-                    {content.overview.body}
+                    <RichText text={content.overview.body} />
                   </p>
                 </div>
 
@@ -192,7 +194,7 @@ export default function AboutResearch() {
                     </div>
                   </div>
                   <p className="text-sm sm:text-base text-slate-700 font-sans leading-relaxed bg-emerald-50/40 p-4 rounded-2xl border border-emerald-100/60">
-                    {content.vision.body}
+                    <RichText text={content.vision.body} />
                   </p>
                 </div>
 
@@ -221,7 +223,7 @@ export default function AboutResearch() {
                         className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 font-sans leading-relaxed"
                       >
                         <span className="w-5 h-5 rounded-full bg-emerald-100 text-[#1a5d2e] flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">✓</span>
-                        <span>{point}</span>
+                        <span><RichText text={point} /></span>
                       </li>
                     ))}
                   </ul>
@@ -280,7 +282,7 @@ export default function AboutResearch() {
                             </h5>
                           </div>
                           <p className="text-xs sm:text-sm text-slate-700 font-sans leading-relaxed">
-                            {item.body}
+                            <RichText text={item.body} />
                           </p>
                         </div>
                       );
@@ -415,7 +417,7 @@ export default function AboutResearch() {
                           <Phone size={13} className="text-[#1a5d2e] shrink-0" />
                           {member.contact && member.contact !== "-" ? (
                             <a
-                              href={`tel:${member.contact.replace(/[^0-9]/g, "")}`}
+                              href={telHref(member.contact)}
                               className="font-mono font-medium hover:text-[#1a5d2e] hover:underline truncate"
                             >
                               {member.contact}
@@ -514,7 +516,7 @@ export default function AboutResearch() {
                       {String(index + 1).padStart(2, "0")}
                     </div>
                     <p className="text-xs sm:text-sm text-slate-700 font-sans leading-relaxed pt-0.5">
-                      {objective}
+                      <RichText text={objective} />
                     </p>
                   </div>
                 ))}
@@ -568,7 +570,7 @@ export default function AboutResearch() {
                         {plan.points.map((point, pointIndex) => (
                           <li key={pointIndex} className="flex items-start gap-2.5">
                             <Check size={16} className="text-[#1a5d2e] shrink-0 mt-0.5" />
-                            <span className="leading-relaxed">{point}</span>
+                            <span className="leading-relaxed"><RichText text={point} /></span>
                           </li>
                         ))}
                       </ul>

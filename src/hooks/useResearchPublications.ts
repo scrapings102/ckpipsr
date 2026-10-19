@@ -51,7 +51,7 @@ export const DEFAULT_PUBLICATIONS: ResearchPublicationsContent = {
       description:
         "Official compilation of scientific research papers, review articles, and journal publications published by faculty members and research scholars of CKPIPSR.",
       pdfUrl:
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/68f0d2dceabfa.pdf",
+        "/media/trust/app/institutes/102/departments/docs/68f0d2dceabfa.pdf",
       tag: "Latest Compilation",
       colorTheme: "emerald",
     },
@@ -63,7 +63,7 @@ export const DEFAULT_PUBLICATIONS: ResearchPublicationsContent = {
       description:
         "Compendium of peer-reviewed journal publications, research achievements, and pharmaceutical science manuscripts published during the academic year 2022-2023.",
       pdfUrl:
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/64c1fc24f3171.pdf",
+        "/media/trust/app/institutes/102/departments/docs/64c1fc24f3171.pdf",
       tag: "Archived Report",
       colorTheme: "blue",
     },
@@ -84,21 +84,21 @@ export const DEFAULT_PG_PROJECTS: ResearchPublicationsContent = {
   publications: [
     {
       id: "ay-2024-2025",
-      title: "Research Publication AY 2024-2025",
+      title: "PG Projects AY 2024-2025",
       academicYear: "AY 2024 - 2025",
       year: 2024,
       description: "Official documentation and compilation of Post Graduate (M.Pharm) dissertation projects, experimental studies, and research publications for the academic year 2024-2025.",
-      pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/68c24ee48d6ad.pdf",
+      pdfUrl: "/media/trust/app/institutes/102/departments/docs/68c24ee48d6ad.pdf",
       tag: "AY 2024-2025 Report",
       colorTheme: "emerald",
     },
     {
       id: "ay-2025-2026",
-      title: "Research Publication AY 2025-2026",
+      title: "PG Projects AY 2025-2026",
       academicYear: "AY 2025 - 2026",
       year: 2025,
       description: "Compendium and official repository of ongoing and completed Post Graduate research initiatives, thesis manuscripts, and scientific publications for AY 2025-2026.",
-      pdfUrl: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/69e33b71b7b8b.pdf",
+      pdfUrl: "/media/trust/app/institutes/102/departments/docs/69e33b71b7b8b.pdf",
       tag: "AY 2025-2026 Report",
       colorTheme: "blue",
     },

@@ -18,6 +18,7 @@ import {
 export interface CourseCard {
   title: string;
   fullName: string;
+  /** `duration` and `intake` arrive filled from the course page's own stats. */
   duration: string;
   intake: string;
   description: string;
@@ -41,7 +42,7 @@ export interface CoursesContent {
   pageTitle: string;
   pageSubtitle: string;
   intro: { badge: string; heading: string; body: string };
-  support: { title: string; body: string; points: string[]; stats: { value: string; label: string }[] };
+  support: { title: string; body: string; image: string; points: string[]; stats: { value: string; label: string }[] };
   courses: CourseEntry[];
 }
 
@@ -62,6 +63,7 @@ export const DEFAULT_COURSES: CoursesContent = {
   support: {
     title: "Academic Support & Holistic Learning",
     body: "Beyond the classroom, we provide a supportive ecosystem that encourages research, innovation, and professional development.",
+    image: "/images/hero/students_learning.jpg",
     points: [
       "PCI & GTU Approved Curriculum",
       "Expert Doctoral Faculty Mentorship",
@@ -107,7 +109,7 @@ export const DEFAULT_COURSES: CoursesContent = {
     {
       id: "short-term-certificate", enabled: true, navLabel: "Short Term Certificate",
       card: {
-        title: "Certificate", fullName: "Short Term Certificate", duration: "8 Weeks", intake: "100 Seats",
+        title: "Certificate", fullName: "Short Term Certificate", duration: "60 Hours (8 weeks, Sat/Sun only, Online)", intake: "100 Seats",
         description: "Intensive online skill program for dossier preparation and filing.",
         icon: "Zap", color: "purple", tags: ["Skill Development", "Industry Focused"],
       },

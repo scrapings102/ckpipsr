@@ -279,135 +279,135 @@ export const COMMITTEES_DATA = {
 
 const _GALLERY_IMAGES: Record<string, string[]> = {
   sports: [
-    "https://ckpcmc.org/images/sport_01.jpeg",
-    "https://ckpcmc.org/images/sport_02.jpeg",
-    "https://ckpcmc.org/images/sport_03.jpeg",
-    "https://ckpcmc.org/images/sport_04.jpeg",
-    "https://ckpcmc.org/images/sport_05.jpeg",
-    "https://ckpcmc.org/images/sport_06.jpeg",
-    "https://ckpcmc.org/images/sport_07.jpeg",
-    "https://ckpcmc.org/images/sport_08.jpeg",
-    "https://ckpcmc.org/images/sport_09.jpeg",
-    "https://ckpcmc.org/images/sport_10.jpeg",
-    "https://ckpcmc.org/images/sport_11.jpeg"
+    "/media/cmc/images/sport_01.jpeg",
+    "/media/cmc/images/sport_02.jpeg",
+    "/media/cmc/images/sport_03.jpeg",
+    "/media/cmc/images/sport_04.jpeg",
+    "/media/cmc/images/sport_05.jpeg",
+    "/media/cmc/images/sport_06.jpeg",
+    "/media/cmc/images/sport_07.jpeg",
+    "/media/cmc/images/sport_08.jpeg",
+    "/media/cmc/images/sport_09.jpeg",
+    "/media/cmc/images/sport_10.jpeg",
+    "/media/cmc/images/sport_11.jpeg"
   ],
   hostel: [
-    "https://ckpcmc.org/images/stationary.jpg",
-    "https://ckpcmc.org/images/stationary2.jpg"
+    "/media/cmc/images/stationary.jpg",
+    "/media/cmc/images/stationary2.jpg"
   ],
   canteen: [
-    "https://ckpcmc.org/images/canteen.jpg"
+    "/media/cmc/images/canteen.jpg"
   ],
   classrooms: [
-    "https://ckpcmc.org/images/classroom2.jpg",
-    "https://ckpcmc.org/images/classrooms.jpg"
+    "/media/cmc/images/classroom2.jpg",
+    "/media/cmc/images/classrooms.jpg"
   ],
   "inter-college": [
-    "https://ckpcmc.org/images/inter_01.jpeg",
-    "https://ckpcmc.org/images/inter_02.jpeg",
-    "https://ckpcmc.org/images/inter_03.jpeg",
-    "https://ckpcmc.org/images/inter_04.jpeg",
-    "https://ckpcmc.org/images/inter_05.jpeg",
-    "https://ckpcmc.org/images/inter_06.jpeg",
-    "https://ckpcmc.org/images/inter_07.jpeg",
-    "https://ckpcmc.org/images/inter_08.jpeg",
-    "https://ckpcmc.org/images/inter_09.jpeg",
-    "https://ckpcmc.org/images/inter_10.jpeg",
-    "https://ckpcmc.org/images/inter_11.jpeg",
-    "https://ckpcmc.org/images/inter_12.jpeg",
-    "https://ckpcmc.org/images/inter_13.jpeg",
-    "https://ckpcmc.org/images/inter_14.jpeg",
-    "https://ckpcmc.org/images/inter_15.jpeg",
-    "https://ckpcmc.org/images/inter_16.jpeg"
+    "/media/cmc/images/inter_01.jpeg",
+    "/media/cmc/images/inter_02.jpeg",
+    "/media/cmc/images/inter_03.jpeg",
+    "/media/cmc/images/inter_04.jpeg",
+    "/media/cmc/images/inter_05.jpeg",
+    "/media/cmc/images/inter_06.jpeg",
+    "/media/cmc/images/inter_07.jpeg",
+    "/media/cmc/images/inter_08.jpeg",
+    "/media/cmc/images/inter_09.jpeg",
+    "/media/cmc/images/inter_10.jpeg",
+    "/media/cmc/images/inter_11.jpeg",
+    "/media/cmc/images/inter_12.jpeg",
+    "/media/cmc/images/inter_13.jpeg",
+    "/media/cmc/images/inter_14.jpeg",
+    "/media/cmc/images/inter_15.jpeg",
+    "/media/cmc/images/inter_16.jpeg"
   ],
   competitions: [
-    "https://ckpcmc.org/images/comp_01.jpeg",
-    "https://ckpcmc.org/images/comp_02.jpeg",
-    "https://ckpcmc.org/images/comp_03.jpeg",
-    "https://ckpcmc.org/images/comp_04.jpeg",
-    "https://ckpcmc.org/images/comp_05.jpeg",
-    "https://ckpcmc.org/images/comp_06.jpeg",
-    "https://ckpcmc.org/images/comp_07.jpeg",
-    "https://ckpcmc.org/images/comp_08.jpeg",
-    "https://ckpcmc.org/images/comp_09.jpeg",
-    "https://ckpcmc.org/images/comp_10.jpeg",
-    "https://ckpcmc.org/images/comp_11.jpeg",
-    "https://ckpcmc.org/images/comp_12.jpeg",
-    "https://ckpcmc.org/images/comp_13.jpeg",
-    "https://ckpcmc.org/images/comp_14.jpeg",
-    "https://ckpcmc.org/images/comp_15.jpeg"
+    "/media/cmc/images/comp_01.jpeg",
+    "/media/cmc/images/comp_02.jpeg",
+    "/media/cmc/images/comp_03.jpeg",
+    "/media/cmc/images/comp_04.jpeg",
+    "/media/cmc/images/comp_05.jpeg",
+    "/media/cmc/images/comp_06.jpeg",
+    "/media/cmc/images/comp_07.jpeg",
+    "/media/cmc/images/comp_08.jpeg",
+    "/media/cmc/images/comp_09.jpeg",
+    "/media/cmc/images/comp_10.jpeg",
+    "/media/cmc/images/comp_11.jpeg",
+    "/media/cmc/images/comp_12.jpeg",
+    "/media/cmc/images/comp_13.jpeg",
+    "/media/cmc/images/comp_14.jpeg",
+    "/media/cmc/images/comp_15.jpeg"
   ],
   gallery: [
-    "https://ckpcmc.org/images/gal_01.jpeg",
-    "https://ckpcmc.org/images/gal_02.jpeg",
-    "https://ckpcmc.org/images/gal_03.jpeg",
-    "https://ckpcmc.org/images/gal_04.jpeg",
-    "https://ckpcmc.org/images/gal_05.jpeg",
-    "https://ckpcmc.org/images/gal_06.jpeg",
-    "https://ckpcmc.org/images/gal_07.jpeg",
-    "https://ckpcmc.org/images/gal_08.jpeg",
-    "https://ckpcmc.org/images/gal_09.jpeg",
-    "https://ckpcmc.org/images/gal_10.jpeg",
-    "https://ckpcmc.org/images/gal_11.jpeg",
-    "https://ckpcmc.org/images/gal_12.jpeg",
-    "https://ckpcmc.org/images/gal_13.jpeg",
-    "https://ckpcmc.org/images/gal_14.jpeg",
-    "https://ckpcmc.org/images/gal_15.jpeg"
+    "/media/cmc/images/gal_01.jpeg",
+    "/media/cmc/images/gal_02.jpeg",
+    "/media/cmc/images/gal_03.jpeg",
+    "/media/cmc/images/gal_04.jpeg",
+    "/media/cmc/images/gal_05.jpeg",
+    "/media/cmc/images/gal_06.jpeg",
+    "/media/cmc/images/gal_07.jpeg",
+    "/media/cmc/images/gal_08.jpeg",
+    "/media/cmc/images/gal_09.jpeg",
+    "/media/cmc/images/gal_10.jpeg",
+    "/media/cmc/images/gal_11.jpeg",
+    "/media/cmc/images/gal_12.jpeg",
+    "/media/cmc/images/gal_13.jpeg",
+    "/media/cmc/images/gal_14.jpeg",
+    "/media/cmc/images/gal_15.jpeg"
   ],
   "media-appreciation": [
-    "https://ckpcmc.org/images/med_01.jpeg",
-    "https://ckpcmc.org/images/med_02.jpeg",
-    "https://ckpcmc.org/images/med_03.jpeg",
-    "https://ckpcmc.org/images/med_04.jpeg",
-    "https://ckpcmc.org/images/med_05.jpeg",
-    "https://ckpcmc.org/images/med_06.jpeg",
-    "https://ckpcmc.org/images/med_07.jpeg",
-    "https://ckpcmc.org/images/med_08.jpeg",
-    "https://ckpcmc.org/images/med_09.jpeg",
-    "https://ckpcmc.org/images/med_10.jpeg",
-    "https://ckpcmc.org/images/med_11.jpeg",
-    "https://ckpcmc.org/images/med_12.jpeg",
-    "https://ckpcmc.org/images/med_13.jpeg",
-    "https://ckpcmc.org/images/med_14.jpeg"
+    "/media/cmc/images/med_01.jpeg",
+    "/media/cmc/images/med_02.jpeg",
+    "/media/cmc/images/med_03.jpeg",
+    "/media/cmc/images/med_04.jpeg",
+    "/media/cmc/images/med_05.jpeg",
+    "/media/cmc/images/med_06.jpeg",
+    "/media/cmc/images/med_07.jpeg",
+    "/media/cmc/images/med_08.jpeg",
+    "/media/cmc/images/med_09.jpeg",
+    "/media/cmc/images/med_10.jpeg",
+    "/media/cmc/images/med_11.jpeg",
+    "/media/cmc/images/med_12.jpeg",
+    "/media/cmc/images/med_13.jpeg",
+    "/media/cmc/images/med_14.jpeg"
   ]
 };
 
 const _ACHIEVEMENTS_DATA: AchievementItem[] = [
   {
     title: "Chess Competition Victory",
-    image_url: "https://ckpcmc.org/images/ch.jpg",
+    image_url: "/media/cmc/images/ch.jpg",
     date: "2024-09-03",
     description: "Organized in C. K. Pithawalla College of Commerce-Management-Computer Application for B.C.A, B.B.A, B.COM students.",
     students: "SHLOK SARANG, PATEL VATSAL, GOSWAMI NILESH, JIKADRA JEMISH, SNEH VASANI, VED THUMMER",
     hashtags: "#Chess #ckpcmc #Achievement #Competition #VNSGU"
   },
   {
-    title: "Aluna Competition — Tattoo Art",
-    image_url: "https://ckpcmc.org/images/WhatsApp%20Image%202024-07-19%20at%208.55.10%20AM%20(3).jpeg",
+    title: "Aluna Competition: Tattoo Art",
+    image_url: "/media/cmc/images/WhatsApp_Image_2024-07-19_at_8.55.10_AM_3_-d5be22.jpeg",
     date: "2024-09-03",
     description: "Traditional tattoo design competition organized in D4 Building on campus.",
     students: "Dhalaria Pranav (TYBBA)",
     hashtags: "#Tattoo #traditional #aluna #ckpcmc #achievement"
   },
   {
-    title: "Aluna Competition — Nail Art",
-    image_url: "https://ckpcmc.org/images/WhatsApp%20Image%202024-07-19%20at%208.55.12%20AM%20(1).jpeg",
+    title: "Aluna Competition: Nail Art",
+    image_url: "/media/cmc/images/WhatsApp_Image_2024-07-19_at_8.55.12_AM_1_-7b83b9.jpeg",
     date: "2024-09-03",
     description: "Creative nail art showcase held during campus cultural festival.",
     students: "Dakhara Yami (TYBCA), Mithusu Sorathiya (FY), Palak Deladia (FY)",
     hashtags: "#NailArt #traditional #aluna #ckpcmc #achievement"
   },
   {
-    title: "Aluna Competition — Traditional Wear",
-    image_url: "https://ckpcmc.org/images/WhatsApp%20Image%202024-07-19%20at%208.55.11%20AM.jpeg",
+    title: "Aluna Competition: Traditional Wear",
+    image_url: "/media/cmc/images/WhatsApp_Image_2024-07-19_at_8.55.11_AM-78b00f.jpeg",
     date: "2024-09-03",
     description: "Cultural traditional attire contest celebrating regional heritage.",
     students: "Tejas Solanki (TYBBA), Jariwala Jenisha (SYBCA), Payal Singh (SYBCA), Kabrawala Krishna (FYBBA)",
     hashtags: "#traditional #aluna #ckpcmc #achievement"
   },
   {
-    title: "Aluna Competition — Mehendi",
-    image_url: "https://ckpcmc.org/images/winer.jpg",
+    title: "Aluna Competition: Mehendi",
+    image_url: "/media/cmc/images/winer.jpg",
     date: "2024-09-03",
     description: "Traditional Mehendi artistry competition across all course batches.",
     students: "Patel Priya (FYBCA), Dakhara Yami (TYBCA), Kapadiya Khushi (FYBBA)",
@@ -418,7 +418,7 @@ const _ACHIEVEMENTS_DATA: AchievementItem[] = [
 const _EVENTS_DATA: EventItem[] = [
   {
     title: "Poetry Recitation Competition",
-    image_url: "https://ckpcmc.org/images/WhatsApp%20Image%202024-09-09%20at%209.58.07%20PM.jpeg",
+    image_url: "/media/cmc/images/WhatsApp_Image_2024-09-09_at_9.58.07_PM-f174fe.jpeg",
     date: "2024-09-09",
     venue_description: "J.Z. Shah Arts & H.P. Desai Commerce College, Amroli",
     coordinators: "Ms. Krishna Khandwala, Ms. Hetal Shrimali, Ms. Apexa Patel, Ms. Rashmi Nayak",
@@ -426,7 +426,7 @@ const _EVENTS_DATA: EventItem[] = [
   },
   {
     title: "Teacher's Day Celebration",
-    image_url: "https://ckpcmc.org/images/Picture1.jpg",
+    image_url: "/media/cmc/images/Picture1.jpg",
     date: "2024-09-05",
     venue_description: "CKPCMC Seminar hall. Acknowledging and honoring faculty contributions to quality higher education.",
     coordinators: "Dr. Tanvi Patel, Ms. Payal Mehta, Ms. Hetal Mehta, Ms. Himisha Kawedia, Ms. Ruchita Lodaliya, Ms. Khushi",
@@ -434,7 +434,7 @@ const _EVENTS_DATA: EventItem[] = [
   },
   {
     title: "Inter-College Boxing Competition",
-    image_url: "https://ckpcmc.org/images/IMG_20240902_104824.jpg",
+    image_url: "/media/cmc/images/IMG_20240902_104824.jpg",
     date: "2024-09-02",
     venue_description: "Organized by V.N.S.G.U. Platform for students to show boxing skills in men's tournament.",
     coordinators: "Mr. Kalpesh Gupta",
@@ -442,7 +442,7 @@ const _EVENTS_DATA: EventItem[] = [
   },
   {
     title: "Debate Competition",
-    image_url: "https://ckpcmc.org/images/WhatsApp%20Image%202024-08-31%20at%202.54.48%20PM.jpeg",
+    image_url: "/media/cmc/images/WhatsApp_Image_2024-08-31_at_2.54.48_PM-9e7ce9.jpeg",
     date: "2024-08-31",
     venue_description: "In Campus. Enhances critical thinking, public speaking, poise, and structured argumentation.",
     coordinators: "Dr. Tanvi Patel, Ms. Payal Mehta, Ms. Hetal Mehta, Ms. Himisha Kawedia, Ms. Ruchita Lodaliya",
@@ -455,19 +455,19 @@ const _NEWS_DATA: NewsItem[] = [
     title: "Sanklan : Inter College Competition",
     description: "Inter College Competition event details & guidelines for participating teams.",
     link: "https://drive.google.com/file/d/1E5I625kpoGE0KNTlcV5G23pRlq8aBDqV/view?usp=sharing",
-    icon_image: "https://ckpcmc.org/images/new.gif"
+    icon_image: "/media/cmc/images/new.gif"
   },
   {
     title: "Application Form For Associate Professor",
     description: "Official recruitment notice and downloadable application form for Associate Professor positions.",
     link: "https://drive.google.com/file/d/1O7w1G-sUqDUZkg4NF5sSkxVyBLbWAJ1S/view",
-    icon_image: "https://ckpcmc.org/images/new.gif"
+    icon_image: "/media/cmc/images/new.gif"
   },
   {
     title: "Application Form for Assistant Professor",
     description: "Official recruitment notice and downloadable application form for Assistant Professor positions.",
     link: "https://drive.google.com/file/d/1T5bdugIxF3l5L1SqXJO24x-CBJBX7X9y/view",
-    icon_image: "https://ckpcmc.org/images/new.gif"
+    icon_image: "/media/cmc/images/new.gif"
   }
 ];
 

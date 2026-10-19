@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useVisionMissionContent } from "../../hooks/useVisionMissionContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
 
 /**
  * The icons an editor can choose from for the core values — the other half of
@@ -74,7 +76,7 @@ export default function VisionMission() {
 
               <blockquote className="relative px-2 sm:px-4">
                 <p className="text-sm sm:text-base md:text-lg font-serif font-bold text-white leading-relaxed tracking-wide text-center uppercase">
-                  {content.vision.statement}
+                  <RichText text={content.vision.statement} />
                 </p>
               </blockquote>
             </div>
@@ -115,7 +117,7 @@ export default function VisionMission() {
                       {mIdx + 1}
                     </div>
                     <p className="text-sm sm:text-base text-slate-800 font-serif font-bold leading-relaxed pt-0.5">
-                      {mission}
+                      <RichText text={mission} />
                     </p>
                   </div>
                 ))}
@@ -148,7 +150,7 @@ export default function VisionMission() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-lg mx-auto sm:max-w-none w-full">
             {content.values.items.map((val, idx) => {
-              const Icon = ICONS[val.icon] ?? Sparkles;
+              const Icon = iconFor(val.icon, ICONS, Sparkles);
               return (
                 <motion.div
                   key={idx}
@@ -169,7 +171,7 @@ export default function VisionMission() {
                         {val.name}
                       </h4>
                       <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                        {val.description}
+                        <RichText text={val.description} />
                       </p>
                     </div>
                   </div>
@@ -190,7 +192,7 @@ export default function VisionMission() {
                 <span className="text-[#123a1a]">{content.cta.headingAccent}</span>
               </h4>
               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                {content.cta.body}
+                <RichText text={content.cta.body} />
               </p>
            </div>
         </div>

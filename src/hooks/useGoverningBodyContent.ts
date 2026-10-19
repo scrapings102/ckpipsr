@@ -42,7 +42,7 @@ export const DEFAULT_GOVERNING_BODY: GoverningBodyContent = {
       name: "Shri Mahesh C. Pithawalla",
       role: "Vice President / Trustee",
       organisation: "Navyug Vidyabhavan Trust",
-      image: "https://ckpipsr.ac.in/images/trustees/mahesh-c-p.jpg",
+      image: "/media/ipsr/images/trustees/mahesh-c-p.jpg",
       credentials: "Trustee, Navyug Vidyabhavan Trust",
       quote: "Guiding institutional expansion, infrastructural investments, and strategic corporate alliances across technical campuses.",
       bio: "Shri Mahesh C. Pithawalla provides executive governance for Navyug Vidyabhavan Trust institutions. His leadership ensures modern laboratory equipment, faculty development, and student welfare facilities across all campuses."
@@ -51,7 +51,7 @@ export const DEFAULT_GOVERNING_BODY: GoverningBodyContent = {
       name: "Shri Biren M. Pithawalla",
       role: "Trustee",
       organisation: "Navyug Vidyabhavan Trust",
-      image: "https://ckpipsr.ac.in/images/trustees/biren-m-p.jpg",
+      image: "/media/ipsr/images/trustees/biren-m-p.jpg",
       credentials: "Trustee, Navyug Vidyabhavan Trust",
       quote: "Spearheading digital learning initiatives, innovation nodal funding, and state-of-the-art research wing development.",
       bio: "Shri Biren M. Pithawalla oversees technology integration, SSIP startup grants, and research facility upgrades across the campus to empower pharmaceutical researchers."
@@ -60,7 +60,7 @@ export const DEFAULT_GOVERNING_BODY: GoverningBodyContent = {
       name: "Shri Rahul A. Pithawalla",
       role: "Trustee",
       organisation: "Navyug Vidyabhavan Trust",
-      image: "https://ckpipsr.ac.in/images/trustees/rahul-a-p.jpg",
+      image: "/media/ipsr/images/trustees/rahul-a-p.jpg",
       credentials: "Trustee, Navyug Vidyabhavan Trust",
       quote: "Promoting entrepreneurial incubation, student startup policy (SSIP) grants, and industrial training placements.",
       bio: "Shri Rahul A. Pithawalla actively fosters the Institutional Innovation Council (IIC) and Training & Placement Cell, building strong pipelines with pharmaceutical industries."
@@ -69,7 +69,7 @@ export const DEFAULT_GOVERNING_BODY: GoverningBodyContent = {
       name: "Shri Ajit C. Pithawalla",
       role: "Trustee",
       organisation: "Navyug Vidyabhavan Trust",
-      image: "https://ckpipsr.ac.in/images/trustees/ajit-c-p.jpg",
+      image: "/media/ipsr/images/trustees/ajit-c-p.jpg",
       credentials: "Trustee, Navyug Vidyabhavan Trust",
       quote: "Preserving organizational ethics, financial compliance, and community outreach healthcare initiatives.",
       bio: "Shri Ajit C. Pithawalla manages trust endowments, scholarship allocations, and community healthcare drives including blood donation and thalassemia campaigns."
@@ -105,7 +105,7 @@ export const DEFAULT_GOVERNING_BODY: GoverningBodyContent = {
       name: "Dr. Kamlesh Zota",
       role: "Member (Industry Nominee)",
       organisation: "Pharmaceutical Industry Leader",
-      image: "https://ckpipsr.ac.in/images/about/kamlesh-zota.png",
+      image: "/media/ipsr/images/about/kamlesh-zota.png",
       credentials: "Pharma Industry Executive | Board Nominee",
       quote: "Bridging industrial pharmaceutical developments with academic curricula and student internships.",
       bio: "Dr. Kamlesh Zota represents the pharmaceutical industry on the governing body, guiding industrial visits, skill workshops, and placement pathways."
@@ -114,7 +114,7 @@ export const DEFAULT_GOVERNING_BODY: GoverningBodyContent = {
       name: "Shri Chandravadan C. Pithawalla",
       role: "Trustee",
       organisation: "Navyug Vidyabhavan Trust",
-      image: "https://ckpipsr.ac.in/images/trustees/chandravadan-c-p.jpg",
+      image: "/api/avatar?name=Shri+Chandravadan+C.+Pithawalla&background=123a1a&color=D4AF37&size=512",
       credentials: "Trustee, Navyug Vidyabhavan Trust",
       quote: "Guiding philanthropic missions, sustainable institution building, and higher education excellence.",
       bio: "Shri Chandravadan C. Pithawalla has served as a devoted trustee and visionary mentor across the Navyug and Pithawalla educational campuses."

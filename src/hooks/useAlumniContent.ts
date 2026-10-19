@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { withPreview } from "./previewToken";
+import { fillFieldText, fillRequired, type FieldText } from "../utils/requiredFields";
 
 /**
  * Students Corner → Alumni (CKPIPSRAA).
  *
  * Committee members arrive with their name and designation already worked
- * out: one linked to the Deans or Faculties page is named from it, and an
+ * out: one linked to the Faculties page is named from it, and an
  * alumnus typed in here is printed as typed.
  *
  * The defaults are a skeleton, not the page's text: unlike the older pages
@@ -17,8 +18,6 @@ export interface AlumniCommitteeMember {
   name: string;
   role: string;
   designation: string;
-  image: string;
-  category: string;
 }
 
 export interface AlumniCommittee {
@@ -29,6 +28,20 @@ export interface AlumniCommittee {
   members: AlumniCommitteeMember[];
   footer: { left: string; right: string };
 }
+
+/** The registration form's boxes, by the name the API uses for each. */
+export type AlumniField =
+  | "fullName"
+  | "email"
+  | "phone"
+  | "degree"
+  | "passingYear"
+  | "enrollmentNo"
+  | "designation"
+  | "company"
+  | "workCity"
+  | "interests"
+  | "message";
 
 export interface AlumniContent {
   pageTitle: string;
@@ -92,6 +105,10 @@ export interface AlumniContent {
     open: boolean;
     closedMessage: string;
   };
+  /** True where the registration form will not send with the box left empty (interests: at least one). */
+  requiredFields: Record<AlumniField, boolean>;
+  /** What each box is called and the hint inside it. The form adds the required star or "(Optional)" itself. */
+  fieldText: Record<AlumniField, FieldText>;
 }
 
 const EMPTY_COMMITTEE: AlumniCommittee = {
@@ -348,88 +365,66 @@ export const DEFAULT_ALUMNI: AlumniContent = {
         name: "Shri Rahulbhai Pithawalla",
         role: "Chairman",
         designation: "Trustee, Navyug Vidyabhavan Trust",
-        image: "https://ckpipsr.ac.in/images/trustees/rahul-a-p.jpg",
-        category: "Trust Management",
       },
       {
         no: 2,
-        name: "Dr. Dhiren P Shah",
+        name: "Dr. Dhiren P. Shah",
         role: "President",
         designation: "Principal, CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-        category: "Institutional Head",
       },
       {
         no: 3,
-        name: "Dr. Bhumika Desai",
+        name: "Dr. Bhumika C. Desai",
         role: "Member Secretary",
         designation: "Assoc. Prof., CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a6308854a00a.webp",
-        category: "Secretariat",
       },
       {
         no: 4,
         name: "Bansari Patel",
         role: "Vice President",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
-        category: "Alumni Leadership",
       },
       {
         no: 5,
         name: "Mr. Paresh G Shah",
         role: "Treasurer",
         designation: "Senior Clerk",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
-        category: "Administration & Finance",
       },
       {
         no: 6,
-        name: "Dr. Vinod Ramani",
+        name: "Dr. Vinodkumar D. Ramani",
         role: "Ex-Officio Member",
         designation: "Assoc. Prof., CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-        category: "Academic Faculty",
       },
       {
         no: 7,
-        name: "Mrs. Kajal Solanki",
+        name: "Mrs. Kajal Chintan Solanki",
         role: "Faculty Coordinators",
         designation: "Asst. Prof. CKPIPSR",
-        image: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&q=80&w=400",
-        category: "Faculty Coordination",
       },
       {
         no: 8,
-        name: "Mrs. Tarkeshwari Ahire",
+        name: "Mrs. Tarkeshwari T. Ahire",
         role: "Faculty Coordinators",
         designation: "Asst. Prof. CKPIPSR",
-        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400",
-        category: "Faculty Coordination",
       },
       {
         no: 9,
         name: "Mitali Patel",
         role: "Representative from student Council",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-        category: "Student Council Rep",
       },
       {
         no: 10,
         name: "Madhu Hardik",
         role: "Representative from student Council",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
-        category: "Student Council Rep",
       },
       {
         no: 11,
         name: "Jayswal Vibha",
         role: "Representative from student Council",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400",
-        category: "Student Council Rep",
       },
     ],
     footer: {
@@ -447,80 +442,60 @@ export const DEFAULT_ALUMNI: AlumniContent = {
         name: "Dr. Dhiren P Shah",
         role: "President",
         designation: "Principal, CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-        category: "Institutional Head",
       },
       {
         no: 2,
         name: "Feral Modi",
         role: "Vice President",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
-        category: "Alumni Leadership",
       },
       {
         no: 3,
         name: "Manish Solanki",
         role: "Secretary",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
-        category: "Alumni Secretariat",
       },
       {
         no: 4,
         name: "Hiren Thakkar",
         role: "Treasurer",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
-        category: "Finance & Accounts",
       },
       {
         no: 5,
         name: "Jaya Indave",
         role: "Program Committee",
         designation: "Alumni, CKPIPSR",
-        image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400",
-        category: "Programs & Events",
       },
       {
         no: 6,
         name: "Dipayan Tarafder",
         role: "Campaigning Committee",
         designation: "Asst. Prof. CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d678047de6f.webp",
-        category: "Campaigning & Outreach",
       },
       {
         no: 7,
         name: "Ms. Shivangi Shrivastav",
         role: "Alumni Talk series Committee",
         designation: "Asst. Prof. CKPIPSR",
-        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-        category: "Talk Series & Webinars",
       },
       {
         no: 8,
         name: "Mrs. Shweta Vaghela",
         role: "Alumni Talk series Committee",
         designation: "Asst. Prof. CKPIPSR",
-        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400",
-        category: "Talk Series & Webinars",
       },
       {
         no: 9,
         name: "Dr. Bhumika Desai",
         role: "Alumni membership and networking drive",
         designation: "Assoc. Prof., CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a6308854a00a.webp",
-        category: "Membership & Networking",
       },
       {
         no: 10,
         name: "Dr. Vinod Ramani",
         role: "Fund Raising Committee",
         designation: "Assoc. Prof., CKPIPSR",
-        image: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-        category: "Fund Raising",
       },
     ],
     footer: {
@@ -540,6 +515,34 @@ export const DEFAULT_ALUMNI: AlumniContent = {
     success: { title: "Registration Submitted!", body: "", again: "Submit Another Entry" },
     open: true,
     closedMessage: "",
+  },
+  // What the form asked for before this could be set.
+  requiredFields: {
+    fullName: true,
+    email: true,
+    phone: true,
+    degree: true,
+    passingYear: true,
+    enrollmentNo: false,
+    designation: true,
+    company: true,
+    workCity: true,
+    interests: false,
+    message: false,
+  },
+  // The words each form showed before they were editable.
+  fieldText: {
+    fullName: { label: "Full Name", placeholder: "e.g. Dr. Rajesh Patel" },
+    email: { label: "Email Address", placeholder: "e.g. rajesh.patel@pharma.com" },
+    phone: { label: "Phone / WhatsApp", placeholder: "+91 98765 43210" },
+    degree: { label: "Degree Completed", placeholder: "" },
+    passingYear: { label: "Year of Passing", placeholder: "" },
+    enrollmentNo: { label: "GTU Enrollment / Roll No", placeholder: "e.g. 192540290001" },
+    designation: { label: "Current Designation", placeholder: "e.g. Senior Research Scientist" },
+    company: { label: "Organization / Company", placeholder: "e.g. Sun Pharma / Zydus / Torrent" },
+    workCity: { label: "City & Country", placeholder: "e.g. Ahmedabad, India / New Jersey, USA" },
+    interests: { label: "How Would You Like to Contribute to CKPIPSR?", placeholder: "" },
+    message: { label: "Message", placeholder: "" }
   },
 };
 
@@ -565,7 +568,13 @@ export function useAlumniContent(): AlumniContent {
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (cancelled || !body) return;
-        if (isUsable(body.alumni)) setContent(body.alumni);
+        if (isUsable(body.alumni)) {
+          setContent({
+            ...body.alumni,
+            requiredFields: fillRequired(DEFAULT_ALUMNI.requiredFields, body.alumni.requiredFields),
+            fieldText: fillFieldText(DEFAULT_ALUMNI.fieldText, body.alumni.fieldText),
+          });
+        }
       })
       // The page does not depend on the API being up.
       .catch(() => undefined);

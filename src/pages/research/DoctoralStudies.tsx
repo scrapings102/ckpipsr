@@ -10,6 +10,7 @@ import {
   Sparkles
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import { useResearchDoctoral } from "../../hooks/useResearchDoctoral";
 
 export default function DoctoralStudies() {
@@ -24,7 +25,7 @@ export default function DoctoralStudies() {
       category="research-and-innovation"
       activeItemLabel="Research - Doctoral Studies"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
         
         {/* Main Doctoral Studies Table Card */}
         <motion.div
@@ -61,7 +62,7 @@ export default function DoctoralStudies() {
 
           {/* Official Formatted Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm font-sans">
+            <table className="w-full min-w-[760px] text-left border-collapse text-xs sm:text-sm font-sans">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-800 font-serif">
                   <th className="py-4 px-4 font-bold text-center w-14 text-slate-900">
@@ -183,7 +184,7 @@ export default function DoctoralStudies() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && (

@@ -54,7 +54,7 @@ export default function Patents() {
       category="research-and-innovation"
       activeItemLabel="Research - Patents"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
         
         {/* Header Introduction & Search Card */}
         <motion.div
@@ -211,7 +211,7 @@ export default function Patents() {
                       <span>Published Date</span>
                     </span>
                     <p className="font-mono font-bold text-slate-900 text-xs mt-0.5">
-                      {patent.publishedDate || "—"}
+                      {patent.publishedDate || "–"}
                     </p>
                   </div>
                 </div>

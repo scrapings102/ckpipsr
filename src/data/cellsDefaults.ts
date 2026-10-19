@@ -45,7 +45,7 @@ export const DEFAULT_COMMITTEES: Record<string, PublicCommittee> = {
       links: [
         {
           label: "Circular",
-          url: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/643e618a22187.pdf"
+          url: "/media/trust/app/institutes/102/departments/docs/643e618a22187.pdf"
         }
       ]
     },
@@ -406,15 +406,15 @@ export const DEFAULT_COMMITTEES: Record<string, PublicCommittee> = {
       links: [
         {
           label: "UGC Circular",
-          url: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/643e5e7d7ed21.pdf"
+          url: "/media/trust/app/institutes/102/departments/docs/643e5e7d7ed21.pdf"
         },
         {
           label: "GTU Circular",
-          url: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/643e5ea2cc27b.pdf"
+          url: "/media/trust/app/institutes/102/departments/docs/643e5ea2cc27b.pdf"
         },
         {
           label: "AICTE Circular",
-          url: "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/643e5efe7df27.pdf"
+          url: "/media/trust/app/institutes/102/departments/docs/643e5efe7df27.pdf"
         }
       ]
     },

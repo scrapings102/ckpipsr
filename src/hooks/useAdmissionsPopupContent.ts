@@ -10,10 +10,12 @@ import { withPreview } from "./previewToken";
  * switched it off — the page waits for the real answer before deciding.
  */
 export interface AdmissionsPopupContent {
+  /** The popup's own switch and the Admissions band's "open", both on; the server works it out. */
   isEnabled: boolean;
   /** Milliseconds after the intro finishes. */
   autoOpenDelayMs: number;
   image: string;
+  /** `alt` and `eyebrow` arrive with the year from the Admissions band filled in. */
   alt: string;
   eyebrow: string;
   title: string;
@@ -27,11 +29,11 @@ export interface AdmissionsPopupContent {
 export const DEFAULT_ADMISSIONS_POPUP: AdmissionsPopupContent = {
   isEnabled: true,
   autoOpenDelayMs: 1200,
-  image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80",
+  image: "/media/unsplash/photo-1541339907198-e08756dedf3f-1b102b.jpg",
   alt: "Admissions 2026-27",
   eyebrow: "Admissions Open 2026-27",
   title: "C.K. Pithawalla Institute",
-  ctaLabel: "Apply Now",
+  ctaLabel: "Inquiry Now",
   ctaHref: "https://gujacpc.admissions.nic.in/",
   ctaIsExternal: true,
 };

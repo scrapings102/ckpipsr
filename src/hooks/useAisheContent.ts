@@ -68,7 +68,7 @@ export const DEFAULT_AISHE: AisheContent = {
       "academicYear": "AY 2024-2025",
       "year": 2024,
       "description": "Official All India Survey on Higher Education (AISHE) certificate and compliance data submission for the Academic Year 2024-25.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/68f072aa648f6.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/68f072aa648f6.pdf",
       "openLabel": "Open AISHE 2024-25",
       "hasFile": true
     },
@@ -78,7 +78,7 @@ export const DEFAULT_AISHE: AisheContent = {
       "academicYear": "AY 2023-2024",
       "year": 2023,
       "description": "Official All India Survey on Higher Education (AISHE) certificate and compliance data submission for the Academic Year 2023-24.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/68f07292237b3.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/68f07292237b3.pdf",
       "openLabel": "Open AISHE 2023-24",
       "hasFile": true
     },
@@ -88,7 +88,7 @@ export const DEFAULT_AISHE: AisheContent = {
       "academicYear": "AY 2022-2023",
       "year": 2022,
       "description": "Official All India Survey on Higher Education (AISHE) certificate and compliance data submission for the Academic Year 2022-23.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e4082ea3964.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/66e4082ea3964.pdf",
       "openLabel": "Open AISHE 2022-23",
       "hasFile": true
     },
@@ -98,7 +98,7 @@ export const DEFAULT_AISHE: AisheContent = {
       "academicYear": "AY 2021-2022",
       "year": 2021,
       "description": "Official All India Survey on Higher Education (AISHE) certificate and compliance data submission for the Academic Year 2021-22.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/642680143b2b4.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/642680143b2b4.pdf",
       "openLabel": "Open AISHE 2021-22",
       "hasFile": true
     },
@@ -108,7 +108,7 @@ export const DEFAULT_AISHE: AisheContent = {
       "academicYear": "AY 2020-2021",
       "year": 2020,
       "description": "Official All India Survey on Higher Education (AISHE) certificate and compliance data submission for the Academic Year 2020-21.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/64267ff401721.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/64267ff401721.pdf",
       "openLabel": "Open AISHE 2020-21",
       "hasFile": true
     },
@@ -118,7 +118,7 @@ export const DEFAULT_AISHE: AisheContent = {
       "academicYear": "AY 2019-2020",
       "year": 2019,
       "description": "Official All India Survey on Higher Education (AISHE) certificate and compliance data submission for the Academic Year 2019-20.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/64267fd8890a9.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/64267fd8890a9.pdf",
       "openLabel": "Open AISHE 2019-20",
       "hasFile": true
     }

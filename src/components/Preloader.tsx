@@ -5,10 +5,11 @@ import { usePreloaderContent } from "../hooks/usePreloaderContent";
 
 gsap.registerPlugin(Flip);
 
-// The images shown, their order, and the pace are edited in the admin panel
-// under Homepage -> Loader. They are picked from the hero's own images so the
-// final one can zoom into the hero without a seam. `usePreloaderContent` falls
-// back to what this file used to hold if the API is unreachable.
+// The images shown, their order, and the speed are edited in the admin panel
+// under Home page -> Loader. They are the loader's own photos, separate from
+// the hero's; the final one zooms to fullscreen and the hero fades in over it.
+// `usePreloaderContent` falls back to what this file used to hold if the API
+// is unreachable.
 
 interface PreloaderProps {
   onExitStart: () => void;
@@ -216,10 +217,12 @@ export default function Preloader({ onExitStart, onComplete }: PreloaderProps) {
 
       <header className="preloader-header">
         <div className="header-inner flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-6 w-full text-center sm:text-left">
-          <div className="header-left font-bold text-[#4CBB17] text-[11px] sm:text-[12px] tracking-widest">ESTD. 2005</div>
+          <div className="header-left font-bold text-[#4CBB17] text-[11px] sm:text-[12px] tracking-widest">{ready && content.established}</div>
           <div className="header-middle flex justify-center text-center">
             <span className="font-sans font-bold text-[11.5px] sm:text-[14px] md:text-[16px] tracking-[0.05em] text-[#123005] leading-snug text-center uppercase">
-              C.K. Pithawalla Institute of Pharmaceutical Science and Research
+              {/* Held back until the content has settled, like the photos below, so the
+                  shipped wording never shows for a moment before the edited one. */}
+              {ready && content.instituteName}
             </span>
           </div>
           <div className="header-right hidden sm:block w-[80px]" />
@@ -319,10 +322,9 @@ const CSS = `
   border-radius: 0;
   overflow: hidden;
 }
-/* Must match HERO_IMAGES[0].position in Hero.tsx — the preloader's final
-   image and the hero's first image are the same file, and the crossfade
-   only looks seamless if both crop it identically. Changing one requires
-   changing the other. */
+/* Matches HERO_IMAGES[0].position in Hero.tsx, so when the loader ends on
+   one of the hero's photos the crossfade crops it identically. A crop chosen
+   in the panel (#view) is applied on top of this by utils/pictureView.ts. */
 .image-wrapper.is-fullscreen img {
   border-radius: 0;
   object-fit: cover;
@@ -351,7 +353,7 @@ const CSS = `
   z-index: 30; 
   pointer-events: none;
   opacity: 0.055; 
-  background-image: url("https://assets.iceable.com/img/noise-transparent.png");
+  background-image: url("/media/misc/iceable-noise-transparent.png");
   background-repeat: repeat; 
   animation: noise-animation-preloader 0.4s steps(2) infinite; 
 }

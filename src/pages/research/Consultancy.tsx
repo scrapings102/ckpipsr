@@ -13,6 +13,7 @@ import {
   Landmark,
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import { useResearchConsultancy, type ConsultancyTone } from "../../hooks/useResearchConsultancy";
 
 /** The status pill colours a status can choose from. */
@@ -57,7 +58,7 @@ export default function Consultancy() {
       category="research-and-innovation"
       activeItemLabel="Research - Consultancy"
     >
-      <div className="space-y-8 max-w-5xl mx-auto">
+      <div className="space-y-8 w-full">
 
         {/* Header Introduction Card */}
         <motion.div
@@ -245,7 +246,7 @@ export default function Consultancy() {
                         ₹ {project.cost}
                       </span>
                       <span className="text-[10px] font-sans text-emerald-700">
-                        Total Project Layout
+                        Total Project Outlay
                       </span>
                     </div>
 
@@ -309,7 +310,7 @@ export default function Consultancy() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && (

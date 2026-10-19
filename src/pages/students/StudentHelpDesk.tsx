@@ -33,7 +33,9 @@ import {
     Filter
 } from 'lucide-react';
 import SubPageLayout from '../../components/SubPageLayout';
-import { useStudentHelpDeskContent } from '../../hooks/useStudentHelpDeskContent';
+import { Select } from '../../components/ui/Select';
+import { useStudentHelpDeskContent, type HelpDeskField } from '../../hooks/useStudentHelpDeskContent';
+import { RichText, plainText } from '../../utils/RichText';
 
 // ── Types ──
 /**
@@ -76,6 +78,45 @@ const ALLOWED_FILE_TYPES = [
     'image/png',
     'image/webp',
 ];
+
+/**
+ * What follows a label: the red star when the panel has made the box
+ * required, the grey "(Optional)" note when it has not.
+ */
+function FieldMark({ required, note }: { required: boolean; note?: string }) {
+    return required ? (
+        <span className="text-rose-500">*</span>
+    ) : (
+        <span className="text-slate-400 text-[10px] font-normal normal-case">(Optional{note ? `, ${note}` : ''})</span>
+    );
+}
+
+/** The red line under a box that is not filled in as it should be. */
+function FieldError({ message }: { message: string | null | false }) {
+    if (!message) return null;
+    return (
+        <p className="text-xs text-rose-600 mt-1.5 flex items-center gap-1 font-medium">
+            <AlertCircle size={13} />
+            <span>{message}</span>
+        </p>
+    );
+}
+
+/**
+ * The drop zone's hint. The words "browse files" keep their underline, as the
+ * page always showed them, wherever the panel's wording puts them.
+ */
+function dropZoneText(hint: string) {
+    const at = hint.toLowerCase().lastIndexOf('browse files');
+    if (at < 0) return hint;
+    return (
+        <>
+            {hint.slice(0, at)}
+            <span className="text-[#96771d] underline">{hint.slice(at, at + 12)}</span>
+            {hint.slice(at + 12)}
+        </>
+    );
+}
 
 /** A time as the timeline prints it. */
 const stamp = (iso: string) => {
@@ -129,11 +170,14 @@ export default function StudentHelpDesk() {
 
     // ── Track Ticket State ──
     //
-    // Both the reference and the email are asked for: references run in
-    // sequence, so a reference on its own would let anyone read anyone’s ticket.
+    // Both a lookup and the email are asked for: references run in sequence,
+    // so a reference on its own would let anyone read anyone’s ticket. The
+    // lookup is the ticket reference or the student’s roll / enrolment number;
+    // a roll number can match several tickets, newest first.
     const [searchTicketId, setSearchTicketId] = useState('');
     const [trackEmail, setTrackEmail] = useState('');
-    const [trackedTicket, setTrackedTicket] = useState<TrackedTicket | null>(null);
+    const [trackedTickets, setTrackedTickets] = useState<TrackedTicket[]>([]);
+    const [openTicketRef, setOpenTicketRef] = useState<string | null>(null);
     const [trackError, setTrackError] = useState<string | null>(null);
     const [trackBusy, setTrackBusy] = useState(false);
 
@@ -165,47 +209,70 @@ export default function StudentHelpDesk() {
     const isEmailValid = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
     const isPhoneValid = (val: string) => val.trim() === '' || /^\d{10}$/.test(val.trim());
 
-    const nameError = touched.fullName && fullName.trim().length === 0
-        ? 'Full name is required.'
-        : null;
+    // The panel decides which boxes must be filled in. A box left optional may
+    // stay empty, but what is typed into it still has to make sense.
+    const required = content.requiredFields;
+    const text = content.fieldText;
+    const values: Record<HelpDeskField, string> = {
+        fullName,
+        email,
+        phone,
+        studentCode,
+        course,
+        semester,
+        issueCategory,
+        priority,
+        contactMethod,
+        subject,
+        description,
+        attachment: file ? file.name : '',
+    };
+    const isMissing = (field: HelpDeskField) => required[field] && values[field].trim() === '';
+    const missingError = (field: HelpDeskField, message: string) =>
+        touched[field] && isMissing(field) ? message : null;
+
+    const nameError = missingError('fullName', 'Full name is required.');
 
     const emailError = touched.email && (
-        email.trim().length === 0
+        isMissing('email')
             ? 'Email address is required.'
-            : !isEmailValid(email)
+            : email.trim() !== '' && !isEmailValid(email)
                 ? 'Please enter a valid email address.'
                 : null
     );
 
-    const phoneError = touched.phone && !isPhoneValid(phone)
-        ? 'Phone number must be exactly 10 digits.'
-        : null;
+    const phoneError = touched.phone && (
+        isMissing('phone')
+            ? 'Phone number is required.'
+            : !isPhoneValid(phone)
+                ? 'Phone number must be exactly 10 digits.'
+                : null
+    );
 
-    const categoryError = touched.issueCategory && issueCategory === ''
-        ? 'Please select an issue category.'
-        : null;
-
-    const subjectError = touched.subject && subject.trim().length === 0
-        ? 'Subject / Short title is required.'
-        : null;
+    const studentCodeError = missingError('studentCode', 'Student roll code or enrollment number is required.');
+    const courseError = missingError('course', 'Please select your program.');
+    const semesterError = missingError('semester', 'Please select your semester.');
+    const categoryError = missingError('issueCategory', 'Please select an issue category.');
+    const priorityError = missingError('priority', 'Please select a priority.');
+    const contactMethodError = missingError('contactMethod', 'Please choose how we should contact you.');
+    const subjectError = missingError('subject', 'Subject / Short title is required.');
 
     const descriptionError = touched.description && (
-        description.trim().length === 0
+        isMissing('description')
             ? 'Detailed description is required.'
             : description.length > MAX_DESCRIPTION_LENGTH
                 ? `Description exceeds ${MAX_DESCRIPTION_LENGTH} characters.`
                 : null
     );
 
+    const attachmentError = missingError('attachment', 'Please attach a supporting document.');
+
     // ── Overall Form Validity ──
+    const FIELD_ORDER = Object.keys(values) as HelpDeskField[];
     const isValid =
-        fullName.trim().length > 0 &&
-        email.trim().length > 0 &&
-        isEmailValid(email) &&
+        !FIELD_ORDER.some(isMissing) &&
+        (email.trim() === '' || isEmailValid(email)) &&
         isPhoneValid(phone) &&
-        issueCategory !== '' &&
-        subject.trim().length > 0 &&
-        description.trim().length > 0 &&
         description.length <= MAX_DESCRIPTION_LENGTH &&
         fileError === null &&
         isConfirmed;
@@ -277,7 +344,30 @@ export default function StudentHelpDesk() {
     // invents one, so what the student quotes always names a row.
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isValid || submitState === 'sending') return;
+        if (submitState === 'sending') return;
+        // A press with something missing shows every error at once and moves to
+        // the first one, so the student is told what to fix rather than facing
+        // a button that does nothing.
+        if (!isValid) {
+            setTouched((prev) => ({ ...prev, ...Object.fromEntries([...FIELD_ORDER, 'consent'].map((f) => [f, true])) }));
+            const firstMissing = [
+                ...FIELD_ORDER.map((field): [boolean, string] => [
+                    isMissing(field) ||
+                        (field === 'email' && email.trim() !== '' && !isEmailValid(email)) ||
+                        (field === 'phone' && !isPhoneValid(phone)) ||
+                        (field === 'description' && description.length > MAX_DESCRIPTION_LENGTH),
+                    field,
+                ]),
+                [!isConfirmed, 'confirm-details'] as [boolean, string],
+            ].find(([missing]) => missing)?.[1];
+            if (firstMissing) {
+                const el = document.getElementById(firstMissing);
+                el?.focus();
+                // The drop zone for a file is not a box that takes focus.
+                if (el && document.activeElement !== el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
 
         setSubmitState('sending');
         setSubmitError(null);
@@ -354,11 +444,12 @@ export default function StudentHelpDesk() {
     };
 
     // ── Handle Track Ticket Lookup ──
-    const runTrack = async (reference: string, emailUsed: string) => {
+    const runTrack = async (lookup: string, emailUsed: string) => {
         setTrackError(null);
-        if (!reference.trim() || !emailUsed.trim()) {
-            setTrackError('Enter both your ticket reference and the email address you raised it with.');
-            setTrackedTicket(null);
+        setOpenTicketRef(null);
+        if (!lookup.trim() || !emailUsed.trim()) {
+            setTrackError('Enter your ticket reference or roll number, and the email address you raised it with.');
+            setTrackedTickets([]);
             return;
         }
 
@@ -367,14 +458,16 @@ export default function StudentHelpDesk() {
             const res = await fetch('/api/help-desk/track', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reference: reference.trim(), email: emailUsed.trim() }),
+                body: JSON.stringify({ lookup: lookup.trim(), email: emailUsed.trim() }),
             });
             const payload = await res.json().catch(() => null);
             if (!res.ok) throw new Error(payload?.error ?? 'That ticket could not be found.');
-            setTrackedTicket(payload.ticket);
+            const tickets: TrackedTicket[] = Array.isArray(payload?.tickets) ? payload.tickets : [];
+            if (tickets.length === 0) throw new Error('That ticket could not be found.');
+            setTrackedTickets(tickets);
         } catch (err) {
             setTrackError(err instanceof Error ? err.message : 'That ticket could not be found.');
-            setTrackedTicket(null);
+            setTrackedTickets([]);
         } finally {
             setTrackBusy(false);
         }
@@ -407,6 +500,84 @@ export default function StudentHelpDesk() {
         }));
     };
 
+    // The tracked ticket card, in three parts so a list of tickets can show
+    // each one's heading as the row that opens it.
+    const ticketSummary = (trackedTicket: TrackedTicket, Title: 'h3' | 'span') => (
+        <>
+            <div>
+                {/* In a list row the chevron takes width, so the line may wrap rather than break the reference. */}
+                <div className={`flex items-center gap-2 ${Title === 'span' ? 'flex-wrap gap-y-1' : ''}`}>
+                    <span className="font-mono text-xs font-bold text-slate-400 uppercase">Ticket ID:</span>
+                    <span className={`font-mono font-bold text-xl text-[#123a1a] ${Title === 'span' ? 'whitespace-nowrap' : ''}`}>{trackedTicket.reference}</span>
+                    <span className={`px-3 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider ${trackedTicket.status === 'Resolved'
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                        : trackedTicket.status === 'In Progress'
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            : 'bg-blue-100 text-blue-900 border border-blue-300'
+                        }`}>
+                        {trackedTicket.status}
+                    </span>
+                </div>
+                <Title className="block font-serif font-bold text-lg text-slate-900 mt-1">{trackedTicket.subject}</Title>
+            </div>
+
+            <div className="text-left sm:text-right text-xs text-slate-500 font-mono">
+                <div>Submitted: {new Date(trackedTicket.submittedAt).toLocaleDateString()}</div>
+                <div>SLA Target: <span className="font-bold text-slate-800">{slaFor(trackedTicket.priority) || 'As scheduled'}</span></div>
+            </div>
+        </>
+    );
+
+    const ticketProgress = (trackedTicket: TrackedTicket) => (
+        <>
+            {/* Ticket Progress Timeline */}
+            <div>
+                <h4 className="font-serif font-bold text-base text-slate-900 mb-6 flex items-center gap-2">
+                    <Clock size={18} className="text-[#D4AF37]" />
+                    <span>Live Progress Timeline</span>
+                </h4>
+
+                <div className="relative pl-6 border-l-2 border-slate-200 space-y-6">
+                    {timelineFor(trackedTicket).map((step, idx) => (
+                        <div key={idx} className="relative group">
+                            <div className={`absolute -left-[31px] top-0 w-4 h-4 rounded-full border-2 bg-white ${step.completed
+                                ? 'border-emerald-600 bg-emerald-500'
+                                : 'border-slate-300'
+                                }`} />
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                <span className={`font-sans text-sm font-bold ${step.completed ? 'text-slate-900' : 'text-slate-400'}`}>
+                                    {step.title}
+                                </span>
+                                <span className="font-mono text-xs text-slate-400">{step.date}</span>
+                            </div>
+                            {step.note && (
+                                <p className="text-xs text-slate-600 mt-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                    {step.note}
+                                </p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Details Grid */}
+            <div className="bg-[#FAF8F3] rounded-2xl p-5 border border-slate-200/60 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span className="text-slate-400 uppercase font-mono text-[10px] block">Student Name</span>
+                    <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.fullName}</span>
+                </div>
+                <div>
+                    <span className="text-slate-400 uppercase font-mono text-[10px] block">Course &amp; Semester</span>
+                    <span className="font-bold text-slate-800 text-sm mt-0.5 block">{[trackedTicket.course, trackedTicket.semester].filter(Boolean).join(' · ') || 'Not specified'}</span>
+                </div>
+                <div>
+                    <span className="text-slate-400 uppercase font-mono text-[10px] block">Assigned Nodal Officer</span>
+                    <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.assignedOfficer || content.success.defaultOfficer}</span>
+                </div>
+            </div>
+        </>
+    );
+
     /** What the page promises for a ticket at the priority chosen. */
     const slaFor = (value: string) =>
         content.form.priorities.find((p) => p.value === value)?.sla ?? '';
@@ -423,7 +594,7 @@ export default function StudentHelpDesk() {
             const matchesCategory = selectedFaqCategory === 'All' || faq.category === selectedFaqCategory;
             const matchesSearch =
                 faq.question.toLowerCase().includes(faqSearchQuery.toLowerCase()) ||
-                faq.answer.toLowerCase().includes(faqSearchQuery.toLowerCase());
+                plainText(faq.answer).toLowerCase().includes(faqSearchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
     }, [faqSearchQuery, selectedFaqCategory]);
@@ -435,7 +606,7 @@ export default function StudentHelpDesk() {
             category="students-corner"
             activeItemLabel="Student Help Desk"
         >
-            <div className="max-w-6xl mx-auto font-sans space-y-10">
+            <div className="w-full font-sans space-y-10">
 
                 {/* ── TAB 1: RAISE TICKET FORM ── */}
                 {activeTab === 'raise' && (
@@ -452,7 +623,7 @@ export default function StudentHelpDesk() {
                                 </h2>
 
                                 <p className="text-[#2D2424]/80 text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-6">
-                                    Thank you, <span className="font-semibold text-[#2D2424]">{generatedTicket.fullName}</span>. {content.success.lead}
+                                    Thank you, <span className="font-semibold text-[#2D2424]">{generatedTicket.fullName}</span>. <RichText text={content.success.lead} />
                                 </p>
 
                                 {/* Ticket Reference Code Highlight */}
@@ -470,7 +641,7 @@ export default function StudentHelpDesk() {
 
                                 {content.success.note && (
                                     <p className="text-xs text-slate-500 max-w-xl mx-auto -mt-5 mb-8">
-                                        {content.success.note}
+                                        <RichText text={content.success.note} />
                                     </p>
                                 )}
 
@@ -555,16 +726,16 @@ export default function StudentHelpDesk() {
                                         {/* Full Name */}
                                         <div className="sm:col-span-2">
                                             <label htmlFor="fullName" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Full Name <span className="text-rose-500">*</span>
+                                                {text.fullName.label} <FieldMark required={required.fullName} />
                                             </label>
                                             <input
                                                 id="fullName"
                                                 type="text"
-                                                required
+                                                required={required.fullName}
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
                                                 onBlur={() => markTouched('fullName')}
-                                                placeholder="Enter your full legal name as per college record"
+                                                placeholder={text.fullName.placeholder}
                                                 className={`w-full px-4 py-3 rounded-xl bg-white border ${nameError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
                                                     } text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs`}
                                             />
@@ -579,16 +750,16 @@ export default function StudentHelpDesk() {
                                         {/* Email Address */}
                                         <div>
                                             <label htmlFor="email" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Email Address <span className="text-rose-500">*</span>
+                                                {text.email.label} <FieldMark required={required.email} />
                                             </label>
                                             <input
                                                 id="email"
                                                 type="email"
-                                                required
+                                                required={required.email}
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 onBlur={() => markTouched('email')}
-                                                placeholder="your.email@example.com"
+                                                placeholder={text.email.placeholder}
                                                 className={`w-full px-4 py-3 rounded-xl bg-white border ${emailError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
                                                     } text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs`}
                                             />
@@ -603,16 +774,17 @@ export default function StudentHelpDesk() {
                                         {/* Phone Number */}
                                         <div>
                                             <label htmlFor="phone" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Phone Number <span className="text-slate-400 text-[10px] font-normal normal-case">(Optional, 10 digits)</span>
+                                                {text.phone.label} <FieldMark required={required.phone} note="10 digits" />
                                             </label>
                                             <input
                                                 id="phone"
                                                 type="tel"
+                                                required={required.phone}
                                                 maxLength={10}
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                                                 onBlur={() => markTouched('phone')}
-                                                placeholder="10-digit mobile number"
+                                                placeholder={text.phone.placeholder}
                                                 className={`w-full px-4 py-3 rounded-xl bg-white border ${phoneError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
                                                     } text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs`}
                                             />
@@ -627,56 +799,60 @@ export default function StudentHelpDesk() {
                                         {/* Student Code / Roll No */}
                                         <div>
                                             <label htmlFor="studentCode" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Student Roll Code / Enrollment No <span className="text-slate-400 text-[10px] font-normal normal-case">(Optional)</span>
+                                                {text.studentCode.label} <FieldMark required={required.studentCode} />
                                             </label>
                                             <input
                                                 id="studentCode"
                                                 type="text"
+                                                required={required.studentCode}
                                                 value={studentCode}
                                                 onChange={(e) => setStudentCode(e.target.value)}
-                                                placeholder="e.g. UG240015 or GTU Enrollment No"
-                                                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs"
+                                                onBlur={() => markTouched('studentCode')}
+                                                placeholder={text.studentCode.placeholder}
+                                                className={`w-full px-4 py-3 rounded-xl bg-white border ${studentCodeError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
+                                                    } text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs`}
                                             />
+                                            <FieldError message={studentCodeError} />
                                         </div>
 
                                         {/* Course Options (Pharmacy specific) */}
                                         <div>
                                             <label htmlFor="course" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Academic Program / Course <span className="text-slate-400 text-[10px] font-normal normal-case">(Optional)</span>
+                                                {text.course.label} <FieldMark required={required.course} />
                                             </label>
-                                            <select
+                                            <Select
                                                 id="course"
+                                                tone="gold"
+                                                required={required.course}
                                                 value={course}
-                                                onChange={(e) => setCourse(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] text-[#2D2424] text-sm outline-none transition-all shadow-xs cursor-pointer"
-                                            >
-                                                <option value="">Select Pharmacy Program...</option>
-                                                {COURSE_OPTIONS.map((c) => (
-                                                    <option key={c} value={c}>
-                                                        {c}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                onChange={setCourse}
+                                                onBlur={() => markTouched('course')}
+                                                placeholder={text.course.placeholder}
+                                                options={COURSE_OPTIONS.map((c) => ({ value: c, label: c }))}
+                                                className={`w-full px-4 py-3 rounded-xl bg-white border ${courseError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
+                                                    } text-[#2D2424] text-sm outline-none transition-all shadow-xs cursor-pointer`}
+                                            />
+                                            <FieldError message={courseError} />
                                         </div>
 
                                         {/* Semester */}
                                         <div className="sm:col-span-2">
                                             <label htmlFor="semester" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Current Semester <span className="text-slate-400 text-[10px] font-normal normal-case">(Optional)</span>
+                                                {text.semester.label} <FieldMark required={required.semester} />
                                             </label>
-                                            <select
+                                            <Select
                                                 id="semester"
+                                                tone="gold"
+                                                required={required.semester}
                                                 value={semester}
-                                                onChange={(e) => setSemester(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] text-[#2D2424] text-sm outline-none transition-all shadow-xs cursor-pointer"
-                                            >
-                                                <option value="">Select Semester...</option>
-                                                {SEMESTER_OPTIONS.map((s) => (
-                                                    <option key={s} value={s}>
-                                                        {s}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                onChange={setSemester}
+                                                onBlur={() => markTouched('semester')}
+                                                placeholder={text.semester.placeholder}
+                                                options={SEMESTER_OPTIONS.map((s) => ({ value: s, label: s }))}
+                                                className={`w-full px-4 py-3 rounded-xl bg-white border ${semesterError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
+                                                    } text-[#2D2424] text-sm outline-none transition-all shadow-xs cursor-pointer`}
+                                            />
+                                            <FieldError message={semesterError} />
                                         </div>
                                     </div>
                                 </section>
@@ -701,24 +877,20 @@ export default function StudentHelpDesk() {
                                         {/* Issue Category */}
                                         <div>
                                             <label htmlFor="issueCategory" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Issue Category <span className="text-rose-500">*</span>
+                                                {text.issueCategory.label} <FieldMark required={required.issueCategory} />
                                             </label>
-                                            <select
+                                            <Select
                                                 id="issueCategory"
-                                                required
+                                                tone="gold"
+                                                required={required.issueCategory}
                                                 value={issueCategory}
-                                                onChange={(e) => setIssueCategory(e.target.value)}
+                                                onChange={setIssueCategory}
                                                 onBlur={() => markTouched('issueCategory')}
+                                                placeholder={text.issueCategory.placeholder}
+                                                options={ISSUE_CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
                                                 className={`w-full px-4 py-3 rounded-xl bg-white border ${categoryError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
                                                     } text-[#2D2424] text-sm outline-none transition-all shadow-xs cursor-pointer`}
-                                            >
-                                                <option value="">Select Category...</option>
-                                                {ISSUE_CATEGORIES.map((cat) => (
-                                                    <option key={cat} value={cat}>
-                                                        {cat}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            />
                                             {categoryError && (
                                                 <p className="text-xs text-rose-600 mt-1.5 flex items-center gap-1 font-medium">
                                                     <AlertCircle size={13} />
@@ -730,29 +902,27 @@ export default function StudentHelpDesk() {
                                         {/* Priority Level */}
                                         <div>
                                             <label htmlFor="priority" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Priority Level <span className="text-slate-400 text-[10px] font-normal normal-case">(Defaults to {content.form.defaultPriority})</span>
+                                                {text.priority.label} {required.priority && <><FieldMark required />{' '}</>}<span className="text-slate-400 text-[10px] font-normal normal-case">({required.priority ? '' : 'Optional, '}Defaults to {content.form.defaultPriority})</span>
                                             </label>
-                                            <select
+                                            <Select
                                                 id="priority"
+                                                tone="gold"
                                                 value={priority}
-                                                onChange={(e) => setPriority(e.target.value)}
+                                                onChange={setPriority}
+                                                options={PRIORITY_OPTIONS}
                                                 className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] text-[#2D2424] text-sm outline-none transition-all shadow-xs cursor-pointer"
-                                            >
-                                                {PRIORITY_OPTIONS.map((p) => (
-                                                    <option key={p.value} value={p.value}>
-                                                        {p.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            />
+                                            <FieldError message={priorityError} />
                                         </div>
 
                                         {/* Preferred Contact Method */}
                                         <div className="sm:col-span-2">
                                             <label className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Preferred Contact Method
+                                                {text.contactMethod.label} <FieldMark required={required.contactMethod} />
                                             </label>
                                             <div className="flex gap-3 max-w-xs">
                                                 <button
+                                                    id="contactMethod"
                                                     type="button"
                                                     onClick={() => setContactMethod('Email')}
                                                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${contactMethod === 'Email'
@@ -775,21 +945,22 @@ export default function StudentHelpDesk() {
                                                     <span>Phone</span>
                                                 </button>
                                             </div>
+                                            <FieldError message={contactMethodError} />
                                         </div>
 
                                         {/* Subject / Short Title */}
                                         <div className="sm:col-span-2">
                                             <label htmlFor="subject" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80 mb-2">
-                                                Subject / Short Title <span className="text-rose-500">*</span>
+                                                {text.subject.label} <FieldMark required={required.subject} />
                                             </label>
                                             <input
                                                 id="subject"
                                                 type="text"
-                                                required
+                                                required={required.subject}
                                                 value={subject}
                                                 onChange={(e) => setSubject(e.target.value)}
                                                 onBlur={() => markTouched('subject')}
-                                                placeholder="Brief summary of your inquiry or issue (e.g. GTU Marksheet Verification)"
+                                                placeholder={text.subject.placeholder}
                                                 className={`w-full px-4 py-3 rounded-xl bg-white border ${subjectError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
                                                     } text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs`}
                                             />
@@ -805,7 +976,7 @@ export default function StudentHelpDesk() {
                                         <div className="sm:col-span-2">
                                             <div className="flex items-center justify-between mb-2">
                                                 <label htmlFor="description" className="block font-sans text-xs font-bold uppercase tracking-wider text-[#2D2424]/80">
-                                                    Detailed Description <span className="text-rose-500">*</span>
+                                                    {text.description.label} <FieldMark required={required.description} />
                                                 </label>
                                                 <span className={`font-mono text-[11px] ${description.length > MAX_DESCRIPTION_LENGTH ? 'text-rose-600 font-bold' : 'text-slate-400'
                                                     }`}>
@@ -815,11 +986,11 @@ export default function StudentHelpDesk() {
                                             <textarea
                                                 id="description"
                                                 rows={5}
-                                                required
+                                                required={required.description}
                                                 value={description}
                                                 onChange={(e) => setDescription(e.target.value)}
                                                 onBlur={() => markTouched('description')}
-                                                placeholder="Please describe what happened, dates, GTU enrollment number, semester, or error messages encountered."
+                                                placeholder={text.description.placeholder}
                                                 className={`w-full px-4 py-3 rounded-xl bg-white border ${descriptionError ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200 focus:border-[#D4AF37]'
                                                     } text-[#2D2424] text-sm placeholder:text-slate-400 outline-none transition-all shadow-xs resize-y leading-relaxed`}
                                             />
@@ -842,6 +1013,8 @@ export default function StudentHelpDesk() {
                                         <div>
                                             <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#2D2424]">
                                                 {content.form.attachment.heading}
+                                                {/* The blurb under the heading already says when it is optional. */}
+                                                {required.attachment && <> <FieldMark required /></>}
                                             </h2>
                                             <p className="text-xs sm:text-sm text-[#2D2424]/70 mt-1">
                                                 {content.form.attachment.blurb}
@@ -860,6 +1033,7 @@ export default function StudentHelpDesk() {
 
                                     {!file ? (
                                         <div
+                                            id="attachment"
                                             onDragOver={handleDragOver}
                                             onDragLeave={handleDragLeave}
                                             onDrop={handleDrop}
@@ -873,7 +1047,7 @@ export default function StudentHelpDesk() {
                                                 <UploadCloud size={24} />
                                             </div>
                                             <p className="font-sans font-bold text-sm text-[#2D2424] mb-1">
-                                                Drag and drop document here, or <span className="text-[#96771d] underline">browse files</span>
+                                                {dropZoneText(text.attachment.placeholder)}
                                             </p>
                                             <p className="text-xs text-slate-400">
                                                 {content.form.attachment.hint}
@@ -911,6 +1085,7 @@ export default function StudentHelpDesk() {
                                             <span>{fileError}</span>
                                         </p>
                                     )}
+                                    {!fileError && <FieldError message={attachmentError} />}
                                 </section>
 
                                 {/* ── Section 4: Confirmation & Actions ── */}
@@ -918,6 +1093,7 @@ export default function StudentHelpDesk() {
                                     {/* Checkbox Confirmation */}
                                     <label className="flex items-start gap-3 cursor-pointer select-none group">
                                         <input
+                                            id="confirm-details"
                                             type="checkbox"
                                             checked={isConfirmed}
                                             onChange={(e) => setIsConfirmed(e.target.checked)}
@@ -927,6 +1103,13 @@ export default function StudentHelpDesk() {
                                             {content.form.consent}
                                         </span>
                                     </label>
+
+                                    {touched.consent && !isConfirmed && (
+                                        <p className="text-xs text-rose-600 flex items-start gap-1.5 font-medium">
+                                            <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                                            <span>Please tick the box to confirm the details are correct.</span>
+                                        </p>
+                                    )}
 
                                     {submitError && (
                                         <p className="text-xs text-rose-600 flex items-start gap-1.5 font-medium">
@@ -939,7 +1122,7 @@ export default function StudentHelpDesk() {
                                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                                         <button
                                             type="submit"
-                                            disabled={!isValid || submitState === 'sending'}
+                                            disabled={submitState === 'sending'}
                                             className="flex-1 sm:flex-initial px-8 py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#C19A20] text-[#1a1208] font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer active:scale-98 text-center flex items-center justify-center gap-2"
                                         >
                                             <Send size={16} />
@@ -970,7 +1153,7 @@ export default function StudentHelpDesk() {
                                 {content.track.heading}
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-600 mb-6">
-                                {content.track.blurb}
+                                <RichText text={content.track.blurb} />
                             </p>
 
                             <form onSubmit={handleTrackSearch} className="flex flex-col gap-3 max-w-xl">
@@ -983,7 +1166,7 @@ export default function StudentHelpDesk() {
                                             onChange={(e) => setSearchTicketId(e.target.value)}
                                             aria-label={content.track.referenceLabel}
                                             placeholder={content.track.referenceLabel}
-                                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] font-mono text-sm uppercase text-[#2D2424] outline-none shadow-xs"
+                                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#D4AF37] font-mono text-sm text-[#2D2424] outline-none shadow-xs"
                                         />
                                     </div>
 
@@ -1019,76 +1202,51 @@ export default function StudentHelpDesk() {
                         </div>
 
                         {/* Tracked Ticket Results Card */}
-                        {trackedTicket && (
+                        {trackedTickets.length === 1 && (
                             <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8 animate-in fade-in zoom-in duration-200">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-mono text-xs font-bold text-slate-400 uppercase">Ticket ID:</span>
-                                            <span className="font-mono font-bold text-xl text-[#123a1a]">{trackedTicket.reference}</span>
-                                            <span className={`px-3 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider ${trackedTicket.status === 'Resolved'
-                                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                                                : trackedTicket.status === 'In Progress'
-                                                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                                    : 'bg-blue-100 text-blue-900 border border-blue-300'
-                                                }`}>
-                                                {trackedTicket.status}
-                                            </span>
-                                        </div>
-                                        <h3 className="font-serif font-bold text-lg text-slate-900 mt-1">{trackedTicket.subject}</h3>
-                                    </div>
-
-                                    <div className="text-left sm:text-right text-xs text-slate-500 font-mono">
-                                        <div>Submitted: {new Date(trackedTicket.submittedAt).toLocaleDateString()}</div>
-                                        <div>SLA Target: <span className="font-bold text-slate-800">{slaFor(trackedTicket.priority) || 'As scheduled'}</span></div>
-                                    </div>
+                                    {ticketSummary(trackedTickets[0], 'h3')}
                                 </div>
+                                {ticketProgress(trackedTickets[0])}
+                            </div>
+                        )}
 
-                                {/* Ticket Progress Timeline */}
-                                <div>
-                                    <h4 className="font-serif font-bold text-base text-slate-900 mb-6 flex items-center gap-2">
-                                        <Clock size={18} className="text-[#D4AF37]" />
-                                        <span>Live Progress Timeline</span>
-                                    </h4>
-
-                                    <div className="relative pl-6 border-l-2 border-slate-200 space-y-6">
-                                        {timelineFor(trackedTicket).map((step, idx) => (
-                                            <div key={idx} className="relative group">
-                                                <div className={`absolute -left-[31px] top-0 w-4 h-4 rounded-full border-2 bg-white ${step.completed
-                                                    ? 'border-emerald-600 bg-emerald-500'
-                                                    : 'border-slate-300'
-                                                    }`} />
-                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                                                    <span className={`font-sans text-sm font-bold ${step.completed ? 'text-slate-900' : 'text-slate-400'}`}>
-                                                        {step.title}
-                                                    </span>
-                                                    <span className="font-mono text-xs text-slate-400">{step.date}</span>
+                        {/* A roll number can match several tickets: one row each, opened one at a time. */}
+                        {trackedTickets.length > 1 && (
+                            <div className="space-y-4 animate-in fade-in duration-200">
+                                <p className="text-xs sm:text-sm text-slate-600">
+                                    {trackedTickets.length} tickets match. The newest is first. Open one to see its progress.
+                                </p>
+                                {trackedTickets.map((ticket) => {
+                                    const isOpen = openTicketRef === ticket.reference;
+                                    return (
+                                        <div
+                                            key={ticket.reference}
+                                            className="bg-white border border-slate-200/90 rounded-3xl shadow-sm overflow-hidden"
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() => setOpenTicketRef(isOpen ? null : ticket.reference)}
+                                                aria-expanded={isOpen}
+                                                className="w-full p-6 sm:p-8 flex items-center gap-4 text-left hover:bg-slate-50/50 cursor-pointer"
+                                            >
+                                                <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                                    {ticketSummary(ticket, 'span')}
                                                 </div>
-                                                {step.note && (
-                                                    <p className="text-xs text-slate-600 mt-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                                        {step.note}
-                                                    </p>
+                                                {isOpen ? (
+                                                    <ChevronUp size={20} className="text-[#96771d] shrink-0" />
+                                                ) : (
+                                                    <ChevronDown size={20} className="text-slate-400 shrink-0" />
                                                 )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Details Grid */}
-                                <div className="bg-[#FAF8F3] rounded-2xl p-5 border border-slate-200/60 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                                    <div>
-                                        <span className="text-slate-400 uppercase font-mono text-[10px] block">Student Name</span>
-                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.fullName}</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-slate-400 uppercase font-mono text-[10px] block">Course &amp; Semester</span>
-                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{[trackedTicket.course, trackedTicket.semester].filter(Boolean).join(' · ') || 'Not specified'}</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-slate-400 uppercase font-mono text-[10px] block">Assigned Nodal Officer</span>
-                                        <span className="font-bold text-slate-800 text-sm mt-0.5 block">{trackedTicket.assignedOfficer || content.success.defaultOfficer}</span>
-                                    </div>
-                                </div>
+                                            </button>
+                                            {isOpen && (
+                                                <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-6 border-t border-slate-100 space-y-8 animate-in fade-in duration-200">
+                                                    {ticketProgress(ticket)}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -1104,7 +1262,7 @@ export default function StudentHelpDesk() {
                                     {content.faqs.heading}
                                 </h2>
                                 <p className="text-xs sm:text-sm text-slate-600">
-                                    {content.faqs.blurb}
+                                    <RichText text={content.faqs.blurb} />
                                 </p>
                             </div>
 
@@ -1170,7 +1328,7 @@ export default function StudentHelpDesk() {
 
                                             {isOpen && (
                                                 <div className="px-6 pb-6 pt-2 border-t border-slate-100 text-sm text-slate-600 space-y-4 animate-in fade-in duration-200">
-                                                    <p className="leading-relaxed font-sans">{faq.answer}</p>
+                                                    <p className="leading-relaxed font-sans"><RichText text={faq.answer} /></p>
                                                     {faq.steps && faq.steps.length > 0 && (
                                                         <div className="bg-[#FAF8F3] rounded-xl p-4 border border-amber-200/50 space-y-2">
                                                             <span className="text-xs font-mono font-bold uppercase text-amber-900 block">Step-by-Step Procedure:</span>
@@ -1199,7 +1357,7 @@ export default function StudentHelpDesk() {
                                 {content.forms.heading}
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-600">
-                                {content.forms.blurb}
+                                <RichText text={content.forms.blurb} />
                             </p>
                         </div>
 
@@ -1218,7 +1376,7 @@ export default function StudentHelpDesk() {
                                             {form.title}
                                         </h3>
                                         <p className="text-xs text-slate-500 leading-relaxed">
-                                            {form.description}
+                                            <RichText text={form.description} />
                                         </p>
                                     </div>
 
@@ -1246,7 +1404,7 @@ export default function StudentHelpDesk() {
                                 {content.directory.heading}
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-600">
-                                {content.directory.blurb}
+                                <RichText text={content.directory.blurb} />
                             </p>
                         </div>
 
@@ -1271,10 +1429,13 @@ export default function StudentHelpDesk() {
                                                 {officer.email}
                                             </a>
                                         </div>
+                                        {/* A linked officer without a Faculties mobile has no number to show. */}
+                                        {officer.phone && (
                                         <div className="flex items-center gap-2 text-slate-700">
                                             <Phone size={14} className="text-[#D4AF37] shrink-0" />
                                             <span>{officer.phone}</span>
                                         </div>
+                                        )}
                                         <div className="flex items-center gap-2 text-slate-700">
                                             <MapPin size={14} className="text-[#D4AF37] shrink-0" />
                                             <span className="font-sans text-slate-600">{officer.office}</span>

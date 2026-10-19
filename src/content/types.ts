@@ -1454,7 +1454,7 @@ export interface SeoRoute {
   path: string;
   /**
    * The tab title, shown exactly as written. Empty = use the page's own
-   * heading (followed by "| CKPCMC Surat"). On `/` the Homepage SEO section's
+   * heading (followed by "| CKPIPSR Surat"). On `/` the Homepage SEO section's
    * title takes precedence.
    */
   title: string;

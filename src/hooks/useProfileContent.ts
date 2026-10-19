@@ -64,7 +64,7 @@ export const DEFAULT_PROFILE: ProfileContent = {
     slides: [
       { url: "/images/hero/66e151f0d6a90.webp", title: "CKPIPSR Main Campus", subtitle: "C. K. Pithawalla Educational Complex, Surat" },
       { url: "/images/hero/66e153e687221.webp", title: "Advanced Pharmaceutical Labs", subtitle: "State-of-the-art Research & Practical Facilities" },
-      { url: "https://ckpipsr.ac.in/images/about/founder.jpg", title: "Visionary Legacy", subtitle: "Honoring Late Shri Chhotubhai Pithawalla" },
+      { url: "/media/ipsr/images/about/founder.jpg", title: "Visionary Legacy", subtitle: "Honoring Late Shri Chhotubhai Pithawalla" },
       { url: "/images/hero/65efeaeece007.webp", title: "Academic Excellence", subtitle: "Nurturing Future Pharmacy Professionals" },
       { url: "/images/hero/66e15283951b9.webp", title: "Modern Infrastructure", subtitle: "Equipped with latest educational technology" },
       { url: "/images/hero/66e1522d09fc0.webp", title: "Campus Environment", subtitle: "Lush green surroundings for holistic development" },

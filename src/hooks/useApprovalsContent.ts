@@ -30,11 +30,12 @@ export interface ApprovalsContent {
   compliance: {
     title: string;
     body: string;
+    image: string;
     stats: { icon: string; value: string; label: string }[];
   };
 }
 
-const DOCS = "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs";
+const DOCS = "/media/trust/app/institutes/102/departments/docs";
 
 export const DEFAULT_APPROVALS: ApprovalsContent = {
   pageTitle: "Regulatory Approvals",
@@ -84,6 +85,7 @@ export const DEFAULT_APPROVALS: ApprovalsContent = {
   compliance: {
     title: "Committed to Compliance",
     body: "Our institution maintains 100% transparency with all regulatory requirements, regularly undergoing audits and inspections to ensure the highest academic standards.",
+    image: "/images/hero/college_campus.jpg",
     stats: [
       { icon: "Building2", value: "GTU", label: "Affiliated" },
       { icon: "Award", value: "PCI", label: "Approved" },

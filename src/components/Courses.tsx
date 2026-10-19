@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { DEFAULT_HOME_COURSES, useHomeCoursesContent } from "../hooks/useHomeCoursesContent";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown } from "lucide-react";
+import { RichText } from "../utils/RichText";
 
 // --- Types ---
 interface AccordionItemData {
@@ -22,62 +25,6 @@ interface AccordionItemProps {
   isActive: boolean;
   onSelect: () => void;
 }
-
-// --- Data for the image accordion ---
-const accordionItems: AccordionItemData[] = [
-  {
-    id: 1,
-    title: "D.Pharm",
-    subtitle: "Diploma in Pharmacy (2 Years)",
-    desc: "A 2-year foundational PCI-approved program in pharmaceutical sciences, hospital pharmacy operations, dispensing, and community healthcare practice.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=2070&auto=format&fit=crop",
-    duration: "2 Years (Annual Pattern)",
-    intake: "60 Seats",
-    eligibility: "10+2 with Physics, Chemistry & Biology/Mathematics",
-    highlights: ["PCI & AICTE Approved", "Hospital Training", "GTU Affiliated", "Modern Dispensing Lab"],
-    link: "/academics/courses-offered-d-pharm",
-  },
-  {
-    id: 2,
-    title: "B.Pharm",
-    subtitle: "Bachelor of Pharmacy (4 Years)",
-    desc: "A comprehensive 4-year undergraduate degree which includes pharmaceutical chemistry, pharmaceutics, pharmacology, and pharmacognosy with full industrial training.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop",
-    duration: "4 Years (8 Semesters)",
-    intake: "100 Seats",
-    eligibility: "10+2 with PCB/PCM + GUJCET / ACPC merit",
-    highlights: ["PCI Approved", "Industrial Internship", "Advanced Machine Room", "Campus Placements"],
-    link: "/academics/courses-offered-b-pharm",
-  },
-  {
-    id: 3,
-    title: "M.Pharm",
-    subtitle: "Master of Pharmacy (2 Years)",
-    desc: "A 2-year specialized post-graduate research degree in Pharmaceutics to foster advanced formulation design, drug delivery, and regulatory science.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1579165466541-71e226318137?q=80&w=2070&auto=format&fit=crop",
-    duration: "2 Years (4 Semesters)",
-    intake: "15 Seats (Pharmaceutics)",
-    eligibility: "B.Pharm with 55%+ from recognized university + GPAT / ACPC",
-    highlights: ["Novel Drug Delivery Systems (NDDS)", "HPLC & Instrumental Lab", "Industry Projects", "Research Publications"],
-    link: "/academics/courses-offered-m-pharm",
-  },
-  {
-    id: 4,
-    title: "Certificate Course",
-    subtitle: "Short Term Certificate (60 Hours)",
-    desc: "Specialized professional certificate program in Pharmaceutical Dossier Preparation & Filing (CTD / eCTD format) for regulatory affairs careers.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop",
-    duration: "60 Hours Intensive",
-    intake: "Batch-wise Selection",
-    eligibility: "Enrolled in or Completed B.Pharm / M.Pharm",
-    highlights: ["CTD / eCTD Module Preparation", "Global Regulatory Guidelines", "Hands-on Practical Case Studies", "Industry Certification"],
-    link: "/academics/courses-offered-short-term-certificate",
-  },
-];
 
 // --- Desktop Accordion Item Component ---
 const AccordionItem = ({ item, isActive, onSelect }: AccordionItemProps) => {
@@ -106,7 +53,7 @@ const AccordionItem = ({ item, isActive, onSelect }: AccordionItemProps) => {
           const target = e.target as HTMLImageElement;
           target.onerror = null;
           target.src =
-            "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop";
+            "/media/unsplash/photo-1517694712202-14dd9538aa97-3b3f9c.jpg";
         }}
       />
       {/* Dark overlay for better text readability */}
@@ -131,10 +78,30 @@ const AccordionItem = ({ item, isActive, onSelect }: AccordionItemProps) => {
 
 // --- Main Courses Component ---
 export default function Courses() {
+  // Edited under Homepage, Courses in the admin panel.
+  const content = useHomeCoursesContent();
+  const accordionItems: AccordionItemData[] = content.items.map((item, i) => ({
+    id: i + 1,
+    title: item.title,
+    subtitle: item.subtitle,
+    desc: item.description,
+    imageUrl: item.image,
+    duration: item.duration,
+  }));
   const [activeIndex, setActiveIndex] = useState(0); // For desktop view (default B.Pharm/D.Pharm)
   const [activeMobileIndex, setActiveMobileIndex] = useState<number | null>(0); // For mobile view accordion
 
-  const scrollToAdmissions = () => {
+  const navigate = useNavigate();
+
+  // An address set in the panel opens that page (another site in a new tab);
+  // without one the button scrolls down to the admissions band.
+  const onApply = () => {
+    const href = content.buttonHref;
+    if (href) {
+      if (href.startsWith("/")) navigate(href);
+      else window.open(href, "_blank", "noopener,noreferrer");
+      return;
+    }
     const el = document.getElementById("admissions");
     if (el) {
       if ((window as any).lenis) {
@@ -156,15 +123,17 @@ export default function Courses() {
           <div className="w-full md:w-[45%] text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#112815]/5 text-[#112815] text-xs font-bold uppercase tracking-widest rounded-full mb-4 md:mb-6">
               <span className="w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse" />
-              Offered Courses
+              {content.eyebrow}
             </div>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#112815] font-bold leading-tight mb-4 md:mb-8">
-              Academic Programmes
+              {content.heading}
             </h2>
 
-            {/* Mobile-only descriptive hint */}
+            {/* Phone-only instruction for using the tiles. It is part of the
+                layout, not content, so it is fixed here rather than edited in the
+                panel, where it read as a box of its own. */}
             <p className="text-slate-600 text-sm leading-relaxed mb-6 md:hidden">
-              Tap on any course box below to view detailed program curriculum, eligibility criteria, and admission guidance.
+              {DEFAULT_HOME_COURSES.mobileHint}
             </p>
 
             {/* Dynamic Card for Active Course - DESKTOP ONLY */}
@@ -173,17 +142,17 @@ export default function Courses() {
                 {activeItem.title} - <span className="text-[#112815]">{activeItem.subtitle}</span>
               </h3>
               <p className="text-[#112815]/80 leading-relaxed font-sans text-sm md:text-base font-medium transition-opacity duration-300">
-                {activeItem.desc}
+                <RichText text={activeItem.desc} />
               </p>
             </div>
 
             {/* Desktop Apply Button */}
             <div className="hidden md:block mt-8">
               <button
-                onClick={scrollToAdmissions}
+                onClick={onApply}
                 className="px-8 py-4 bg-[#D4AF37] hover:bg-[#112815] text-[#112815] hover:text-white font-sans font-bold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 group shadow-xl shadow-[#D4AF37]/25 cursor-pointer select-none active:scale-95"
               >
-                Apply for Admission
+                {content.buttonLabel}
               </button>
             </div>
           </div>
@@ -237,7 +206,7 @@ export default function Courses() {
                             const target = e.target as HTMLImageElement;
                             target.onerror = null;
                             target.src =
-                              "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop";
+                              "/media/unsplash/photo-1517694712202-14dd9538aa97-3b3f9c.jpg";
                           }}
                         />
 
@@ -312,14 +281,14 @@ export default function Courses() {
                                 {item.title} - <span className="text-[#112815]">{item.subtitle}</span>
                               </h3>
                               <p className="text-[#112815]/80 leading-relaxed font-sans text-sm sm:text-base font-medium mb-6">
-                                {item.desc}
+                                <RichText text={item.desc} />
                               </p>
                               <div>
                                 <button
-                                  onClick={scrollToAdmissions}
-                                  className="px-7 py-3.5 bg-[#D4AF37] hover:bg-[#112815] text-[#112815] hover:text-white font-sans font-bold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md shadow-[#D4AF37]/25 cursor-pointer select-none active:scale-95"
+                                  onClick={onApply}
+                                  className="w-full sm:w-auto px-7 py-3.5 bg-[#D4AF37] hover:bg-[#112815] text-[#112815] hover:text-white font-sans font-bold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md shadow-[#D4AF37]/25 cursor-pointer select-none active:scale-95 text-center flex items-center justify-center"
                                 >
-                                  Apply for Admission
+                                  {content.buttonLabel}
                                 </button>
                               </div>
                             </div>

@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useRef,
   useCallback,
-  useMemo,
 } from 'react';
 import './ckpipsr-navbar-shape.css';
 import CurvedSweep from './CurvedSweep.tsx';
@@ -62,124 +61,29 @@ import {
 } from 'lucide-react';
 import CkpcmcLogo from './CkpcmcLogo';
 import { useLenis } from '../context/LenisContext';
+import { previewToken, withPreview } from '../hooks/previewToken';
+import { useFooterContent } from '../hooks/useFooterContent';
+import { useAdmissionsContent } from '../hooks/useAdmissionsContent';
 import {
-  ckpipsrNavigation,
-  categoryUrlPrefixes,
-  categoryDisplayNames,
-  slugify,
-} from '../data/ckpipsrContent';
-import {
-  courseHref,
-  courseNavLabel,
-  useCourses,
-  visibleCourses,
-  type CourseEntry,
-} from '../hooks/useCourses';
-import { useNavFeatured, type NavFeaturedMenu } from '../hooks/useNavFeatured';
-import { useCellsMenu, type CellsMenuItem } from '../hooks/useCellsMenu';
+  NAV_DOCK_IDS,
+  NAV_MENU_IDS,
+  type NavMenu,
+  type NavMenuChild,
+  type NavMenuLink,
+  type NavMenusContent,
+} from '../hooks/useNavMenusContent';
+import { navPages, overlayName, useSiteNav } from '../utils/navMenus';
+import { iconFor } from '../utils/iconFor';
 
-const navItems = Object.keys(ckpipsrNavigation).map((categoryLabel) => {
-  const jsonKey =
-    Object.keys(categoryDisplayNames).find(
-      (k) => categoryDisplayNames[k] === categoryLabel,
-    ) || '';
-  const urlPrefix = categoryUrlPrefixes[jsonKey] || slugify(categoryLabel);
-  return {
-    name: categoryLabel,
-    id: urlPrefix,
-    dropdown: ckpipsrNavigation[categoryLabel].map((item) => item.label),
-    align: 'left' as const,
-  };
-});
-
-export interface GroupedNavItem {
-  isParent: boolean;
-  label: string;
-  path?: string;
-  children?: { label: string; fullLabel: string; path: string }[];
-}
-
-export function groupNavItems(
-  items: { label: string; path: string }[],
-): GroupedNavItem[] {
-  const result: GroupedNavItem[] = [];
-  const processed = new Set<string>();
-
-  const parentCandidates = new Set<string>();
-  items.forEach((item) => {
-    const idx = item.label.indexOf(' - ');
-    if (idx !== -1) {
-      const parentName = item.label.substring(0, idx).trim();
-      parentCandidates.add(parentName);
-    }
-  });
-
-  items.forEach((item) => {
-    if (processed.has(item.label)) return;
-
-    const idx = item.label.indexOf(' - ');
-    if (idx !== -1) {
-      const parentName = item.label.substring(0, idx).trim();
-      if (!processed.has(parentName)) {
-        processed.add(parentName);
-        const children = items
-          .filter((i) => i.label.startsWith(parentName + ' - '))
-          .map((i) => {
-            processed.add(i.label);
-            const childLabel = i.label.substring(parentName.length + 3).trim();
-            return {
-              label: childLabel,
-              fullLabel: i.label,
-              path: i.path,
-            };
-          });
-
-        const parentItem = items.find((i) => i.label === parentName);
-
-        result.push({
-          isParent: true,
-          label: parentName,
-          path: parentItem?.path,
-          children,
-        });
-      }
-    } else {
-      if (parentCandidates.has(item.label)) {
-        if (!processed.has(item.label)) {
-          processed.add(item.label);
-          const children = items
-            .filter((i) => i.label.startsWith(item.label + ' - '))
-            .map((i) => {
-              processed.add(i.label);
-              const childLabel = i.label
-                .substring(item.label.length + 3)
-                .trim();
-              return {
-                label: childLabel,
-                fullLabel: i.label,
-                path: i.path,
-              };
-            });
-
-          result.push({
-            isParent: true,
-            label: item.label,
-            path: item.path,
-            children,
-          });
-        }
-      } else {
-        processed.add(item.label);
-        result.push({
-          isParent: false,
-          label: item.label,
-          path: item.path,
-        });
-      }
-    }
-  });
-
-  return result;
+/**
+ * The enquiry phone and email in the top bars: the first of each on the Contact
+ * Us page, which the footer already fetches, so they are typed once.
+ */
+function useEnquiryContact() {
+  const contact = useFooterContent().contact;
+  const phone = contact?.phones[0] ?? '+91 63550 65636';
+  const email = contact?.emails[0] ?? 'ckpipsr@gmail.com';
+  return { phone, email, tel: `tel:${phone.replace(/[^\d+]/g, '')}` };
 }
 
 function useSmoothScrollTo() {
@@ -250,22 +154,6 @@ function useSmoothScrollTo() {
   };
 }
 
-const resolveNavItemPath = (
-  category: string,
-  subItemName: string,
-): string | undefined => {
-  const navItem = ckpipsrNavigation[category]?.find(
-    (ni) => ni.label === subItemName,
-  );
-  if (navItem?.path) return navItem.path;
-
-  const jsonKey = Object.keys(categoryDisplayNames).find(
-    (k) => categoryDisplayNames[k] === category,
-  );
-  const prefix = jsonKey ? categoryUrlPrefixes[jsonKey] : slugify(category);
-  return `/${prefix}/${slugify(subItemName)}`;
-};
-
 const bottomNavItems = [
   { name: 'About Us', id: 'about-us' },
   { name: 'Academics', id: 'academics' },
@@ -277,587 +165,30 @@ const bottomNavItems = [
   { name: 'Activities', id: 'activities' },
 ];
 
-const landingNavItems = [
-  { name: 'Home', id: 'home', icon: HomeIcon },
-  { name: 'About Us', id: 'about', icon: Info },
-  { name: 'News & Gazette', id: 'university-gazette', icon: Newspaper },
-  { name: "Principal's Message", id: 'principal-message', icon: FileText },
-  { name: 'Courses Offered', id: 'courses', icon: BookOpen },
-  { name: 'Campus Life', id: 'campus-life', icon: Building2 },
-  { name: 'Blogs & Magazine', id: 'blogs-magazine', icon: Sparkles },
-  { name: 'Admissions', id: 'admissions', icon: UserCheck },
-];
-
-const dropdownDetails: Record<
-  string,
-  {
-    desc: string;
-    icon: React.ComponentType<{ size?: number; className?: string }>;
-  }
-> = {
-  'About Us': { desc: 'Milestones and legacy of CKPIPSR', icon: Info },
-  Profile: { desc: 'Overview and background of CKPIPSR', icon: Info },
-  'Vision and Mission': {
-    desc: 'Our foundational pillars and goals',
-    icon: Target,
-  },
-  'PO and PEOs': {
-    desc: 'Program outcomes and educational objectives',
-    icon: Target,
-  },
-  'About Trust': {
-    desc: 'Navyug Vidyabhavan Trust history',
-    icon: HeartHandshake,
-  },
-  'The Founder': { desc: 'Honoring Shri Chhotubhai Pithawalla', icon: Award },
-  'Governing Body': {
-    desc: 'Distinguished members of the governing council',
-    icon: Users,
-  },
-  'The Principal': {
-    desc: 'Leadership message and vision from Dr. Dhiren Shah',
-    icon: FileText,
-  },
-  'Deans and Faculty In-charges': {
-    desc: 'Academic council and department heads',
-    icon: Users,
-  },
-  'Campus Map': {
-    desc: 'Interactive campus layout, blocks, and directions',
-    icon: Compass,
-  },
-  'Contact Us': { desc: 'Location, timings, and contact details', icon: Phone },
-  'Courses Offered': {
-    desc: 'D.Pharm, B.Pharm, and M.Pharm programs',
-    icon: BookOpen,
-  },
-  'Courses Offered - D.Pharm': {
-    desc: 'Diploma in Pharmacy (2 Years)',
-    icon: BookOpen,
-  },
-  'Courses Offered - B.Pharm': {
-    desc: 'Bachelor of Pharmacy (4 Years)',
-    icon: BookOpen,
-  },
-  'Courses Offered - M.Pharm': {
-    desc: 'Master of Pharmacy (2 Years)',
-    icon: Sparkles,
-  },
-  'Courses Offered - Short Term Certificate': {
-    desc: 'Online dossier & skill program',
-    icon: Award,
-  },
-  Faculties: {
-    desc: 'Our qualified academic guides and researchers',
-    icon: Users,
-  },
-  Resources: {
-    desc: 'Campus infrastructure and central facilities',
-    icon: Building2,
-  },
-  'Anti-Ragging Committee': {
-    desc: 'Zero-tolerance safety protocols & vigilance',
-    icon: Shield,
-  },
-  ARC: { desc: 'Anti-Ragging Committee, Squad & Reporting', icon: Shield },
-  WDC: {
-    desc: 'Women Development Cell & Gender Equality',
-    icon: HeartHandshake,
-  },
-  'Women Cell': {
-    desc: 'Women Development Cell & Gender Equality',
-    icon: HeartHandshake,
-  },
-  'ST-SC Cell': {
-    desc: 'Equal opportunities & welfare resources',
-    icon: UserCheck,
-  },
-  'SC-ST Cell': {
-    desc: 'Equal opportunities, empowerment & welfare resources',
-    icon: UserCheck,
-  },
-  GRC: {
-    desc: 'Grievance Redressal Cell & fair student resolution',
-    icon: Scale,
-  },
-  Grievance: {
-    desc: 'Grievance Redressal Cell & fair student resolution',
-    icon: Scale,
-  },
-  ADC: {
-    desc: 'Anti-Discrimination Cell & Equal Opportunity',
-    icon: ShieldCheck,
-  },
-  'Anti-Discrimination Cell': {
-    desc: 'Anti-Discrimination Cell & Equal Opportunity',
-    icon: ShieldCheck,
-  },
-  EDC: { desc: 'Entrepreneurship Development Cell & Innovation', icon: Rocket },
-  'Entrepreneurship Development Cell': {
-    desc: 'Entrepreneurship Development Cell & Innovation',
-    icon: Rocket,
-  },
-  GSC: {
-    desc: 'Gender Sensitization Cell & Equality Promotion',
-    icon: HeartHandshake,
-  },
-  'Gender Sensitization Cell': {
-    desc: 'Gender Sensitization Cell & Equality Promotion',
-    icon: HeartHandshake,
-  },
-  'Research - About': {
-    desc: 'Research & Development Cell, Vision, Mission & Policy',
-    icon: FlaskConical,
-  },
-  'About Research': {
-    desc: 'Research & Development Cell, Vision, Mission & Policy',
-    icon: FlaskConical,
-  },
-  'Research - Publications': {
-    desc: 'Annual research journals & publications',
-    icon: FileText,
-  },
-  Publications: {
-    desc: 'Annual research journals & publications',
-    icon: FileText,
-  },
-  'Research Publications': {
-    desc: 'Annual research journals & publications',
-    icon: FileText,
-  },
-  'Research - Patents': {
-    desc: 'Granted patents & innovative technology filings',
-    icon: Award,
-  },
-  Patents: {
-    desc: 'Granted patents & innovative technology filings',
-    icon: Award,
-  },
-  'Research - Books': {
-    desc: 'Authored textbooks, monographs & book chapters',
-    icon: BookOpen,
-  },
-  Books: {
-    desc: 'Authored textbooks, monographs & book chapters',
-    icon: BookOpen,
-  },
-  'Books & Chapters': {
-    desc: 'Authored textbooks, monographs & book chapters',
-    icon: BookOpen,
-  },
-  'Research - Doctoral Studies': {
-    desc: 'Ph.D. research scholars, approved GTU guides & theses',
-    icon: GraduationCap,
-  },
-  'Doctoral Studies': {
-    desc: 'Ph.D. research scholars, approved GTU guides & theses',
-    icon: GraduationCap,
-  },
-  'Ph.D. Studies': {
-    desc: 'Ph.D. research scholars, approved GTU guides & theses',
-    icon: GraduationCap,
-  },
-  'Research - PG Projects': {
-    desc: 'Post graduate dissertation projects & publications',
-    icon: FlaskConical,
-  },
-  'PG Projects': {
-    desc: 'Post graduate dissertation projects & publications',
-    icon: FlaskConical,
-  },
-  'Research - Grants': {
-    desc: 'Sponsored seminars, refresher courses & research funding',
-    icon: Landmark,
-  },
-  Grants: {
-    desc: 'Sponsored seminars, refresher courses & research funding',
-    icon: Landmark,
-  },
-  'Research - Consultancy': {
-    desc: 'Funded minor research projects & investigator consultancies',
-    icon: Briefcase,
-  },
-  Consultancy: {
-    desc: 'Funded minor research projects & investigator consultancies',
-    icon: Briefcase,
-  },
-  'Research - Ethics': {
-    desc: 'Code of ethics for research, organization & scientific investigators',
-    icon: Shield,
-  },
-  'Research Ethics': {
-    desc: 'Code of ethics for research, organization & scientific investigators',
-    icon: Shield,
-  },
-  Ethics: {
-    desc: 'Code of ethics for research, organization & scientific investigators',
-    icon: Shield,
-  },
-  'Research - MOUs': {
-    desc: 'Industrial partnerships, hospital linkages & academic MOUs',
-    icon: HeartHandshake,
-  },
-  'MOUs & Collaborations': {
-    desc: 'Industrial partnerships, hospital linkages & academic MOUs',
-    icon: HeartHandshake,
-  },
-  MOUs: {
-    desc: 'Industrial partnerships, hospital linkages & academic MOUs',
-    icon: HeartHandshake,
-  },
-  'SSIP - About': {
-    desc: 'Student Start-up & Innovation Policy, IPIES ecosystem & pre-incubation',
-    icon: Rocket,
-  },
-  'About SSIP': {
-    desc: 'Student Start-up & Innovation Policy, IPIES ecosystem & pre-incubation',
-    icon: Rocket,
-  },
-  'SSIP Cell': {
-    desc: 'Student Start-up & Innovation Policy, IPIES ecosystem & pre-incubation',
-    icon: Rocket,
-  },
-  SSIP: {
-    desc: 'Student Start-up & Innovation Policy, IPIES ecosystem & pre-incubation',
-    icon: Rocket,
-  },
-  'Animal Ethics Committee (IAEC)': {
-    desc: 'Institutional Animal Ethics Committee',
-    icon: Shield,
-  },
-  'Sexual Harassment Committee': {
-    desc: 'POSH compliance & women cell',
-    icon: Shield,
-  },
-  'About IQAC': { desc: 'Quality assurance cell overview', icon: Shield },
-  'IQAC Objectives': { desc: 'Quality assurance standards', icon: Shield },
-  'Minutes & ATR': { desc: 'Meetings and action audits', icon: FileText },
-  'Teaching Staff': { desc: 'Our qualified academic guides', icon: Users },
-  'Non-Teaching Staff': {
-    desc: 'Lab assistants and library admins',
-    icon: Users,
-  },
-  'Central Library': {
-    desc: 'Central collection of medical & pharmacy journals',
-    icon: BookOpen,
-  },
-  'Instrument Room': {
-    desc: 'HPLC, UV Spectrophotometer & High-tech testing',
-    icon: Cpu,
-  },
-  'Herbal Garden': {
-    desc: 'Botanical collection of medicinal plants',
-    icon: Sparkles,
-  },
-  Sports: { desc: 'Indoor-outdoor games & gymkhana', icon: Trophy },
-  Hostel: { desc: 'Secure residential boarding facilities', icon: Building2 },
-  Canteen: { desc: 'Hygienic vegetarian cafeteria', icon: Coffee },
-  Classrooms: { desc: 'Digitized smart lecture theaters', icon: Laptop },
-  Library: { desc: 'Central collection of books and journals', icon: BookOpen },
-  'Inter-College Achievements': {
-    desc: 'Championship representation records',
-    icon: Trophy,
-  },
-  Competitions: {
-    desc: 'Pharma quizzes, poster contests & fests',
-    icon: Palette,
-  },
-  Gallery: { desc: 'Moments of convocations & campus life', icon: Image },
-  'Media Appreciation': {
-    desc: 'Official press releases & clippings',
-    icon: Newspaper,
-  },
-  News: { desc: 'Live notices and campus bulletins', icon: Newspaper },
-  Achievements: { desc: 'Celebrations of rankers & medalists', icon: Trophy },
-  Events: {
-    desc: 'National conferences, webinars & workshops',
-    icon: Calendar,
-  },
-  Scholarships: {
-    desc: 'Government schemes, corporate foundations & awards',
-    icon: Award,
-  },
-  Scholorships: {
-    desc: 'Government schemes, corporate foundations & awards',
-    icon: Award,
-  },
-  Timetables: {
-    desc: 'Academic routine and semester class schedules',
-    icon: Calendar,
-  },
-  Courses: {
-    desc: 'B.Pharm semester syllabus, subject codes & syllabus PDFs',
-    icon: BookOpen,
-  },
-  'Course Syllabus': {
-    desc: 'B.Pharm semester syllabus, subject codes & syllabus PDFs',
-    icon: BookOpen,
-  },
-  Alumni: {
-    desc: 'CKPIPSRAA network, committee & alumni registration',
-    icon: GraduationCap,
-  },
-  'Student Help Desk': {
-    desc: 'Raise tickets, check status, FAQs & student support',
-    icon: Headset,
-  },
+/** The icon on each homepage dock pill, by the part of the homepage it scrolls to. */
+const DOCK_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  home: HomeIcon,
+  about: Info,
+  'university-gazette': Newspaper,
+  'principal-message': FileText,
+  courses: BookOpen,
+  'campus-life': Building2,
+  'blogs-magazine': Sparkles,
+  admissions: UserCheck,
 };
 
-const megaMenuDisplayNames: Record<string, string> = {
-  'Courses Offered - D.Pharm': 'D.Pharm',
-  'Courses Offered - B.Pharm': 'B.Pharm',
-  'Courses Offered - M.Pharm': 'M.Pharm',
-  'Courses Offered - Short Term Certificate': 'Short-Term Certificate',
-  'Resources - Laboratories': 'Laboratories',
-  'Resources - Library': 'Central Library',
-  'Resources - Sports': 'Sports Facilities',
-  'Resources - Hostel': 'Residential Hostels',
-  'Resources - Medical': 'Medical Center',
-  'Resources - Transportation': 'Transportation & Parking',
-  'Resources - Seminar Hall': 'Seminar Hall',
-  'Resources - Cafeteria': 'Cafeteria & Dining',
-  'Resources - Central Facilities': 'Central Facilities',
-  'Resources - EV Charging Station': 'EV Charging Station',
-  'Resources - Medicinal Garden': 'Medicinal Garden',
-  'Research - About': 'About Research',
-  'Research - Publications': 'Publications',
-  'Research - Patents': 'Patents',
-  'Research - Books': 'Books',
-  'Research - Doctoral Studies': 'Doctoral Studies',
-  'Research - PG Projects': 'PG Projects',
-  'Research - Grants': 'Grants',
-  'Research - Consultancy': 'Consultancy',
-  'Research - Ethics': 'Ethics',
-  Ethics: 'Ethics',
-  'Research Ethics': 'Research Ethics',
-  'Research - MOUs': 'MOUs',
-  MOUs: 'MOUs',
-  'MOUs & Collaborations': 'MOUs',
-  'SSIP - About': 'About SSIP',
-  'SSIP - Mentors': 'SSIP Mentors',
-  'SSIP - Updates': 'SSIP Updates',
-  'SSIP - Apply': 'Apply to SSIP',
-  ARC: 'Anti-Ragging Committee (ARC)',
-  WDC: 'Women Development Cell (WDC)',
-  'SC-ST Cell': 'SC-ST Cell (Empowerment)',
-  GRC: 'Grievance Redressal Cell (GRC)',
-  ADC: 'Anti-Discrimination Cell (ADC)',
-  EDC: 'Entrepreneurship Development Cell (EDC)',
-  GSC: 'Gender Sensitization Cell (GSC)',
+/** The icons this file already imports; any other Lucide name is loaded by iconFor. */
+const NAV_ICONS = {
+  Info, Target, HeartHandshake, Award, Users, FileText, Compass, Phone, BookOpen,
+  Sparkles, Building2, Shield, Cpu, Library, Trophy, Coffee, Laptop, Calendar,
+  GraduationCap, FlaskConical, Landmark, Briefcase, Rocket, Headset, Scale,
+  ShieldCheck, UserCheck, Palette, Image, Newspaper,
 };
-
-const menuSubmaps: Record<string, string[]> = {};
-Object.keys(ckpipsrNavigation).forEach((categoryLabel) => {
-  menuSubmaps[categoryLabel] = ckpipsrNavigation[categoryLabel].map(
-    (item) => item.label,
-  );
-});
-
-/* ═══════════════════════════════════════════════════════════════
-   MEGA MENU CONFIG — Code 1's big two-column + image-collage style,
-   rebuilt to cover all 8 of Code 2's nav categories.
-   Item descriptions/icons are pulled from dropdownDetails above,
-   so there's only one source of truth for that text.
-═══════════════════════════════════════════════════════════════ */
-interface MegaMenuColumn {
-  title: string;
-  items: string[];
-}
-
-interface MegaMenuConfig {
-  columns: MegaMenuColumn[];
-  images: {
-    tall1: { url: string; caption: string };
-    tall2: { url: string; caption: string };
-    landscape: { url: string; caption: string; tag: string };
-  };
-  accentText: string;
-}
-
-const megaMenuConfigs: Record<string, MegaMenuConfig> = {
-  'About Us': {
-    columns: [
-      {
-        title: 'Who We Are',
-        items: [
-          'Profile',
-          'The Founder',
-          'Vision and Mission',
-          'About Trust',
-          'PO and PEOs',
-        ],
-      },
-      {
-        title: 'Governance & Campus',
-        items: [
-          'Governing Body',
-          'Campus Map',
-          'Contact Us',
-          'The Principal',
-          'Deans and Faculty In-charges',
-        ],
-      },
-    ],
-    images: {
-      tall1: {
-        url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=400&auto=format&fit=crop',
-        caption: 'Vision & Goals',
-      },
-      tall2: {
-        url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop',
-        caption: "Principal's Message",
-      },
-      landscape: {
-        url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop',
-        caption:
-          'C.K. Pithawalla Institute of Pharmaceutical Science & Research',
-        tag: 'Est. 2005',
-      },
-    },
-    accentText:
-      'A Legacy of Quality in Pharmaceutical Education & Scientific Research',
-  },
-  Academics: {
-    columns: [
-      {
-        title: 'Pharmacy Programs',
-        items: [
-          'Courses Offered',
-          'Courses Offered - D.Pharm',
-          'Courses Offered - B.Pharm',
-          'Courses Offered - M.Pharm',
-          'Courses Offered - Short Term Certificate',
-        ],
-      },
-      { title: 'Academics', items: ['Approvals', 'Faculties'] },
-      {
-        title: 'Resources',
-        items: [
-          'Resources - Laboratories',
-          'Resources - Library',
-          'Resources - Sports',
-          'Resources - Hostel',
-          'Resources - Medical',
-          'Resources - Transportation',
-          'Resources - Seminar Hall',
-          'Resources - Cafeteria',
-          'Resources - Central Facilities',
-          'Resources - EV Charging Station',
-          'Resources - Medicinal Garden',
-        ],
-      },
-    ],
-    images: {
-      tall1: {
-        url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=400&auto=format&fit=crop',
-        caption: 'Formulation Lab',
-      },
-      tall2: {
-        url: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=400&auto=format&fit=crop',
-        caption: 'Library Hub',
-      },
-      landscape: {
-        url: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=600&auto=format&fit=crop',
-        caption: 'Advanced Research Instrumentation & Resources',
-        tag: 'PCI & GTU Approved',
-      },
-    },
-    accentText:
-      'Nurturing Competent, Ethical & Innovative Pharmacy Professionals',
-  },
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   DESKTOP NAV ITEM — Code 1's mega-menu visual, wired to Code 2's
-   router-based navigation. Open/close state is lifted to Navbar
-   (activeMegaMenu) so the full-page backdrop blur can react to it.
-═══════════════════════════════════════════════════════════════ */
-/**
- * Puts the admin panel's course list into the navigation data.
- *
- * The menus below were built for a fixed set of pages read once at import.
- * Courses are data now, so their entries are rewritten in place — the
- * Academics list, the mega-menu's Pharmacy Programs column, and the
- * description and display name each menu looks a label up by. Everything that
- * renders from these reads them at render time, so running this before the
- * navbar renders is enough. Idempotent: it only ever replaces course entries.
- */
-const COURSE_LABEL_PREFIX = 'Courses Offered - ';
-
-/**
- * Puts the admin panel's committee list into the navigation data.
- *
- * As with the courses above: the Cells menu was built for a fixed set of
- * pages, and committees are data now — they can be added, renamed, reordered
- * and switched off. A committee switched off is not in the list the API
- * serves, so it simply disappears from the menu.
- */
-function syncCellsNav(committees: CellsMenuItem[]) {
-  const cells = ckpipsrNavigation['Cells'];
-  if (!cells || committees.length === 0) return;
-
-  cells.splice(
-    0,
-    cells.length,
-    ...committees.map((c) => ({ label: c.navLabel, path: `/cells/${c.slug}` })),
-  );
-  menuSubmaps['Cells'] = cells.map((item) => item.label);
-
-  for (const committee of committees) {
-    dropdownDetails[committee.navLabel] = {
-      desc: committee.menuDescription,
-      icon: dropdownDetails[committee.navLabel]?.icon ?? Shield,
-    };
-    megaMenuDisplayNames[committee.navLabel] = committee.menuTitle;
-  }
-}
-
-function syncCourseNav(courses: CourseEntry[]) {
-  const academics = ckpipsrNavigation['Academics'];
-  if (!academics) return;
-
-  const others = academics.filter(
-    (item) => !item.label.startsWith(COURSE_LABEL_PREFIX),
-  );
-  const courseItems = courses.map((course) => ({
-    label: courseNavLabel(course),
-    path: courseHref(course.id),
-  }));
-  const at = others.findIndex((item) => item.label === 'Courses Offered');
-  others.splice(at + 1, 0, ...courseItems);
-  academics.splice(0, academics.length, ...others);
-  menuSubmaps['Academics'] = academics.map((item) => item.label);
-
-  for (const course of courses) {
-    const label = courseNavLabel(course);
-    dropdownDetails[label] = {
-      desc: `${course.card.fullName} (${course.card.duration})`,
-      icon: dropdownDetails[label]?.icon ?? BookOpen,
-    };
-    megaMenuDisplayNames[label] = course.navLabel;
-  }
-
-  const programs = megaMenuConfigs['Academics']?.columns.find(
-    (col) => col.title === 'Pharmacy Programs',
-  );
-  if (programs)
-    programs.items = [
-      'Courses Offered',
-      ...courseItems.map((item) => item.label),
-    ];
-}
 
 interface NavItemDesktopProps {
   key?: string;
-  item: {
-    name: string;
-    id: string;
-    dropdown: string[];
-    align: string;
-  };
+  item: NavMenu;
   isActive: boolean;
-  /** This menu's pictures from the admin panel, if it has been published. */
-  featured?: NavFeaturedMenu;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onToggle: () => void;
@@ -875,14 +206,7 @@ interface NavItemDesktopProps {
  */
 /** Long section names sit on two short lines ("Research &" / "Innovation"),
  *  which frees room for CET's spacing between menus. */
-const shortBarNames: Record<string, string> = {
-  'Research & Innovation': 'Research',
-  'Accreditation & Ranking': 'Accreditation',
-  'Students Corner': 'Students',
-};
-
-function navLines(name: string): [string, string] | null {
-  const barName = shortBarNames[name] || name;
+function navLines(barName: string): [string, string] | null {
   if (barName.length <= 12 || !barName.includes(' ')) return null;
   const mid = barName.length / 2;
   let at = -1;
@@ -895,13 +219,35 @@ function navLines(name: string): [string, string] | null {
   return [barName.slice(0, at), barName.slice(at + 1)];
 }
 
+/** One block in a dropdown column: a plain link, or a heading with the links under it there. */
+type ColumnEntry =
+  | { kind: 'link'; link: NavMenuLink }
+  | { kind: 'group'; link: NavMenuLink; children: NavMenuChild[] };
+
+/**
+ * What one column of a desktop dropdown lists, in the menu's order. A heading
+ * shows in every column that holds one of its links, so Research's links can
+ * run over two columns. A link pointing past the last column sits in the last.
+ */
+function columnEntries(menu: NavMenu, column: number): ColumnEntry[] {
+  const last = menu.columns.length;
+  const inColumn = (l: NavMenuChild) => Math.min(Math.max(l.column, 1), last) === column;
+  const entries: ColumnEntry[] = [];
+  for (const link of menu.links) {
+    if (link.children.length > 0) {
+      const children = link.children.filter(inColumn);
+      if (children.length > 0) entries.push({ kind: 'group', link, children });
+    } else if (inColumn(link)) entries.push({ kind: 'link', link });
+  }
+  return entries;
+}
+
 const navMorph = { switching: false, dir: 1, fromHeight: 0, lastIndex: -1 };
 const MORPH_EASE = [0.16, 1, 0.3, 1] as const;
 
 function NavItemDesktop({
   item,
   isActive,
-  featured,
   onMouseEnter,
   onMouseLeave,
   onToggle,
@@ -918,63 +264,20 @@ function NavItemDesktop({
     return () => ro.disconnect();
   }, [isActive]);
 
-  const getDynamicMegaMenuConfig = (categoryLabel: string): MegaMenuConfig => {
-    if (megaMenuConfigs[categoryLabel]) return megaMenuConfigs[categoryLabel];
-
-    const items = ckpipsrNavigation[categoryLabel]?.map((i) => i.label) || [];
-    const columns: MegaMenuColumn[] = [];
-    if (items.length <= 8) {
-      columns.push({ title: 'Quick Links', items });
-    } else {
-      const half = Math.ceil(items.length / 2);
-      columns.push({
-        title: 'Resources & Programs',
-        items: items.slice(0, half),
-      });
-      columns.push({ title: 'General Information', items: items.slice(half) });
-    }
-
-    const defaultImages = {
-      tall1:
-        'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=400&auto=format&fit=crop',
-      tall2:
-        'https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=400&auto=format&fit=crop',
-      landscape:
-        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop',
-    };
-
-    return {
-      columns,
-      images: {
-        tall1: { url: defaultImages.tall1, caption: 'College Campus' },
-        tall2: { url: defaultImages.tall2, caption: 'Study & Research' },
-        landscape: {
-          url: defaultImages.landscape,
-          caption: `Explore our ${categoryLabel} section`,
-          tag: 'CKPIPSR',
-        },
+  const { featured } = item;
+  const config = {
+    columns: item.columns.map((col, i) => ({ title: col.title, entries: columnEntries(item, i + 1) })),
+    accentText: featured.accentText,
+    images: {
+      tall1: { url: featured.tall1.image, caption: featured.tall1.caption },
+      tall2: { url: featured.tall2.image, caption: featured.tall2.caption },
+      landscape: {
+        url: featured.landscape.image,
+        caption: featured.landscape.caption,
+        tag: featured.landscape.tag,
       },
-      accentText: `Welcome to the ${categoryLabel} section of CKPIPSR`,
-    };
+    },
   };
-
-  const base = getDynamicMegaMenuConfig(item.name);
-  // What the panel publishes wins over what this menu shipped with.
-  const config: MegaMenuConfig = featured
-    ? {
-      ...base,
-      accentText: featured.accentText,
-      images: {
-        tall1: { url: featured.tall1.image, caption: featured.tall1.caption },
-        tall2: { url: featured.tall2.image, caption: featured.tall2.caption },
-        landscape: {
-          url: featured.landscape.image,
-          caption: featured.landscape.caption,
-          tag: featured.landscape.tag,
-        },
-      },
-    }
-    : base;
   const navigate = useNavigate();
 
   return (
@@ -990,8 +293,8 @@ function NavItemDesktop({
         className={`flex items-center gap-1 text-[11px] min-[1360px]:text-[11.5px] 2xl:text-[12.5px] font-sans font-bold py-2 px-0.5 min-[1400px]:px-1 2xl:px-1.5 transition-all duration-200 relative whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] shrink-0 bg-transparent ${isActive ? 'text-[#D4AF37]' : 'text-white hover:text-[#D4AF37]'}`}
       >
         {(() => {
-          const barName = shortBarNames[item.name] || item.name;
-          const lines = navLines(item.name);
+          const barName = item.barLabel || item.label;
+          const lines = navLines(barName);
           return lines ? (
             <span className='leading-[1.1] text-left'>
               {lines[0]}
@@ -1008,7 +311,7 @@ function NavItemDesktop({
         />
       </button>
 
-      {item.dropdown.length > 0 && config && (
+      {item.links.length > 0 && (
         <AnimatePresence>
           {isActive && (
             <motion.div
@@ -1076,139 +379,94 @@ function NavItemDesktop({
                     <div
                       className={`grid gap-x-6 gap-y-4 ${config.columns.length === 3 ? 'grid-cols-3' : config.columns.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}
                     >
-                      {config.columns.map((col) => (
-                        <div key={col.title} className='flex flex-col'>
+                      {config.columns.map((col, colIndex) => (
+                        // Keyed by place too: a long Cells menu has two "Quick Links" columns.
+                        <div key={`${col.title}-${colIndex}`} className='flex flex-col'>
                           <div className='mb-3 flex items-center justify-between border-b border-white/15 pb-2'>
                             <span className='text-[10px] font-sans tracking-[0.2em] text-[#D4AF37] uppercase font-bold'>
                               {col.title}
                             </span>
                           </div>
                           <div className='flex flex-col gap-1.5'>
-                            {(() => {
-                              const allNavItems =
-                                ckpipsrNavigation[item.name] || [];
-                              const itemsToGroup = col.items.map((lbl) => {
-                                const found = allNavItems.find(
-                                  (ni) => ni.label === lbl,
-                                );
-                                return {
-                                  label: lbl,
-                                  path: found?.path || '',
-                                };
-                              });
-                              const groupedColItems =
-                                groupNavItems(itemsToGroup);
-
-                              return groupedColItems.map((groupedItem) => {
-                                if (groupedItem.isParent) {
-                                  const isDuplicateHeader =
-                                    groupedItem.label.toLowerCase() ===
-                                    col.title.toLowerCase();
-                                  return (
-                                    <div
-                                      key={groupedItem.label}
-                                      className={`flex flex-col gap-1.5 ${isDuplicateHeader ? '' : 'mt-2'}`}
-                                    >
-                                      {!isDuplicateHeader &&
-                                        (groupedItem.path ? (
-                                          <button
-                                            onClick={() => {
-                                              onMouseLeave();
-                                              if (groupedItem.path)
-                                                navigate(groupedItem.path);
-                                            }}
-                                            className='text-left font-sans font-bold text-[11px] tracking-wider uppercase text-[#D4AF37] hover:text-[#50C878] transition-colors'
-                                          >
-                                            {groupedItem.label}
-                                          </button>
-                                        ) : (
-                                          <span className='text-left font-sans font-bold text-[11px] tracking-wider uppercase text-[#D4AF37]/80 select-none'>
-                                            {groupedItem.label}
-                                          </span>
-                                        ))}
-
-                                      <div className='flex flex-col gap-1.5 pl-3 border-l border-white/10 ml-0.5'>
-                                        {groupedItem.children?.map((child) => {
-                                          const childDetail = dropdownDetails[
-                                            child.fullLabel
-                                          ] ||
-                                            dropdownDetails[child.label] || {
-                                            desc: '',
-                                            icon: Sparkles,
-                                          };
-                                          return (
-                                            <button
-                                              key={child.fullLabel}
-                                              onClick={() => {
-                                                onMouseLeave();
-                                                const navItemPath =
-                                                  resolveNavItemPath(
-                                                    item.name,
-                                                    child.fullLabel,
-                                                  );
-                                                if (navItemPath)
-                                                  navigate(navItemPath);
-                                              }}
-                                              className='group/menu-item text-left flex flex-col gap-0.5 py-1 px-2.5 -mx-2.5 rounded-lg hover:bg-[#50C878]/15 border border-transparent hover:border-[#50C878]/30 transition-all duration-200 w-full cursor-pointer'
-                                            >
-                                              <span className='font-sans font-bold text-[12px] text-white/90 group-hover/menu-item:text-[#50C878] transition-colors flex items-center gap-1.5'>
-                                                <span>
-                                                  {megaMenuDisplayNames[
-                                                    child.fullLabel
-                                                  ] || child.label}
-                                                </span>
-                                                <ArrowRight
-                                                  size={10}
-                                                  className='opacity-0 -translate-x-1 group-hover/menu-item:opacity-100 group-hover/menu-item:translate-x-0 transition-all duration-200 text-[#50C878]'
-                                                />
-                                              </span>
-                                              {childDetail.desc && (
-                                                <span className='font-sans text-[10.5px] text-white/60 group-hover/menu-item:text-white/85 transition-colors leading-tight font-medium'>
-                                                  {childDetail.desc}
-                                                </span>
-                                              )}
-                                            </button>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  );
-                                } else {
-                                  const detail = dropdownDetails[
-                                    groupedItem.label
-                                  ] || { desc: '', icon: Sparkles };
-                                  return (
-                                    <button
-                                      key={groupedItem.label}
-                                      onClick={() => {
-                                        onMouseLeave();
-                                        const navItemPath = resolveNavItemPath(
-                                          item.name,
-                                          groupedItem.label,
-                                        );
-                                        if (navItemPath) navigate(navItemPath);
-                                      }}
-                                      className='group/menu-item text-left flex flex-col gap-0.5 py-1.5 px-3 -mx-3 rounded-xl hover:bg-[#50C878]/15 border border-transparent hover:border-[#50C878]/30 transition-all duration-200 w-full cursor-pointer'
-                                    >
-                                      <span className='font-sans font-bold text-[13px] text-white group-hover/menu-item:text-[#50C878] transition-colors flex items-center gap-1.5'>
-                                        <span>
-                                          {megaMenuDisplayNames[
-                                            groupedItem.label
-                                          ] || groupedItem.label}
+                            {col.entries.map((entry, entryIndex) => {
+                              if (entry.kind === 'group') {
+                                const heading = entry.link;
+                                const isDuplicateHeader =
+                                  heading.label.toLowerCase() ===
+                                  col.title.toLowerCase();
+                                return (
+                                  <div
+                                    key={entryIndex}
+                                    className={`flex flex-col gap-1.5 ${isDuplicateHeader ? '' : 'mt-2'}`}
+                                  >
+                                    {!isDuplicateHeader &&
+                                      (heading.href ? (
+                                        <button
+                                          onClick={() => {
+                                            onMouseLeave();
+                                            navigate(heading.href);
+                                          }}
+                                          className='text-left font-sans font-bold text-[11px] tracking-wider uppercase text-[#D4AF37] hover:text-[#50C878] transition-colors'
+                                        >
+                                          {heading.label}
+                                        </button>
+                                      ) : (
+                                        <span className='text-left font-sans font-bold text-[11px] tracking-wider uppercase text-[#D4AF37]/80 select-none'>
+                                          {heading.label}
                                         </span>
-                                        <ArrowRight
-                                          size={11}
-                                          className='opacity-0 -translate-x-1 group-hover/menu-item:opacity-100 group-hover/menu-item:translate-x-0 transition-all duration-200 text-[#50C878]'
-                                        />
-                                      </span>
-                                      <span className='font-sans text-[11px] text-white/70 group-hover/menu-item:text-white/90 transition-colors leading-tight font-medium'>
-                                        {detail.desc}
-                                      </span>
-                                    </button>
-                                  );
-                                }
-                              });
-                            })()}
+                                      ))}
+
+                                    <div className='flex flex-col gap-1.5 pl-3 border-l border-white/10 ml-0.5'>
+                                      {entry.children.map((child, childIndex) => (
+                                        <button
+                                          key={childIndex}
+                                          onClick={() => {
+                                            onMouseLeave();
+                                            navigate(child.href);
+                                          }}
+                                          className='group/menu-item text-left flex flex-col gap-0.5 py-1 px-2.5 -mx-2.5 rounded-lg hover:bg-[#50C878]/15 border border-transparent hover:border-[#50C878]/30 transition-all duration-200 w-full cursor-pointer'
+                                        >
+                                          <span className='font-sans font-bold text-[12px] text-white/90 group-hover/menu-item:text-[#50C878] transition-colors flex items-center gap-1.5'>
+                                            <span>{child.label}</span>
+                                            <ArrowRight
+                                              size={10}
+                                              className='opacity-0 -translate-x-1 group-hover/menu-item:opacity-100 group-hover/menu-item:translate-x-0 transition-all duration-200 text-[#50C878]'
+                                            />
+                                          </span>
+                                          {child.description && (
+                                            <span className='font-sans text-[10.5px] text-white/60 group-hover/menu-item:text-white/85 transition-colors leading-tight font-medium'>
+                                              {child.description}
+                                            </span>
+                                          )}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              const { link } = entry;
+                              return (
+                                <button
+                                  key={entryIndex}
+                                  onClick={() => {
+                                    onMouseLeave();
+                                    if (link.href) navigate(link.href);
+                                  }}
+                                  className='group/menu-item text-left flex flex-col gap-0.5 py-1.5 px-3 -mx-3 rounded-xl hover:bg-[#50C878]/15 border border-transparent hover:border-[#50C878]/30 transition-all duration-200 w-full cursor-pointer'
+                                >
+                                  <span className='font-sans font-bold text-[13px] text-white group-hover/menu-item:text-[#50C878] transition-colors flex items-center gap-1.5'>
+                                    <span>{link.label}</span>
+                                    <ArrowRight
+                                      size={11}
+                                      className='opacity-0 -translate-x-1 group-hover/menu-item:opacity-100 group-hover/menu-item:translate-x-0 transition-all duration-200 text-[#50C878]'
+                                    />
+                                  </span>
+                                  <span className='font-sans text-[11px] text-white/70 group-hover/menu-item:text-white/90 transition-colors leading-tight font-medium'>
+                                    {link.description}
+                                  </span>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       ))}
@@ -1499,6 +757,8 @@ function NavContent({
   activeMegaMenu,
   setActiveMegaMenu,
   subpage = false,
+  menus,
+  enquiryButton,
 }: {
   menuOpen: boolean;
   setMenuOpen: any;
@@ -1507,7 +767,13 @@ function NavContent({
   activeMegaMenu: string | null;
   setActiveMegaMenu: (name: string | null) => void;
   subpage?: boolean;
+  /** The menus with the committees and courses merged in. */
+  menus: NavMenu[];
+  /** The gold enquiry button: its words and the page it opens. */
+  enquiryButton: NavMenusContent['enquiry'];
 }) {
+  // The enquiry buttons open the page set in the panel, keeping a preview link.
+  const goToEnquiry = useNavigate();
   const ckpNavRef = useRef<HTMLDivElement | null>(null);
 
   /* Grace period between a trigger and its panel. Without it the menu
@@ -1528,12 +794,11 @@ function NavContent({
   useEffect(() => () => ckpCancelClose(), []);
   useCkpWave(ckpNavRef);
   const scrollToId = useSmoothScrollTo();
-  // The pictures each mega menu shows, edited under Featured in the panel.
-  const navFeatured = useNavFeatured();
+  const enquiry = useEnquiryContact();
   // Split menu around the centred brand: exactly 4 items on left and 4 on right
   const half = 4;
-  const ipsrLeft = navItems.slice(0, half),
-    ipsrRight = navItems.slice(half);
+  const ipsrLeft = menus.slice(0, half),
+    ipsrRight = menus.slice(half);
 
   return (
     <>
@@ -1574,18 +839,17 @@ function NavContent({
             <div className='ckp-menu ckp-menu--left'>
               {ipsrLeft.map((item) => (
                 <NavItemDesktop
-                  key={item.name}
+                  key={item.id}
                   item={item}
-                  featured={navFeatured[item.id]}
-                  isActive={activeMegaMenu === item.name}
+                  isActive={activeMegaMenu === item.id}
                   onMouseEnter={() => {
                     ckpCancelClose();
-                    setActiveMegaMenu(item.name);
+                    setActiveMegaMenu(item.id);
                   }}
                   onMouseLeave={ckpScheduleClose}
                   onToggle={() =>
                     setActiveMegaMenu(
-                      activeMegaMenu === item.name ? null : item.name,
+                      activeMegaMenu === item.id ? null : item.id,
                     )
                   }
                 />
@@ -1616,18 +880,17 @@ function NavContent({
               <div className='ckp-menu ckp-menu--right'>
                 {ipsrRight.map((item) => (
                   <NavItemDesktop
-                    key={item.name}
+                    key={item.id}
                     item={item}
-                    featured={navFeatured[item.id]}
-                    isActive={activeMegaMenu === item.name}
+                    isActive={activeMegaMenu === item.id}
                     onMouseEnter={() => {
                       ckpCancelClose();
-                      setActiveMegaMenu(item.name);
+                      setActiveMegaMenu(item.id);
                     }}
                     onMouseLeave={ckpScheduleClose}
                     onToggle={() =>
                       setActiveMegaMenu(
-                        activeMegaMenu === item.name ? null : item.name,
+                        activeMegaMenu === item.id ? null : item.id,
                       )
                     }
                   />
@@ -1636,10 +899,10 @@ function NavContent({
 
               <div className='ckp-actions'>
                 <button
-                  onClick={() => scrollToId('admissions')}
+                  onClick={() => goToEnquiry(withPreview(enquiryButton.href))}
                   className='group/btn flex items-center gap-1.5 px-2.5 lg:px-4 py-1.5 rounded-full text-[9px] lg:text-[9.5px] font-bold uppercase tracking-wider transition-all duration-300 bg-[#D4AF37] hover:bg-[#E5C158] text-[#123a1a] hover:shadow-[0_4px_18px_rgba(212,175,55,0.45)] hover:scale-105 active:scale-95 shadow-md cursor-pointer whitespace-nowrap select-none'
                 >
-                  <span>APPLY NOW</span>
+                  <span>{enquiryButton.label}</span>
                   <ArrowRight
                     size={10}
                     className='transition-transform duration-300 group-hover/btn:translate-x-0.5 stroke-[3]'
@@ -1678,18 +941,18 @@ function NavContent({
             </div>
             <div className='ckp-sph__tr'>
               <span className='ckp-sph__enq'>
-                Enquiries: <a href='tel:+916355065636'>+91 63550 65636</a>
+                Inquiries: <a href={enquiry.tel}>{enquiry.phone}</a>
               </span>
               <span className='ckp-sph__sep'>|</span>
-              <a className='ckp-sph__mail' href='mailto:ckpipsr@gmail.com'>
-                ckpipsr@gmail.com
+              <a className='ckp-sph__mail' href={`mailto:${enquiry.email}`}>
+                {enquiry.email}
               </a>
               <button
                 type='button'
-                onClick={() => scrollToId('admissions')}
+                onClick={() => goToEnquiry(withPreview(enquiryButton.href))}
                 className='ckp-sph__apply'
               >
-                <span>APPLY NOW</span>
+                <span className='uppercase'>{enquiryButton.label}</span>
                 <ArrowRight size={11} className='stroke-[3]' />
               </button>
             </div>
@@ -1698,18 +961,17 @@ function NavContent({
             <div className='ckp-sph__L'>
               {ipsrLeft.map((item) => (
                 <NavItemDesktop
-                  key={item.name}
+                  key={item.id}
                   item={item}
-                  featured={navFeatured[item.id]}
-                  isActive={activeMegaMenu === item.name}
+                  isActive={activeMegaMenu === item.id}
                   onMouseEnter={() => {
                     ckpCancelClose();
-                    setActiveMegaMenu(item.name);
+                    setActiveMegaMenu(item.id);
                   }}
                   onMouseLeave={ckpScheduleClose}
                   onToggle={() =>
                     setActiveMegaMenu(
-                      activeMegaMenu === item.name ? null : item.name,
+                      activeMegaMenu === item.id ? null : item.id,
                     )
                   }
                 />
@@ -1719,18 +981,17 @@ function NavContent({
             <div className='ckp-sph__R'>
               {ipsrRight.map((item) => (
                 <NavItemDesktop
-                  key={item.name}
+                  key={item.id}
                   item={item}
-                  featured={navFeatured[item.id]}
-                  isActive={activeMegaMenu === item.name}
+                  isActive={activeMegaMenu === item.id}
                   onMouseEnter={() => {
                     ckpCancelClose();
-                    setActiveMegaMenu(item.name);
+                    setActiveMegaMenu(item.id);
                   }}
                   onMouseLeave={ckpScheduleClose}
                   onToggle={() =>
                     setActiveMegaMenu(
-                      activeMegaMenu === item.name ? null : item.name,
+                      activeMegaMenu === item.id ? null : item.id,
                     )
                   }
                 />
@@ -1792,163 +1053,6 @@ function NavContent({
   );
 }
 
-function BottomNavItem({
-  item,
-  isActive,
-  onItemClick,
-}: {
-  key?: string;
-  item: { name: string; id: string };
-  isActive: boolean;
-  onItemClick: (name: string, id: string) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [expandedParent, setExpandedParent] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const subItems = menuSubmaps[item.name] || [];
-  const rawItems = ckpipsrNavigation[item.name] || [];
-  const groupedItems = groupNavItems(rawItems);
-
-  return (
-    <div
-      className='relative'
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => {
-        setIsOpen(false);
-        setExpandedParent(null);
-      }}
-    >
-      <button
-        onClick={() => {
-          if (subItems.length === 0) onItemClick(item.name, item.id);
-          else setIsOpen(!isOpen);
-        }}
-        className='relative px-4 sm:px-5 py-2.5 mx-0.5 text-[9.5px] sm:text-[11px] xl:text-[12px] uppercase tracking-wider font-bold transition-all duration-300 rounded-2xl overflow-visible hover:scale-105 active:scale-95 cursor-pointer select-none flex items-center gap-1 text-white'
-      >
-        {isActive && (
-          <motion.div
-            layoutId='bottomNavIndicator'
-            className='absolute inset-0 bg-[#123a1a] rounded-2xl shadow-[0_4px_14px_rgba(0,0,0,0.15)]'
-            transition={{
-              type: 'spring',
-              stiffness: 700,
-              damping: 35,
-              mass: 0.6,
-            }}
-          />
-        )}
-        <span className='relative z-10 whitespace-nowrap'>{item.name}</span>
-        {subItems.length > 0 && (
-          <ChevronDown
-            size={11}
-            className='relative z-10 text-white rotate-180 transition-transform duration-200'
-          />
-        )}
-      </button>
-
-      {subItems.length > 0 && (
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 15, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 15, scale: 0.95 }}
-              transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
-              className='absolute bottom-full mb-3 left-1/2 -translate-x-1/2 min-w-[240px] max-h-[70vh] overflow-y-auto overscroll-contain touch-pan-y bg-[#123a1a]/95 backdrop-blur-3xl border border-[#50C878]/35 rounded-2xl p-2 shadow-[0_-15px_40px_rgba(0,0,0,0.45)] z-50 flex flex-col gap-0.5'
-              data-lenis-prevent='true'
-            >
-              <div className='absolute w-full h-4 bg-transparent left-0 bottom-[-16px]' />
-              <div className='px-2.5 py-1.5 border-b border-white/15 mb-1 flex items-center justify-between'>
-                <span className='text-[8.5px] font-sans tracking-[0.2em] text-[#D4AF37] uppercase font-bold'>
-                  Explore {item.name}
-                </span>
-                <div className='w-1 h-1 rounded-full bg-[#D4AF37] animate-pulse' />
-              </div>
-              {groupedItems.map((groupedItem) => {
-                if (groupedItem.isParent) {
-                  const isExpanded = expandedParent === groupedItem.label;
-                  return (
-                    <div key={groupedItem.label} className='flex flex-col'>
-                      <button
-                        type='button'
-                        onClick={() => {
-                          setExpandedParent(
-                            isExpanded ? null : groupedItem.label,
-                          );
-                        }}
-                        onMouseEnter={() => {
-                          setExpandedParent(groupedItem.label);
-                        }}
-                        className='group/item flex items-center justify-between px-3 py-2 rounded-xl text-left text-white/90 hover:bg-[#50C878]/15 border border-transparent hover:border-[#50C878]/30 transition-all duration-200 cursor-pointer w-full'
-                      >
-                        <span className='font-sans font-bold text-[12px] text-white group-hover/item:text-[#50C878] transition-colors whitespace-nowrap'>
-                          {groupedItem.label}
-                        </span>
-                        <ChevronDown
-                          size={11}
-                          className={`text-white/65 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#50C878]' : '-rotate-90'}`}
-                        />
-                      </button>
-
-                      {isExpanded && (
-                        <div className='flex flex-col pl-3 border-l border-[#50C878]/30 ml-3.5 my-1 gap-0.5'>
-                          {groupedItem.children?.map((child) => {
-                            return (
-                              <button
-                                key={child.fullLabel}
-                                onClick={() => {
-                                  const navItemPath = resolveNavItemPath(
-                                    item.name,
-                                    child.fullLabel,
-                                  );
-                                  if (navItemPath) {
-                                    navigate(navItemPath);
-                                    setIsOpen(false);
-                                  }
-                                }}
-                                className='group/subitem flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-white/80 hover:bg-[#50C878]/10 border border-transparent hover:border-[#50C878]/20 transition-all duration-150 cursor-pointer w-full'
-                              >
-                                <span className='font-sans font-semibold text-[11px] text-white/85 group-hover/subitem:text-[#50C878] transition-colors font-medium'>
-                                  {child.label}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                } else {
-                  return (
-                    <button
-                      key={groupedItem.label}
-                      onClick={() => {
-                        const navItemPath = resolveNavItemPath(
-                          item.name,
-                          groupedItem.label,
-                        );
-                        if (navItemPath) {
-                          navigate(navItemPath);
-                          setIsOpen(false);
-                        }
-                      }}
-                      className='group/item flex items-center justify-between px-3 py-2 rounded-xl text-left text-white/90 hover:bg-[#50C878]/15 border border-transparent hover:border-[#50C878]/30 transition-all duration-200 cursor-pointer w-full hover:scale-[1.02] active:scale-[0.98]'
-                    >
-                      <span className='font-sans font-bold text-[12px] text-white group-hover/item:text-[#50C878] transition-colors whitespace-nowrap'>
-                        {groupedItem.label}
-                      </span>
-                    </button>
-                  );
-                }
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
-    </div>
-  );
-}
-
 function getSlugGroup(slug: string): string {
   const s = slug.toLowerCase().trim();
   if (
@@ -2006,8 +1110,16 @@ export function isPathMatching(
   if (!currentPath || !targetPath) return false;
   if (currentPath === targetPath) return true;
 
-  const cleanCurrent = currentPath.replace(/^\/+|\/+$/g, '').toLowerCase();
-  const cleanTarget = targetPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+  const cleanCurrent = currentPath
+    .split('?')[0]
+    .split('#')[0]
+    .replace(/^\/+|\/+$/g, '')
+    .toLowerCase();
+  const cleanTarget = targetPath
+    .split('?')[0]
+    .split('#')[0]
+    .replace(/^\/+|\/+$/g, '')
+    .toLowerCase();
 
   if (cleanCurrent === cleanTarget) return true;
 
@@ -2020,165 +1132,70 @@ export function isPathMatching(
   if (
     currentLast &&
     targetLast &&
-    getSlugGroup(currentLast) === getSlugGroup(targetLast)
+    getSlugGroup(currentLast) === getSlugGroup(targetLast) &&
+    (currentSegments.length === 1 || targetSegments.length === 1 || currentSegments[0] === targetSegments[0])
   ) {
     return true;
   }
 
-  if (cleanTarget !== '' && cleanCurrent.startsWith(cleanTarget)) return true;
-  if (cleanCurrent !== '' && cleanTarget.startsWith(cleanCurrent)) return true;
+  // Only consider sub-path match if there is a strict slash delimiter boundary ('/')
+  // to avoid 'courses-offered-b-pharm' falsely prefix-matching 'courses-offered'
+  if (cleanTarget !== '' && cleanCurrent.startsWith(cleanTarget + '/')) {
+    return true;
+  }
 
   return false;
 }
 
-function getActiveCategory(pathname: string): string {
+/** The menu whose pages the inside-page bar lists for this address. */
+function getActiveCategory(pathname: string, menus: NavMenu[]): string {
   const cleanPath = pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-  if (!cleanPath) return 'About Us';
+  if (!cleanPath) return 'about-us';
 
   const firstSegment = cleanPath.split('/')[0];
 
   if (firstSegment === 'about' || firstSegment === 'about-us')
-    return 'About Us';
+    return 'about-us';
   if (firstSegment === 'academics' || firstSegment === 'courses')
-    return 'Academics';
+    return 'academics';
   if (
     firstSegment === 'students' ||
     firstSegment === 'students-corner' ||
     firstSegment === 'student-corner'
   )
-    return 'Students Corner';
-  if (firstSegment === 'cells' || firstSegment === 'committees') return 'Cells';
+    return 'students-corner';
+  if (firstSegment === 'cells' || firstSegment === 'committees') return 'cells';
   if (
     firstSegment === 'rni' ||
     firstSegment === 'research-and-innovation' ||
     firstSegment === 'research'
   )
-    return 'Research & Innovation';
-  if (firstSegment === 'iqac') return 'Accreditation & Ranking';
+    return 'research-and-innovation';
+  if (firstSegment === 'iqac') return 'iqac';
   if (
     firstSegment === 'tnp' ||
     firstSegment === 'training-and-placement' ||
     firstSegment === 'placement' ||
     firstSegment === 'placements'
   )
-    return 'T&P';
+    return 'training-and-placement';
   if (firstSegment === 'activities' || firstSegment === 'events')
-    return 'Activities';
+    return 'activities';
 
-  for (const [category, items] of Object.entries(ckpipsrNavigation)) {
+  for (const menu of menus) {
     if (
-      items.some((item) => {
-        const itemClean = item.path.replace(/^\/+|\/+$/g, '').toLowerCase();
+      navPages(menu.links).some((page) => {
+        const itemClean = page.href.replace(/^\/+|\/+$/g, '').toLowerCase();
         return isPathMatching(cleanPath, itemClean);
       })
     ) {
-      return category;
+      return menu.id;
     }
   }
 
-  const jsonKey = Object.keys(categoryUrlPrefixes).find(
-    (key) => categoryUrlPrefixes[key] === firstSegment,
-  );
-  if (jsonKey) {
-    return categoryDisplayNames[jsonKey];
-  }
-  return 'About Us';
+  if (menus.some((menu) => menu.id === firstSegment)) return firstSegment;
+  return 'about-us';
 }
-
-const getShortName = (name: string): string => {
-  const shortNames: Record<string, string> = {
-    Home: 'Home',
-    'About Us': 'About',
-    "Principal's Message": 'Principal',
-    'Courses Offered': 'Courses',
-    'Courses Offered - D.Pharm': 'D.Pharm',
-    'Courses Offered - B.Pharm': 'B.Pharm',
-    'Courses Offered - M.Pharm': 'M.Pharm',
-    'Courses Offered - Short Term Certificate': 'Certificate',
-    Approvals: 'Approvals',
-    Faculties: 'Faculties',
-    Resources: 'Resources',
-    'Resources - Laboratories': 'Labs',
-    'Resources - Library': 'Library',
-    'Resources - Sports': 'Sports',
-    'Resources - Hostel': 'Hostel',
-    'Resources - Medical': 'Medical',
-    'Resources - Transportation': 'Transport',
-    'Resources - Seminar Hall': 'Seminar Hall',
-    'Resources - Cafeteria': 'Cafeteria',
-    'Resources - Central Facilities': 'Central Fac',
-    'Resources - EV Charging Station': 'EV Station',
-    'Resources - Medicinal Garden': 'Garden',
-    'Campus Life': 'Campus',
-    Faculty: 'Faculty',
-    'News & Events': 'News',
-    'News & Gazette': 'News',
-    Admissions: 'Admissions',
-    'Vision and Mission': 'Vision',
-    'PO and PEOs': 'PO & PEO',
-    'The Trust': 'Trust',
-    'About Trust': 'Trust',
-    'The Founder': 'Founder',
-    'Governing Body': 'Governing Body',
-    Principal: 'Principal',
-    'The Principal': 'Principal',
-    'Accreditation & Ranking': 'Accreditation',
-    'Deans and Faculty In-charges': 'Deans & Faculty',
-    'Campus Map': 'Campus Map',
-    'Contact Us': 'Contact',
-    Timetables: 'Timetables',
-    Courses: 'Courses',
-    'Course Syllabus': 'Syllabus',
-    Scholorships: 'Scholarships',
-    Alumni: 'Alumni',
-    'Student Help Desk': 'Help Desk',
-    ARC: 'Anti-Ragging',
-    WDC: 'Women Cell',
-    'SC-ST Cell': 'SC-ST Cell',
-    GRC: 'Grievance',
-    ADC: 'Discipline',
-    EDC: 'Equal Opp',
-    GSC: 'Gender Cell',
-    'Research - About': 'Research',
-    'Research - Publications': 'Publications',
-    'Research - Patents': 'Patents',
-    'Research - Books': 'Books',
-    'Research - Doctoral Studies': 'Ph.D. Studies',
-    'Research - PG Projects': 'PG Projects',
-    'Research - Grants': 'Grants',
-    'Research - Consultancy': 'Consultancy',
-    'Research - Ethics': 'Ethics',
-    'Research - MOUs': 'MOUs',
-    'SSIP - About': 'SSIP Cell',
-    'SSIP - Mentors': 'SSIP Mentors',
-    'SSIP - Updates': 'SSIP Updates',
-    'SSIP - Apply': 'SSIP Apply',
-    IIC: 'IIC Cell',
-    'About IQAC': 'About IQAC',
-    'IQAC Composition': 'Composition',
-    'IQAC Initiatives and Activities': 'Initiatives',
-    'MoMs and ATR': 'Minutes & ATR',
-    'Institution Distinctiveness': 'Distinctiveness',
-    'Best Practices': 'Best Practices',
-    NIRF: 'NIRF',
-    AISHE: 'AISHE',
-    IIQA: 'IIQA',
-    IDP: 'IDP',
-    RTI: 'RTI',
-    Placements: 'Placements',
-    Training: 'Training',
-    Activity: 'Activities',
-    Visits: 'Visits',
-    Committee: 'Committee',
-    Events: 'Events',
-    Achievements: 'Achievements',
-  };
-  if (shortNames[name]) return shortNames[name];
-  // A course added in the admin panel: its menu name is the short name.
-  if (name.startsWith('Courses Offered - '))
-    return name.slice('Courses Offered - '.length);
-  return name;
-};
 
 // ─── Apple Liquid Glass Dock Track ──────────
 const GlassDock = ({
@@ -2244,10 +1261,12 @@ const GlassDock = ({
 
   useEffect(() => {
     measureAndSync();
+    const timer = setTimeout(measureAndSync, 40);
     const ro = new ResizeObserver(measureAndSync);
     if (flexRef.current) ro.observe(flexRef.current);
     window.addEventListener('resize', measureAndSync);
     return () => {
+      clearTimeout(timer);
       ro.disconnect();
       window.removeEventListener('resize', measureAndSync);
     };
@@ -2577,89 +1596,53 @@ function GlassPillBtn({
 interface NavProps {
   activeSection: string;
   setActiveSection: (sec: string) => void;
-  onItemClick?: (name: string, id: string) => void;
+  onItemClick?: (id: string) => void;
+  nav: NavMenusContent;
 }
 
 function BottomScrollNav({
   activeSection,
   setActiveSection,
   onItemClick,
+  nav,
 }: NavProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isSubPage = location.pathname !== '/';
-  const activeCategory = getActiveCategory(location.pathname);
-  let subPageItems = isSubPage ? ckpipsrNavigation[activeCategory] || [] : [];
+  const activeCategory = getActiveCategory(location.pathname, nav.menus);
+  const menu = nav.menus.find((m) => m.id === activeCategory);
+  let subPageItems = isSubPage && menu ? navPages(menu.links) : [];
+  let dockGroup = 'top';
 
-  if (activeCategory === 'Academics' && isSubPage) {
-    const isResourcesPath = location.pathname.includes('resources');
-    // Every course page lives at /academics/courses-offered-<id>, including
-    // courses added in the admin panel; the rest are the legacy aliases.
-    const isCoursesPath =
-      location.pathname.includes('courses-offered') ||
-      location.pathname.includes('b-pharm') ||
-      location.pathname.includes('d-pharm') ||
-      location.pathname.includes('m-pharm') ||
-      location.pathname.includes('short-term');
+  // Academics: resource pages list their facility group; Courses Offered,
+  // individual courses, Approvals, and Faculties are available together in the bottom dock.
+  if (activeCategory === 'academics' && isSubPage && menu) {
+    const isResourcePath = location.pathname.includes('resources');
+    const resourceGroup = menu.links.find((l) =>
+      l.children.some((c) => isPathMatching(location.pathname, c.href)),
+    );
 
-    if (isResourcesPath) {
-      subPageItems = subPageItems.filter(
-        (item) =>
-          item.label === 'Resources' || item.label.startsWith('Resources - '),
-      );
-    } else if (isCoursesPath) {
-      subPageItems = subPageItems.filter((item) =>
-        item.label.startsWith('Courses Offered'),
-      );
+    if (isResourcePath && resourceGroup) {
+      dockGroup = 'resources';
+      subPageItems = navPages([resourceGroup]);
     } else {
-      subPageItems = subPageItems.filter(
-        (item) =>
-          item.label === 'Courses Offered' ||
-          item.label === 'Approvals' ||
-          item.label === 'Faculties' ||
-          item.label === 'Resources',
-      );
+      dockGroup = 'academic-courses';
+      const coursesGroup = menu.links.find((l) => l.holdsCourses);
+      const topLevelLinks = menu.links.filter((l) => !l.holdsCourses && l.href);
+      const combined = [
+        ...(coursesGroup ? [coursesGroup] : []),
+        ...topLevelLinks.map((l) => ({ ...l, children: [] })),
+      ];
+      subPageItems = navPages(combined);
     }
   }
-
-  const getIconForLabel = (label: string) => {
-    if (dropdownDetails[label]?.icon) return dropdownDetails[label].icon;
-
-    const suffix = label.includes(' - ') ? label.split(' - ')[1] : label;
-    if (dropdownDetails[suffix]?.icon) return dropdownDetails[suffix].icon;
-
-    const lower = suffix.toLowerCase();
-    if (lower.includes('lab')) return Cpu;
-    if (lower.includes('lib')) return Library;
-    if (lower.includes('sport')) return Trophy;
-    if (lower.includes('hostel')) return Building2;
-    if (lower.includes('medic') || lower.includes('health')) return Shield;
-    if (
-      lower.includes('transport') ||
-      lower.includes('bus') ||
-      lower.includes('park')
-    )
-      return Building2;
-    if (lower.includes('seminar')) return Laptop;
-    if (
-      lower.includes('cafe') ||
-      lower.includes('canteen') ||
-      lower.includes('din')
-    )
-      return Coffee;
-    if (lower.includes('garden')) return Sparkles;
-    if (lower.includes('ev ') || lower.includes('charging')) return Cpu;
-    if (lower.includes('facilit')) return Building2;
-
-    return Sparkles;
-  };
 
   return (
     <div className='flex items-center justify-center w-full max-w-full mx-auto'>
       <AnimatePresence mode='wait' initial={false}>
         {isSubPage ? (
           <motion.div
-            key={`subpage-dock-${activeCategory}`}
+            key={`subpage-dock-${activeCategory}-${dockGroup}`}
             className='w-full max-w-full flex justify-center'
             initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{
@@ -2683,7 +1666,7 @@ function BottomScrollNav({
                 title='Back to Landing Page'
               >
                 <HomeIcon className='w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#EFBF04] md:text-white' />
-                <span className='hidden md:inline font-bold'>Home</span>
+                <span className='hidden md:inline font-bold'>{nav.wording.dockHome}</span>
               </button>
 
               <span className='text-white/20 font-thin select-none shrink-0 text-sm px-0.5'>
@@ -2694,19 +1677,19 @@ function BottomScrollNav({
                 {subPageItems.map((item) => {
                   const isActive = isPathMatching(
                     location.pathname,
-                    item.path,
+                    item.href,
                   );
-                  const SubIcon = getIconForLabel(item.label);
+                  const SubIcon = iconFor(item.icon, NAV_ICONS, Sparkles);
                   return (
                     <GlassPillBtn
-                      key={item.label}
-                      label={getShortName(item.label)}
-                      value={item.path}
+                      key={item.href}
+                      label={item.shortLabel}
+                      value={item.href}
                       icon={SubIcon}
                       isActive={isActive}
                       layoutPrefix='subpage'
                       onClick={() => {
-                        navigate(item.path);
+                        navigate(item.href);
                       }}
                     />
                   );
@@ -2734,19 +1717,19 @@ function BottomScrollNav({
           >
             <GlassDock activeValue={activeSection}>
               <LayoutGroup id='landing-nav'>
-                {landingNavItems.map((item) => {
-                  const isActive = activeSection === item.name;
+                {nav.dock.map((item) => {
+                  const isActive = activeSection === item.id;
                   return (
                     <GlassPillBtn
-                      key={item.name}
-                      label={getShortName(item.name)}
-                      value={item.name}
-                      icon={item.icon}
+                      key={item.id}
+                      label={item.label}
+                      value={item.id}
+                      icon={DOCK_ICONS[item.id]}
                       isActive={isActive}
                       layoutPrefix='landing'
                       onClick={() => {
-                        if (onItemClick) onItemClick(item.name, item.id);
-                        else setActiveSection(item.name);
+                        if (onItemClick) onItemClick(item.id);
+                        else setActiveSection(item.id);
                       }}
                     />
                   );
@@ -2774,16 +1757,11 @@ export default function Navbar({
   const navigate = useNavigate();
   const location = useLocation();
   const isSubPage = location.pathname !== '/';
-  // Courses come from the admin panel. Syncing them into the navigation data
-  // here, before anything below renders, keeps every menu in step with them.
-  const { content: coursesContent } = useCourses();
-  useMemo(
-    () => syncCourseNav(visibleCourses(coursesContent)),
-    [coursesContent],
-  );
-  // Cell committees are data too, and the same applies to them.
-  const cellsMenu = useCellsMenu();
-  useMemo(() => syncCellsNav(cellsMenu), [cellsMenu]);
+  // Navigation menus in the admin panel, with the committees and courses merged in.
+  const nav = useSiteNav();
+  const enquiry = useEnquiryContact();
+  // The session is edited with the homepage Admissions band, so the year is typed once.
+  const admissions = useAdmissionsContent();
   const [isScrolled, setIsScrolled] = useState(false);
   const [visible, setVisible] = useState(() => {
     if (isSubPage) return false;
@@ -2815,7 +1793,7 @@ export default function Navbar({
       if (customEv?.detail?.category) {
         setInitialCategory(customEv.detail.category);
       } else {
-        setInitialCategory('About Us');
+        setInitialCategory('about-us');
       }
       setMenuOpen(true);
     };
@@ -2855,7 +1833,7 @@ export default function Navbar({
     setInitialCategory(null);
     setActiveMegaMenu(null);
     if (location.pathname === '/') {
-      setActiveSection(landingNavItems[0].name);
+      setActiveSection(NAV_DOCK_IDS[0]);
     }
   }, [location.pathname]);
 
@@ -2866,7 +1844,7 @@ export default function Navbar({
     const prev = ckpMegaNow.current;
     navMorph.switching = prev !== null && name !== null && prev !== name;
     if (navMorph.switching) {
-      const order = navItems.map((n) => n.name);
+      const order: readonly string[] = NAV_MENU_IDS;
       const a = order.indexOf(prev as string),
         b = order.indexOf(name as string);
       navMorph.dir = a === -1 || b === -1 ? 1 : b > a ? 1 : -1;
@@ -2885,7 +1863,8 @@ export default function Navbar({
     setActiveMegaMenu(name);
   };
   const [timeStr, setTimeStr] = useState<string>('');
-  const [activeSection, setActiveSection] = useState(landingNavItems[0].name);
+  // The id of the homepage part the dock marks as current.
+  const [activeSection, setActiveSection] = useState<string>(NAV_DOCK_IDS[0]);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(
     typeof window !== 'undefined' && window.innerWidth < 1280,
   );
@@ -2974,8 +1953,8 @@ export default function Navbar({
     undefined,
   );
 
-  const handleItemClick = (name: string, id: string) => {
-    setActiveSection(name);
+  const handleItemClick = (id: string) => {
+    setActiveSection(id);
     isScrollingRef.current = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     scrollToId(id);
@@ -3022,6 +2001,24 @@ export default function Navbar({
       setShowBottomNav(!isHelpDeskPage);
     }
   }, [isSubPage, location.pathname, isHelpDeskPage]);
+
+  // Bottom navbar appears strictly after the shutter finishes opening on subpages
+  const [shutterReady, setShutterReady] = useState(!isSubPage);
+  useEffect(() => {
+    if (!isSubPage) {
+      setShutterReady(true);
+      return;
+    }
+    setShutterReady(false);
+    const handleShutterDone = () => setShutterReady(true);
+    window.addEventListener('ckp:shutter-done', handleShutterDone);
+    const fallbackTimer = setTimeout(() => setShutterReady(true), 650);
+
+    return () => {
+      window.removeEventListener('ckp:shutter-done', handleShutterDone);
+      clearTimeout(fallbackTimer);
+    };
+  }, [isSubPage, location.pathname]);
 
   const lastScrollYRef = useRef(
     typeof window !== 'undefined' ? window.scrollY : 0,
@@ -3105,22 +2102,24 @@ export default function Navbar({
 
       // ── Active-section highlight (unchanged — already purely position-based) ──
       if (!isScrollingRef.current) {
-        const targetItems = isSubPage ? bottomNavItems : landingNavItems;
+        const targetItems = isSubPage
+          ? bottomNavItems
+          : NAV_DOCK_IDS.map((id) => ({ id }));
         const sections = targetItems
           .map((item) => ({
-            name: item.name,
+            name: item.id,
             el: document.getElementById(item.id),
           }))
           .filter((s) => s.el);
         if (sections.length > 0) {
           if (scrollYVal < 120) {
-            setActiveSection(targetItems[0].name);
+            setActiveSection(targetItems[0].id);
           } else {
             const isAtBottom =
               window.innerHeight + scrollYVal >=
               document.documentElement.scrollHeight - 60;
             if (isAtBottom) {
-              setActiveSection(targetItems[targetItems.length - 1].name);
+              setActiveSection(targetItems[targetItems.length - 1].id);
             } else {
               const targetY = window.innerHeight * 0.38;
               let foundActive = false;
@@ -3217,37 +2216,35 @@ export default function Navbar({
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className='fixed inset-0 bg-black/45 backdrop-blur-md z-40 pointer-events-auto'
             onMouseEnter={() => setActiveMegaMenu(null)}
+            onClick={() => setActiveMegaMenu(null)}
           />
         )}
       </AnimatePresence>
 
       {/* ── TOP NAV — the wave on the homepage; the white band on inside pages ── */}
-      <div className={isSubPage ? 'ckp-subnav w-full' : 'contents'}>
+      <div className={isSubPage ? 'ckp-subnav w-full relative z-50' : 'contents'}>
         <motion.nav
           key='top-nav'
           initial={{ y: -130 }}
-          animate={{ y: isSubPage || visible || menuOpen ? 0 : -220 }}
-          transition={
-            isSubPage || visible || menuOpen
-              ? { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
-              : { duration: 0.1, ease: 'easeIn' }
-          }
-          className={`${isSubPage ? 'relative mx-auto w-full' : 'fixed left-1/2 -translate-x-1/2 w-[98%] max-w-[1720px]'} z-50 ${menuOpen || ckpMenuLayer ? (isSubPage ? '' : 'max-lg:top-3 sm:max-lg:top-4 max-lg:z-[70]') : ''} ${isSubPage
-            ? ''
-            : isScrolled
-              ? 'top-3 sm:top-4 lg:top-5'
-              : 'top-4 sm:top-5 lg:top-14 xl:top-16 min-[1361px]:top-[68px]'
-            }`}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className={`${
+            isSubPage
+              ? 'relative mx-auto w-full z-50'
+              : 'absolute left-1/2 -translate-x-1/2 w-[98%] max-w-[1720px] z-50 top-4 sm:top-5 lg:top-14 xl:top-16 min-[1361px]:top-[68px]'
+          }${menuOpen ? ' pointer-events-none' : ''}`}
         >
           <div className='w-full rounded-[26px] sm:rounded-[32px] bg-transparent flex flex-col relative overflow-visible'>
             {/* Main nav row */}
-            <div className='bg-transparent w-full relative z-30 overflow-visible'>
+            <div className='bg-transparent w-full relative z-50 overflow-visible'>
               <NavContent
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
                 setInitialCategory={setInitialCategory}
-                isScrolled={isScrolled}
+                isScrolled={false}
                 subpage={isSubPage}
+                menus={nav.menus}
+                enquiryButton={nav.enquiry}
                 activeMegaMenu={activeMegaMenu}
                 setActiveMegaMenu={ckpGuardedSetMega}
               />
@@ -3255,10 +2252,7 @@ export default function Navbar({
             {/* Announcement bar (homepage) — below the bar, so the crest has headroom */}
             {!isSubPage && (
               <div
-                className={`bg-gradient-to-r from-[#0C1E03] via-[#163807] to-[#0C1E03] border-b-2 border-[#D4AF37] border-t border-[#D4AF37]/35 text-white/90 hidden xl:block relative z-10 w-full overflow-hidden transition-all duration-300 rounded-b-[26px] sm:rounded-b-[32px] shadow-[0_18px_40px_-22px_rgba(0,0,0,0.6)] ckp-strip-edge ${isScrolled
-                  ? 'h-0 py-0 opacity-0 border-t-0 border-b-0'
-                  : 'min-h-[32px] py-1 px-4 sm:px-6 lg:px-8 xl:px-10 opacity-100'
-                  }`}
+                className='bg-gradient-to-r from-[#0C1E03] via-[#163807] to-[#0C1E03] border-b-2 border-[#D4AF37] border-t border-[#D4AF37]/35 text-white/90 hidden xl:block relative z-10 w-full overflow-hidden transition-all duration-300 rounded-b-[26px] sm:rounded-b-[32px] shadow-[0_18px_40px_-22px_rgba(0,0,0,0.6)] ckp-strip-edge min-h-[32px] py-1 px-4 sm:px-6 lg:px-8 xl:px-10 opacity-100'
               >
                 {/* three columns, as on CET: the admissions chip sits on the strip's true
                   centre — directly under the logo — whatever the two sides contain */}
@@ -3274,42 +2268,48 @@ export default function Navbar({
                     </span>
                   </div>
 
-                  <button
-                    onClick={onOpenAdmissions}
-                    className='justify-self-center shrink-0 font-bold text-[10px] uppercase text-[#D4AF37] hover:text-white border border-[#D4AF37]/50 hover:border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/30 px-2.5 py-0.5 rounded-full select-none tracking-wider cursor-pointer transition-all flex items-center gap-1'
-                  >
-                    <span className='w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse' />
-                    <span>Admissions Open 2026-27</span>
-                  </button>
+                  {/* Shown only while admissions are open; otherwise an empty
+                      middle cell keeps the bar's three columns in place. */}
+                  {admissions.isOpen ? (
+                    <button
+                      onClick={onOpenAdmissions}
+                      className='justify-self-center shrink-0 font-bold text-[10px] uppercase text-[#D4AF37] hover:text-white border border-[#D4AF37]/50 hover:border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/30 px-2.5 py-0.5 rounded-full select-none tracking-wider cursor-pointer transition-all flex items-center gap-1'
+                    >
+                      <span className='w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse' />
+                      <span>Admissions Open {admissions.session}</span>
+                    </button>
+                  ) : (
+                    <span aria-hidden />
+                  )}
 
                   <div className='justify-self-end flex items-center gap-x-3 xl:gap-x-3.5 min-w-0'>
                     <a
-                      href='tel:+916355065636'
+                      href={enquiry.tel}
                       className='flex items-center gap-1 hover:text-emerald-200 transition-colors text-white/90'
                     >
                       <Phone size={11} className='text-white' />
-                      <span>Enquiries: +91 6355065636</span>
+                      <span>Inquiries: {enquiry.phone}</span>
                     </a>
                     <span className='text-white/20'>|</span>
                     <a
-                      href='mailto:ckpipsr@gmail.com'
+                      href={`mailto:${enquiry.email}`}
                       className='flex items-center gap-1 hover:text-emerald-200 transition-colors text-white/90'
                     >
                       <Mail size={11} className='text-white' />
-                      <span>ckpipsr@gmail.com</span>
+                      <span>{enquiry.email}</span>
                     </a>
                     <span className='text-white/20'>|</span>
                     <button
                       id='student-help-desk-btn'
                       onClick={() => navigate('/student-help-desk')}
                       className='inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full border border-[#D4AF37] bg-black/35 hover:bg-[#D4AF37]/20 text-[#D4AF37] hover:text-[#FFE58F] text-[10px] xl:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-xs cursor-pointer active:scale-95 group'
-                      title='Student Help Desk'
+                      title={nav.fullScreen.helpDesk.label}
                     >
                       <Headset
                         size={12}
                         className='text-[#D4AF37] shrink-0 group-hover:scale-110 transition-transform'
                       />
-                      <span>STUDENT HELP DESK</span>
+                      <span>{nav.fullScreen.helpDesk.label}</span>
                     </button>
                   </div>
                 </div>
@@ -3320,20 +2320,22 @@ export default function Navbar({
       </div>
       {/* ── BOTTOM FLOATING NAV — Appears strictly when reaching footer section ── */}
       <AnimatePresence>
-        {showBottomNav && !isModalOpen && !isHelpDeskPage && (
+        {showBottomNav && !isModalOpen && !isHelpDeskPage && !menuOpen && shutterReady && (
           <motion.nav
             key='bottom-nav'
             initial={{ y: 90, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 90, opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className='fixed bottom-3 sm:bottom-5 md:bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[95vw] sm:w-[92vw] md:w-[90vw] max-w-6xl flex justify-center items-center pointer-events-auto select-none px-1 sm:px-2'
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            // Lifted while previewing, so the preview line at the very bottom stays clear.
+            className={`fixed ${previewToken() ? 'mb-12' : ''} bottom-3 sm:bottom-5 md:bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[95vw] sm:w-[92vw] md:w-[90vw] max-w-6xl flex justify-center items-center pointer-events-auto select-none px-1 sm:px-2`}
           >
             <div className='w-full max-w-full'>
               <BottomScrollNav
                 activeSection={activeSection}
                 setActiveSection={setActiveSection}
                 onItemClick={handleItemClick}
+                nav={nav}
               />
             </div>
           </motion.nav>
@@ -3351,6 +2353,7 @@ export default function Navbar({
               timeStr={timeStr}
               initialCategory={initialCategory}
               onClose={() => setInitialCategory(null)}
+              nav={nav}
             />
           </CurvedSweep>
         )}
@@ -3362,31 +2365,8 @@ export default function Navbar({
 /* ═══════════════════════════════════════════════════════════════
    OVERLAY MENU — unchanged from Code 2
 ═══════════════════════════════════════════════════════════════ */
-const OVERLAY_TREE = Object.keys(ckpipsrNavigation).map((categoryLabel) => ({
-  key: categoryLabel,
-  label: categoryLabel,
-}));
-
-const overlaySectionMap: Record<string, string> = {};
-Object.keys(ckpipsrNavigation).forEach((categoryLabel) => {
-  const jsonKey =
-    Object.keys(categoryDisplayNames).find(
-      (k) => categoryDisplayNames[k] === categoryLabel,
-    ) || '';
-  overlaySectionMap[categoryLabel] =
-    categoryUrlPrefixes[jsonKey] || slugify(categoryLabel);
-});
-
-const POPULAR_TERMS = [
-  'Admissions',
-  'B.Pharm',
-  'M.Pharm',
-  'D.Pharm',
-  'Hostel',
-  'Gallery',
-];
 const PROSPECTUS_IMG =
-  'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&q=80';
+  '/media/unsplash/photo-1576086213369-97a306d36557-779194.jpg';
 
 function OverlayMenu({
   setMenuOpen,
@@ -3395,25 +2375,32 @@ function OverlayMenu({
   timeStr,
   initialCategory,
   onClose,
+  nav,
 }: {
   setMenuOpen: (v: boolean) => void;
   navigate: (path: string) => void;
   scrollToId: (id: string) => void;
   timeStr: string;
+  /** The id of the menu to open at, from a page's Back or menu button. */
   initialCategory?: string | null;
   onClose?: () => void;
+  nav: NavMenusContent;
 }) {
+  const { fullScreen, wording } = nav;
   const [stack, setStack] = useState<string[]>(() =>
     initialCategory ? [initialCategory] : [],
   );
   const [query, setQuery] = useState('');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const admissions = useAdmissionsContent();
   const [note, setNote] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
   const autoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
+  // stack[0] is a menu id, stack[1] the name of a heading opened inside it.
   const current = stack[stack.length - 1] ?? null;
+  const openMenu = nav.menus.find((m) => m.id === stack[0]);
 
   // Whenever initialCategory changes or menu opens fresh, sync stack and clean search
   useEffect(() => {
@@ -3461,10 +2448,10 @@ function OverlayMenu({
     if (autoTimer.current) clearTimeout(autoTimer.current);
     const q = val.trim();
     if (q.length < 3) {
-      setNote(q ? 'Keep typing…' : '');
+      setNote(q ? wording.keepTyping : '');
       return;
     }
-    setNote('Searching…');
+    setNote(wording.searching);
     autoTimer.current = setTimeout(() => {
       handleClose();
       navigate(`/search?query=${encodeURIComponent(q)}`);
@@ -3477,12 +2464,9 @@ function OverlayMenu({
     handleClose();
     navigate(`/search?query=${encodeURIComponent(q)}`);
   };
-  const goSub = (subItem: string) => {
-    const rootCategory = stack[0];
-    if (!rootCategory) return;
-    const navItemPath = resolveNavItemPath(rootCategory, subItem);
+  const goSub = (href: string) => {
     handleClose();
-    if (navItemPath) navigate(navItemPath);
+    if (href) navigate(href);
   };
 
   const panelLeftVariants: any = {
@@ -3609,7 +2593,7 @@ function OverlayMenu({
         opacity: 0,
         transition: { duration: 0.25, ease: 'easeIn', delay: 0.35 },
       }}
-      className='fixed inset-0 z-[60] flex flex-col md:flex-row bg-[#081406] overflow-y-auto md:overflow-hidden pointer-events-auto'
+      className='fixed inset-0 z-[120] flex flex-col md:flex-row bg-[#081406] overflow-y-auto md:overflow-hidden pointer-events-auto'
       role='dialog'
       aria-modal='true'
       aria-label='Menu and search'
@@ -3625,10 +2609,10 @@ function OverlayMenu({
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         onClick={handleClose}
         aria-label='Close menu'
-        className='hidden lg:flex absolute top-4 right-4 md:top-6 md:right-6 z-[80] items-center gap-2 px-4 py-2.5 rounded-full bg-[#112815] text-white hover:bg-[#D4AF37] hover:text-[#112815] border border-[#D4AF37]/50 hover:border-transparent transition-all duration-300 active:scale-95 cursor-pointer group/close shadow-[0_4px_25px_rgba(0,0,0,0.3)] backdrop-blur-md'
+        className='flex absolute top-4 right-4 md:top-6 md:right-6 z-[130] items-center gap-2 px-4 py-2.5 rounded-full bg-[#112815] text-white hover:bg-[#D4AF37] hover:text-[#112815] border border-[#D4AF37]/50 hover:border-transparent transition-all duration-300 active:scale-95 cursor-pointer group/close shadow-[0_4px_25px_rgba(0,0,0,0.3)] backdrop-blur-md'
       >
         <span className='font-sans text-[10px] font-bold uppercase tracking-[0.15em] transition-colors duration-300 text-white group-hover/close:text-[#112815]'>
-          Close
+          {wording.close}
         </span>
         <X
           size={15}
@@ -3653,7 +2637,7 @@ function OverlayMenu({
               htmlFor='ckp-search'
               className='block font-sans font-bold text-xl md:text-3xl mb-2 md:mb-4'
             >
-              Search
+              {wording.search}
             </label>
             <div className='flex items-center border-b-[3px] border-[#112815]'>
               <input
@@ -3665,7 +2649,7 @@ function OverlayMenu({
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') submit();
                 }}
-                placeholder='Please enter a search term'
+                placeholder={wording.searchPlaceholder}
                 autoComplete='off'
                 className='flex-1 bg-transparent outline-none py-1.5 md:py-3 text-base md:text-xl placeholder:text-[#112815]/40'
               />
@@ -3682,20 +2666,27 @@ function OverlayMenu({
             </div>
             <div className='mt-3 md:mt-6'>
               <h4 className='font-sans text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-[#112815]/50 font-bold mb-2 md:mb-3'>
-                Popular search terms
+                {fullScreen.popularHeading}
               </h4>
               <div className='flex flex-wrap gap-x-3 md:gap-x-5 gap-y-1.5 md:gap-y-2'>
-                {POPULAR_TERMS.map((term) => (
+                {fullScreen.popularTerms.map((term) => (
                   <button
-                    key={term}
+                    key={term.label}
                     onClick={() => {
-                      setQuery(term);
-                      runAuto(term);
+                      // With an address set in the panel the term opens that
+                      // page; without one it searches the site for its words.
+                      if (term.href) {
+                        handleClose();
+                        navigate(withPreview(term.href));
+                        return;
+                      }
+                      setQuery(term.label);
+                      runAuto(term.label);
                       searchRef.current?.focus();
                     }}
                     className="relative font-sans font-semibold text-xs md:text-[15px] text-[#112815] cursor-pointer after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:w-full after:h-0.5 after:bg-[#C19A20] after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"
                   >
-                    {term}
+                    {term.label}
                   </button>
                 ))}
               </div>
@@ -3713,8 +2704,8 @@ function OverlayMenu({
           {/* Background Image of students & campus with rich overlay */}
           <div className='absolute inset-0 z-0 overflow-hidden select-none pointer-events-none'>
             <img
-              src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop'
-              alt='Campus & Admissions'
+              src={fullScreen.photo.image}
+              alt={fullScreen.photo.alt}
               className='w-full h-full object-cover opacity-50 transition-all duration-700 hover:scale-105'
               loading='lazy'
               decoding='async'
@@ -3730,25 +2721,27 @@ function OverlayMenu({
 
           <div className='relative z-10 flex-1 min-w-0 max-w-md flex flex-col items-center justify-center text-center gap-2 md:gap-3.5 my-auto'>
             <div className='space-y-1 lg:space-y-1.5 text-center'>
-              <span className='font-sans text-[8px] md:text-[9.5px] tracking-[0.2em] text-[#D4AF37] uppercase font-bold block text-center'>
-                2026 Admissions open
-              </span>
+              {/* The first year of the session ("2026" of "2026-27"), shown only while admissions are open. */}
+              {admissions.isOpen && (
+                <span className='font-sans text-[8px] md:text-[9.5px] tracking-[0.2em] text-[#D4AF37] uppercase font-bold block text-center'>
+                  {admissions.session.split('-')[0]} Admissions open
+                </span>
+              )}
               <h3 className='font-sans text-sm sm:text-base md:text-lg lg:text-xl font-bold leading-tight text-center'>
-                Embark on Your Academic Journey
+                {fullScreen.photo.heading}
               </h3>
               <p className='text-[10px] md:text-xs text-white/70 leading-relaxed font-medium text-center line-clamp-2 md:line-clamp-none max-w-sm'>
-                Join Surat's premier institution for pharmaceutical education,
-                research, and healthcare innovation. Apply online today.
+                {fullScreen.photo.text}
               </p>
             </div>
             <button
               onClick={() => {
                 handleClose();
-                scrollToId('admissions');
+                navigate(withPreview(fullScreen.photo.buttonHref));
               }}
               className='bg-[#D4AF37] hover:bg-[#C19A20] text-[#112815] font-sans font-bold text-[10px] md:text-[11px] lg:text-[12px] tracking-wider uppercase py-2 px-5 md:py-2.5 md:px-6 transition-all duration-300 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_10px_20px_rgba(212,175,55,0.15)] hover:shadow-[0_15px_30px_rgba(212,175,55,0.3)] hover:scale-[1.02] mx-auto rounded-md'
             >
-              Apply Now <ArrowRight size={13} className='stroke-[3] shrink-0' />
+              {fullScreen.photo.buttonLabel} <ArrowRight size={13} className='stroke-[3] shrink-0' />
             </button>
           </div>
         </motion.section>
@@ -3794,7 +2787,7 @@ function OverlayMenu({
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') submit();
                         }}
-                        placeholder='Search website...'
+                        placeholder={wording.phoneSearchPlaceholder}
                         className='flex-1 bg-transparent text-sm font-sans font-semibold outline-none text-[#112815] placeholder:text-[#112815]/40 py-0.5'
                         autoFocus
                       />
@@ -3820,7 +2813,7 @@ function OverlayMenu({
                   ) : (
                     <>
                       <span className='font-sans text-[10px] tracking-[0.28em] uppercase text-[#112815]/45 font-bold'>
-                        Main menu
+                        {wording.mainMenu}
                       </span>
                       <button
                         onClick={() => setShowMobileSearch(true)}
@@ -3832,12 +2825,12 @@ function OverlayMenu({
                     </>
                   )}
                 </motion.div>
-                {OVERLAY_TREE.map((item, i) => {
+                {nav.menus.map((item, i) => {
                   return (
                     <motion.button
                       variants={itemVariants}
-                      key={item.key}
-                      onClick={() => setStack([item.key])}
+                      key={item.id}
+                      onClick={() => setStack([item.id])}
                       className='group/row w-full flex items-center justify-between gap-4 py-4 border-b border-[#112815]/12 text-left cursor-pointer'
                     >
                       <span className='flex items-center gap-4'>
@@ -3879,11 +2872,11 @@ function OverlayMenu({
                       <Headset size={16} />
                     </span>
                     <span className='font-sans font-semibold text-[20px] md:text-[22px] uppercase tracking-tight text-[#112815] group-hover/row:text-[#C19A20] transition-colors'>
-                      Student Help Desk
+                      {fullScreen.helpDesk.label}
                     </span>
                   </span>
                   <span className='text-[10px] font-sans font-bold uppercase tracking-wider text-[#C19A20] border border-[#C19A20]/40 px-2.5 py-0.5 rounded-full'>
-                    Portal
+                    {fullScreen.helpDesk.badge}
                   </span>
                 </motion.button>
               </motion.nav>
@@ -3905,37 +2898,30 @@ function OverlayMenu({
                   <span className='w-9 h-9 rounded-full bg-[#112815] text-white flex items-center justify-center transition-all duration-300 group-hover/back:bg-[#D4AF37] group-hover/back:text-[#112815] group-hover/back:-translate-x-1'>
                     <ArrowRight size={16} className='stroke-[2.5] rotate-180' />
                   </span>
-                  <span className='font-sans font-bold text-[15px]'>Back</span>
+                  <span className='font-sans font-bold text-[15px]'>{wording.back}</span>
                 </motion.button>
                 <motion.div
                   variants={subitemVariants}
                   className='font-sans font-bold text-[26px] md:text-[30px] uppercase tracking-tight border-b-2 border-[#112815] pb-3 mb-3 text-[#112815]'
                 >
-                  {stack[stack.length - 1]}
+                  {stack.length === 1 ? (openMenu?.label ?? stack[0]) : stack[stack.length - 1]}
                 </motion.div>
                 {(() => {
-                  const rootCategory = stack[0];
-                  if (!rootCategory) return null;
-
-                  const rawItems = ckpipsrNavigation[rootCategory] || [];
-                  const groupedItems = groupNavItems(rawItems);
+                  if (!openMenu) return null;
 
                   if (stack.length === 1) {
-                    return groupedItems.map((groupedItem) => {
-                      const label = groupedItem.label;
-                      const detail = dropdownDetails[label] || {
-                        desc: '',
-                        icon: Sparkles,
-                      };
+                    return openMenu.links.map((link, linkIndex) => {
+                      const label = overlayName(link);
+                      const isParent = link.children.length > 0;
                       return (
                         <motion.button
                           variants={subitemVariants}
-                          key={label}
+                          key={linkIndex}
                           onClick={() => {
-                            if (groupedItem.isParent) {
+                            if (isParent) {
                               setStack([...stack, label]);
                             } else {
-                              goSub(label);
+                              goSub(link.href);
                             }
                           }}
                           className='group/sub w-full flex items-center gap-3 py-3.5 border-b border-[#112815]/10 text-left cursor-pointer hover:bg-[#50C878]/10 rounded-xl px-2 transition-colors'
@@ -3945,13 +2931,13 @@ function OverlayMenu({
                               <span className='w-2 h-2 rounded-full bg-[#50C878] shrink-0' />
                               {label}
                             </span>
-                            {detail.desc && (
+                            {link.description && (
                               <span className='font-sans text-[11px] text-[#112815]/60 mt-0.5 leading-snug pl-4'>
-                                {detail.desc}
+                                {link.description}
                               </span>
                             )}
                           </span>
-                          {groupedItem.isParent ? (
+                          {isParent ? (
                             <ChevronDown
                               size={14}
                               className='ml-auto text-[#50C878] -rotate-90 stroke-[2.5]'
@@ -3966,31 +2952,26 @@ function OverlayMenu({
                       );
                     });
                   } else {
-                    const parentItem = groupedItems.find(
-                      (g) => g.label === stack[1],
+                    const parentItem = openMenu.links.find(
+                      (l) => overlayName(l) === stack[1],
                     );
                     const childrenToRender = parentItem?.children || [];
-                    return childrenToRender.map((child) => {
-                      const detail = dropdownDetails[child.fullLabel] ||
-                        dropdownDetails[child.label] || {
-                        desc: '',
-                        icon: Sparkles,
-                      };
+                    return childrenToRender.map((child, childIndex) => {
                       return (
                         <motion.button
                           variants={subitemVariants}
-                          key={child.fullLabel}
-                          onClick={() => goSub(child.fullLabel)}
+                          key={childIndex}
+                          onClick={() => goSub(child.href)}
                           className='group/sub w-full flex items-center gap-3 py-3.5 border-b border-[#112815]/10 text-left cursor-pointer hover:bg-[#50C878]/10 rounded-xl px-2 transition-colors'
                         >
                           <span className='flex flex-col'>
                             <span className='font-sans font-bold text-[16px] group-hover/sub:text-[#50C878] transition-colors leading-tight flex items-center gap-2'>
                               <span className='w-2 h-2 rounded-full bg-[#50C878] shrink-0' />
-                              {child.label}
+                              {overlayName(child)}
                             </span>
-                            {detail.desc && (
+                            {child.description && (
                               <span className='font-sans text-[11px] text-[#112815]/60 mt-0.5 leading-snug pl-4'>
-                                {detail.desc}
+                                {child.description}
                               </span>
                             )}
                           </span>

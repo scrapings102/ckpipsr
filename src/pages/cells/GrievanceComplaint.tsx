@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
+import { Select } from "../../components/ui/Select";
 
 const EMPTY_FORM = {
   name: "",
@@ -83,15 +84,17 @@ export default function GrievanceComplaint() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="block font-semibold text-slate-800">Category *</label>
-              <select
+              <label htmlFor="grievance-category" className="block font-semibold text-slate-800">Category *</label>
+              <Select
+                id="grievance-category"
                 value={complaintForm.categoryType}
-                onChange={(e) => setComplaintForm({ ...complaintForm, categoryType: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-[#1a5d2e]"
-              >
-                <option value="SC">Scheduled Caste (SC)</option>
-                <option value="ST">Scheduled Tribe (ST)</option>
-              </select>
+                onChange={(categoryType) => setComplaintForm({ ...complaintForm, categoryType })}
+                options={[
+                  { value: "SC", label: "Scheduled Caste (SC)" },
+                  { value: "ST", label: "Scheduled Tribe (ST)" },
+                ]}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-[#1a5d2e] data-[state=open]:bg-white"
+              />
             </div>
 
             <div className="space-y-1.5">

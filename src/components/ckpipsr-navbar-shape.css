@@ -138,6 +138,8 @@
 
 .ckp-nav.is-waved .ckp-bar__glass {
   border-radius: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .ckp-bar__sheen {
@@ -583,6 +585,7 @@
   width: 100%;
   margin-left: 0;
   margin-right: 0;
+  margin-top: -2px;
   border-top: 0 !important;
   border-bottom-left-radius: 26px !important;
   border-bottom-right-radius: 26px !important;
@@ -922,6 +925,8 @@
 
 .ckp-sph {
   font-family: var(--font-sans);
+  position: relative;
+  z-index: 50;
 }
 
 /* ---- top band ---- */
@@ -1026,6 +1031,7 @@
 /* ---- menu strip ---- */
 .ckp-sph__strip {
   position: relative;
+  z-index: 50;
   /* the mega-menus position against this */
   height: 58px;
   background: linear-gradient(180deg, #1a4a25, #123a1a);
@@ -1043,6 +1049,7 @@
   gap: 28px;
   padding-right: 22px;
   min-width: 0;
+  height: 100%;
 }
 
 .ckp-sph__R {
@@ -1051,6 +1058,7 @@
   gap: 28px;
   padding-left: 22px;
   min-width: 0;
+  height: 100%;
 }
 
 .ckp-sph__sp {

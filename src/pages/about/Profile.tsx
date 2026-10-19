@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useProfileContent } from "../../hooks/useProfileContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText, plainText } from "../../utils/RichText";
 
 /**
  * The icons an editor can choose from — the other half of PROFILE_ICONS in the
@@ -74,9 +76,12 @@ export default function Profile() {
   // The opening paragraph is set with its first letter as a drop cap. Splitting
   // it here keeps the whole sentence editable as one field, rather than asking
   // an editor to supply the letter and the rest separately.
+  // The paragraph may open with formatting (a <strong> say), so the letter is
+  // taken from just after any opening tags and the tags are kept on the rest.
   const [lead = "", ...restOfBody] = content.body;
-  const dropCap = lead.slice(0, 1);
-  const leadRest = lead.slice(1);
+  const opening = lead.match(/^((?:<[^>]*>)*)([^<&])/);
+  const dropCap = opening ? opening[2] : plainText(lead).slice(0, 1);
+  const leadRest = opening ? opening[1] + lead.slice(opening[0].length) : lead.slice(1);
 
   return (
     <SubPageLayout
@@ -86,101 +91,109 @@ export default function Profile() {
       activeItemLabel="Profile"
     >
       <div className="space-y-20">
-        {/* EDITORIAL INTRODUCTION SECTION */}
-        <section className="relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#123a1a]/5 text-[#123a1a] text-[10px] font-black uppercase tracking-[0.2em] border border-[#123a1a]/10">
-                {content.eyebrow}
-              </div>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 leading-tight tracking-tight">
-                {content.headingLead} <br />
-                <span className="text-[#123a1a]">{content.headingAccent}</span>
-              </h2>
-              <div className="h-1.5 w-24 bg-[#D4AF37] rounded-full" />
+        {/* EDITORIAL INTRODUCTION SECTION - FULL-WIDTH BLOCK */}
+        <section className="relative w-full space-y-6 sm:space-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#123a1a]/5 text-[#123a1a] text-[10px] font-black uppercase tracking-[0.2em] border border-[#123a1a]/10">
+            {content.eyebrow}
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-slate-900 leading-tight tracking-tight">
+            {content.headingLead}{" "}
+            <span className="text-[#123a1a]">{content.headingAccent}</span>
+          </h2>
+          <div className="h-1.5 w-24 bg-[#D4AF37] rounded-full" />
 
-              <div className="text-slate-600 leading-relaxed font-medium text-lg space-y-6">
-                <p>
-                  <span className="float-left text-7xl font-serif font-bold text-[#D4AF37] mr-4 mt-2 leading-[0.6]">
-                    {dropCap}
-                  </span>
-                  {leadRest}
-                </p>
-                {restOfBody.map((paragraph, idx) => (
-                  <p key={idx}>{paragraph}</p>
-                ))}
+          <div className="text-slate-600 leading-relaxed font-medium text-base sm:text-lg space-y-5 sm:space-y-6 w-full">
+            {/* A short paragraph cannot wrap around the cap, so it is shown whole. */}
+            {plainText(lead).length >= 160 ? (
+              <p>
+                <span className="float-left text-6xl sm:text-7xl font-serif font-bold text-[#D4AF37] mr-3 sm:mr-4 mt-1 sm:mt-2 leading-[0.6]">
+                  {dropCap}
+                </span>
+                <RichText text={leadRest} />
+              </p>
+            ) : (
+              <p><RichText text={lead} /></p>
+            )}
+            {restOfBody.map((paragraph, idx) => (
+              <p key={idx}><RichText text={paragraph} /></p>
+            ))}
+          </div>
+        </section>
+
+        {/* CAMPUS IMAGE SHOWCASE - FULL-WIDTH BLOCK */}
+        <section className="relative w-full">
+          <div
+            className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 group shadow-xl bg-[#FAF8F3] transform hover:scale-[1.005] transition-all duration-700 w-full"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            <div className="w-full h-[300px] sm:h-[400px] md:h-[480px] lg:h-[540px] xl:h-[580px] relative overflow-hidden bg-slate-950">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentImageIndex}
+                  src={slide.url}
+                  alt={slide.title}
+                  initial={{ opacity: 0, scale: 1.12 }}
+                  animate={{ opacity: 1, scale: 1.0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full h-full object-cover object-center"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.includes("66e151f0d6a90.webp")) {
+                      target.src = "/images/hero/66e151f0d6a90.webp";
+                    }
+                  }}
+                />
+              </AnimatePresence>
+
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0c2411]/90 via-[#0c2411]/25 to-transparent pointer-events-none" />
+
+              <div className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between z-10">
+                <span className="px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-[10px] sm:text-xs font-black tracking-widest text-[#D4AF37] uppercase border border-white/20 shadow-lg">
+                  Showcase {currentImageIndex + 1} / {slides.length}
+                </span>
+
+                <button
+                  onClick={() => setIsPaused(!isPaused)}
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#D4AF37] backdrop-blur-md text-white hover:text-[#123a1a] transition-all border border-white/20 flex items-center justify-center shadow-lg cursor-pointer"
+                  aria-label={isPaused ? "Play showcase" : "Pause showcase"}
+                >
+                  {isPaused ? <Play size={14} /> : <Pause size={14} />}
+                </button>
+              </div>
+
+              {/* Slide Details Caption & Navigation Arrows */}
+              <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentImageIndex}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                    className="space-y-1 max-w-2xl pointer-events-none"
+                  >
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white drop-shadow-md leading-tight">
+                      {slide.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#D4AF37] font-bold uppercase tracking-wider">
+                      {slide.subtitle}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                <div className="flex gap-2 self-end sm:self-auto pointer-events-auto">
+                  <button type="button" onClick={handlePrev} aria-label="Previous picture" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#D4AF37] backdrop-blur-md text-white hover:text-[#123a1a] transition-all border border-white/20 flex items-center justify-center shadow-lg cursor-pointer"><ChevronLeft size={18} /></button>
+                  <button type="button" onClick={handleNext} aria-label="Next picture" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#D4AF37] backdrop-blur-md text-white hover:text-[#123a1a] transition-all border border-white/20 flex items-center justify-center shadow-lg cursor-pointer"><ChevronRight size={18} /></button>
+                </div>
               </div>
             </div>
 
-            {/* Auto-scrolling Campus Image Showcase - Refined Bento Style */}
-            <div className="lg:sticky lg:top-24">
-              <section
-                className="relative rounded-[3rem] overflow-hidden border border-slate-200 group shadow-2xl bg-[#FAF8F3] transform hover:scale-[1.02] transition-all duration-700"
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
-              >
-                <div className="aspect-[4/5] w-full relative overflow-hidden bg-slate-950">
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={currentImageIndex}
-                      src={slide.url}
-                      alt={slide.title}
-                      initial={{ opacity: 0, scale: 1.15 }}
-                      animate={{ opacity: 1, scale: 1.0 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                      className="w-full h-full object-cover object-center"
-                      referrerPolicy="no-referrer"
-                    />
-                  </AnimatePresence>
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c2411] via-[#0c2411]/20 to-transparent pointer-events-none" />
-
-                  <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-10">
-                    <span className="px-4 py-1.5 rounded-full bg-black/30 backdrop-blur-xl text-[10px] font-black tracking-widest text-[#D4AF37] uppercase border border-white/20 shadow-2xl">
-                      Showcase {currentImageIndex + 1} / {slides.length}
-                    </span>
-
-                    <button
-                      onClick={() => setIsPaused(!isPaused)}
-                      className="w-9 h-9 rounded-full bg-black/30 hover:bg-[#D4AF37] backdrop-blur-xl text-white hover:text-[#123a1a] transition-all border border-white/20 flex items-center justify-center shadow-2xl cursor-pointer"
-                      aria-label={isPaused ? "Play showcase" : "Pause showcase"}
-                    >
-                      {isPaused ? <Play size={14} /> : <Pause size={14} />}
-                    </button>
-                  </div>
-
-                  <div className="absolute bottom-8 left-8 right-8 z-10">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={currentImageIndex}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.5 }}
-                        className="space-y-1"
-                      >
-                        <h3 className="text-2xl font-serif font-bold text-white drop-shadow-2xl">
-                          {slide.title}
-                        </h3>
-                        <p className="text-sm text-[#D4AF37] font-bold uppercase tracking-widest">
-                          {slide.subtitle}
-                        </p>
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
-
-                  <div className="absolute bottom-8 right-8 flex gap-2">
-                    <button onClick={handlePrev} className="w-10 h-10 rounded-full bg-black/30 hover:bg-[#D4AF37] backdrop-blur-xl text-white hover:text-[#123a1a] transition-all border border-white/20 flex items-center justify-center shadow-2xl cursor-pointer"><ChevronLeft size={20} /></button>
-                    <button onClick={handleNext} className="w-10 h-10 rounded-full bg-black/30 hover:bg-[#D4AF37] backdrop-blur-xl text-white hover:text-[#123a1a] transition-all border border-white/20 flex items-center justify-center shadow-2xl cursor-pointer"><ChevronRight size={20} /></button>
-                  </div>
-                </div>
-
-                <div className="p-6 text-xs font-black uppercase tracking-widest text-[#123a1a] bg-white border-t border-slate-100 flex items-center justify-between">
-                  <span>{content.showcase.captionLeft}</span>
-                  <span className="text-[#D4AF37]">{content.showcase.captionRight}</span>
-                </div>
-              </section>
+            <div className="px-5 sm:px-6 py-3.5 sm:py-4 text-xs font-black uppercase tracking-wider text-[#123a1a] bg-white border-t border-slate-100 flex items-center justify-between">
+              <span>{content.showcase.captionLeft}</span>
+              <span className="text-[#D4AF37]">{content.showcase.captionRight}</span>
             </div>
           </div>
         </section>
@@ -188,7 +201,7 @@ export default function Profile() {
         {/* KEY HIGHLIGHTS SECTION */}
         <section className="grid md:grid-cols-2 gap-8">
           {content.highlights.map((feature, fIdx) => {
-            const Icon = ICONS[feature.icon] ?? Award;
+            const Icon = iconFor(feature.icon, ICONS, Award);
             return (
               <motion.div
                 key={fIdx}
@@ -211,7 +224,7 @@ export default function Profile() {
                       {feature.title}
                     </h4>
                     <p className="text-slate-500 leading-relaxed font-medium italic">
-                      "{feature.description}"
+                      "<RichText text={feature.description} />"
                     </p>
                   </div>
                 </div>
@@ -254,7 +267,7 @@ export default function Profile() {
                   </h4>
                 </div>
                 <p className="text-sm text-slate-600 font-medium leading-relaxed group-hover:text-white/80 transition-colors">
-                  {item.description}
+                  <RichText text={item.description} />
                 </p>
                 <div className="h-1.5 w-12 bg-[#D4AF37] rounded-full group-hover:w-full transition-all duration-500" />
               </motion.div>

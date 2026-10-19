@@ -5,6 +5,14 @@
  */
 export function cdn(url: string | undefined, width = 800, quality = 90): string {
   if (!url) return "";
+  // The visible area chosen in the admin panel rides after "#"; keep it on the
+  // proxied address so the picture is still framed on it.
+  const view = url.match(/#view=[^#]*$/)?.[0] ?? "";
+  if (view) return cdnBase(url.slice(0, -view.length), width, quality) + view;
+  return cdnBase(url, width, quality);
+}
+
+function cdnBase(url: string, width: number, quality: number): string {
   if (url.startsWith("data:") || url.includes("unsplash.com")) return url;
   
   if (url.includes("wsrv.nl")) {

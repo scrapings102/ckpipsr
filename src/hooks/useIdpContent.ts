@@ -99,7 +99,7 @@ export const DEFAULT_IDP: IdpContent = {
     "yearChip": "2025–2030",
     "fileLabel": "Official IDP PDF",
     "description": "Comprehensive strategic plan encompassing academic development, institutional governance, resource mobilization, digital learning integration, research promotion, and student welfare initiatives for 2025-2030.",
-    "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/6996e062b372b.pdf",
+    "url": "/media/trust/app/institutes/102/departments/docs/6996e062b372b.pdf",
     "missingLabel": "Not published yet",
     "hasFile": true
   },

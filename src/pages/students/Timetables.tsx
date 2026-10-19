@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ExternalLink, CalendarDays } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useTimetablesContent } from "../../hooks/useTimetablesContent";
+import { RichText } from "../../utils/RichText";
 
 export default function Timetables() {
   const content = useTimetablesContent();
@@ -15,7 +16,7 @@ export default function Timetables() {
       category="students-corner"
       activeItemLabel="Timetables"
     >
-      <div className="space-y-12 max-w-6xl mx-auto py-2">
+      <div className="space-y-12 w-full py-2">
         {/* ── HERO / FIND YOUR TIMETABLE HEADER SECTION ── */}
         <div className="text-center space-y-3">
           {/* Decorative Heading with Ornamental Green Accents */}
@@ -30,7 +31,7 @@ export default function Timetables() {
           </div>
 
           <p className="text-slate-600 font-sans text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
-            {heading.intro}
+            <RichText text={heading.intro} />
           </p>
         </div>
 
@@ -39,7 +40,7 @@ export default function Timetables() {
           <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 space-y-3">
             <CalendarDays size={32} className="mx-auto text-slate-300" />
             <h4 className="text-base font-serif font-bold text-slate-800">{empty.title}</h4>
-            <p className="text-xs text-slate-500">{empty.body}</p>
+            <p className="text-xs text-slate-500"><RichText text={empty.body} /></p>
           </div>
         ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">

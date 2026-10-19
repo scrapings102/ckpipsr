@@ -4,8 +4,8 @@ import { withPreview } from "./previewToken";
 /**
  * The intro animation's editable content.
  *
- * The images are chosen in the admin panel from the hero's own list, so the
- * final one can zoom into the hero without a seam. The defaults below are what
+ * The images are the loader's own, added and cropped in the admin panel,
+ * separate from the hero's. The defaults below are what
  * the loader shipped with and stay the fallback: the animation must play if the
  * API is down or slow.
  *
@@ -17,6 +17,9 @@ export interface PreloaderContent {
   enabled: boolean;
   speed: number;
   images: string[];
+  /** The two lines across the top. */
+  established: string;
+  instituteName: string;
 }
 
 export const DEFAULT_PRELOADER: PreloaderContent = {
@@ -28,6 +31,8 @@ export const DEFAULT_PRELOADER: PreloaderContent = {
     "/images/hero/65efeac7d49a3.webp",
     "/images/hero/65efeaeece007.webp",
   ],
+  established: "ESTD. 2005",
+  instituteName: "C.K. Pithawalla Institute of Pharmaceutical Science and Research",
 };
 
 /** Enough of a check that a malformed response cannot break the animation. */
@@ -57,7 +62,16 @@ function fetchPreloader(): Promise<PreloaderContent> {
   if (inFlight) return inFlight;
   inFlight = fetch(withPreview("/api/home/preloader"))
     .then((res) => (res.ok ? res.json() : null))
-    .then((body) => (body && isUsable(body.preloader) ? body.preloader : DEFAULT_PRELOADER))
+    .then((body) =>
+      body && isUsable(body.preloader)
+        ? {
+            ...body.preloader,
+            // Content published before these could be edited lacks them.
+            established: body.preloader.established || DEFAULT_PRELOADER.established,
+            instituteName: body.preloader.instituteName || DEFAULT_PRELOADER.instituteName,
+          }
+        : DEFAULT_PRELOADER,
+    )
     .catch(() => DEFAULT_PRELOADER);
   return inFlight;
 }

@@ -14,8 +14,6 @@ export interface FacultyMember {
   name: string;
   designation: string;
   qualification: string;
-  /** Blank hides the gold badge. */
-  experience: string;
   areaOfInterest: string;
   /** Blank hides the contact button. */
   email: string;
@@ -33,13 +31,22 @@ export interface FacultyProfileDetails {
   department: string;
   designation: string;
   qualification: string;
-  experience: string;
   /** A link (https://…) or a short bio. */
   profile: string;
   achievements: string[];
   email: string;
   contactNumber: string;
+  /** "YYYY-MM-DD". Missing or blank hides the line. */
   joiningDate?: string;
+  /**
+   * Whole years. Without a joining date this is the experience as it stands;
+   * with one, the years before joining, and the site adds a year for each
+   * full year since. Neither set hides the badge.
+   */
+  pastExperienceYears?: number;
+  /** "https://..." or a site path "/...". Missing hides the View Resume button. */
+  resumeUrl?: string;
+  /** Missing when none is set; a blank link is not shown. */
   researchLinks?: ResearchLinks;
 }
 
@@ -48,7 +55,13 @@ export interface FacultiesContent {
   pageSubtitle: string;
   intro: { badge: string; heading: string; body: string };
   members: FacultyMember[];
-  research: { title: string; body: string; stats: { value: string; label: string }[] };
+  research: { title: string; body: string; image: string; stats: { value: string; label: string }[] };
+}
+
+/** The leading number of years in "28 Year(s), 6 Month(s)", or none. */
+function wholeYears(text: string): number | undefined {
+  const match = /^\s*(\d+)\s*year/i.exec(text || "");
+  return match ? Number(match[1]) : undefined;
 }
 
 export const DEFAULT_FACULTIES: FacultiesContent = {
@@ -65,7 +78,6 @@ export const DEFAULT_FACULTIES: FacultiesContent = {
       name: member.name,
       designation: member.designation,
       qualification: member.qualification || d.qualification,
-      experience: member.experience || d.experience || "5+ Years Experience",
       areaOfInterest: member.area_of_interest,
       email: member.email,
       image: member.image_url,
@@ -73,12 +85,17 @@ export const DEFAULT_FACULTIES: FacultiesContent = {
         department: d.department,
         designation: d.designation,
         qualification: d.qualification,
-        experience: d.experience,
+        // Whole years: with joiningDate set, pastExperienceYears is past years brought (7 for Principal, 0 for others whose joining date aligns with full experience)
+        pastExperienceYears: d.joiningDate
+          ? member.name.toLowerCase().includes("dhiren") ? 7 : 0
+          : wholeYears(d.experience || member.experience),
+        joiningDate: d.joiningDate,
         profile: d.profile,
         achievements: d.achievements,
         email: d.email,
         contactNumber: d.contactNumber,
-        joiningDate: d.joiningDate,
+        // A placeholder link the office asked for until real resumes are added.
+        resumeUrl: "https://www.google.com",
         researchLinks: d.researchLinks,
       },
     };
@@ -86,6 +103,7 @@ export const DEFAULT_FACULTIES: FacultiesContent = {
   research: {
     title: "Academic Integrity & Research",
     body: "Our faculty members are active researchers contributing to the global pharmaceutical knowledge base through publications and innovative patents.",
+    image: "/images/hero/college_campus.jpg",
     stats: [
       { value: "50+", label: "Scientific Publications" },
       { value: "10+", label: "Industrial Patents" },

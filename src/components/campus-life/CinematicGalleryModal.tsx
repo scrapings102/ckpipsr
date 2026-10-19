@@ -130,7 +130,7 @@ export default function CinematicGalleryModal({
           </div>
 
           {/* Thumbnail Strip */}
-          <div className="w-full flex items-center justify-center gap-2 sm:gap-2.5 overflow-x-auto py-2 no-scrollbar shrink-0 z-10">
+          <div className="w-full flex items-center justify-start sm:justify-center gap-2 sm:gap-2.5 overflow-x-auto py-2 px-4 no-scrollbar shrink-0 z-10">
             {items.map((item, idx) => {
               const isActive = activeIndex === idx;
               return (

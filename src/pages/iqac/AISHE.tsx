@@ -19,6 +19,11 @@ import {
 import SubPageLayout from "../../components/SubPageLayout";
 import { useAisheContent } from "../../hooks/useAisheContent";
 import type { MomTone } from "../../hooks/useIqacMomsContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
 
 /** The icons a summary tile can carry; the panel offers these same names. */
 const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -56,7 +61,7 @@ export default function AISHE() {
       category="iqac"
       activeItemLabel="AISHE"
     >
-      <div className="space-y-10 max-w-5xl mx-auto">
+      <div className="space-y-10 w-full">
 
         {/* Header Introduction Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -86,13 +91,13 @@ export default function AISHE() {
           </div>
 
           <p className="text-sm sm:text-base font-sans text-slate-700 leading-relaxed font-normal">
-            {intro.body}
+            <RichText text={intro.body} />
           </p>
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
             {intro.stats.map((stat, i) => {
-              const Icon = ICONS[stat.icon];
+              const Icon = iconFor(stat.icon, ICONS, NoIcon);
               return (
                 <div
                   key={i}
@@ -131,7 +136,7 @@ export default function AISHE() {
             <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 space-y-3">
               <FileCheck size={32} className="mx-auto text-slate-300" />
               <h4 className="text-base font-serif font-bold text-slate-800">{empty.title}</h4>
-              <p className="text-xs text-slate-500">{empty.body}</p>
+              <p className="text-xs text-slate-500"><RichText text={empty.body} /></p>
             </div>
           ) : (
           <div className="grid grid-cols-1 gap-4">
@@ -165,7 +170,7 @@ export default function AISHE() {
                       </div>
 
                       <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed max-w-2xl">
-                        {doc.description}
+                        <RichText text={doc.description} />
                       </p>
                     </div>
                   </div>
@@ -206,7 +211,7 @@ export default function AISHE() {
               {quick.title}
             </h4>
             <p className="text-xs text-slate-600">
-              {quick.body}
+              <RichText text={quick.body} />
             </p>
           </div>
 

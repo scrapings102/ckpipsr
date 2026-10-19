@@ -23,6 +23,7 @@ import {
   BookOpen
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import { useIicContent } from "../../hooks/useIicContent";
 
 type TabType = "about" | "structure";
@@ -40,7 +41,7 @@ export default function IIC() {
       category="research-and-innovation"
       activeItemLabel="IIC"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
         
         {/* Sub-Navigation Tabs */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
@@ -115,7 +116,7 @@ export default function IIC() {
                             ✓
                           </div>
                           <p className="text-xs sm:text-sm font-sans font-medium text-slate-700 leading-relaxed">
-                            {obj}
+                            <RichText text={obj} />
                           </p>
                         </div>
                       ))}
@@ -154,7 +155,7 @@ export default function IIC() {
                           {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
                         </span>
                         <p className="text-xs sm:text-sm font-sans text-slate-700 leading-relaxed font-normal">
-                          {item}
+                          <RichText text={item} />
                         </p>
                       </div>
                     ))}
@@ -193,7 +194,7 @@ export default function IIC() {
                 <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
                   {structure.instituteId && (
                     <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#1a5d2e] text-white border border-[#1a5d2e] shadow-xs">
-                      {structure.instituteId}
+                      Institute ID – {structure.instituteId}
                     </span>
                   )}
                   <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-50 text-[#1a5d2e] border border-emerald-200">
@@ -258,7 +259,7 @@ export default function IIC() {
                           Responsibility
                         </span>
                         <p className="text-slate-700 font-medium leading-relaxed whitespace-pre-line">
-                          {member.responsibility}
+                          <RichText text={member.responsibility} />
                         </p>
                       </div>
                     </div>

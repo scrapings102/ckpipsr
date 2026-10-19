@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, ArrowUpRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Pillar } from './campusLifeData';
+import { RichText } from '../../utils/RichText';
 
 interface PillarCardProps {
   pillar: Pillar;
@@ -57,7 +58,7 @@ export default function PillarCard({
               {pillar.headline}
             </p>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              {pillar.description}
+              <RichText text={pillar.description} />
             </p>
           </div>
 
@@ -143,27 +144,6 @@ export default function PillarCard({
               </div>
             </div>
 
-            {/* Inset Secondary Thumbnail (Floating preview) */}
-            {pillar.sideImage && (
-              <div
-                className={`hidden sm:block absolute -bottom-4 ${
-                  isEven ? '-left-4' : '-right-4'
-                } w-28 sm:w-36 aspect-[4/3] rounded-2xl overflow-hidden p-1.5 bg-white shadow-xl border border-slate-200/90 z-20 group-hover:-translate-y-1 transition-transform duration-300`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenGallery(pillar.sideImage);
-                }}
-              >
-                <img
-                  src={pillar.sideImage}
-                  alt={`${pillar.title} detail`}
-                  className="w-full h-full object-cover rounded-xl"
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>

@@ -228,7 +228,7 @@ export default function MobileIsland({ theme, title, subtitle, logo, menuOpen, o
                         <button
                             type="button"
                             className="mi-seal"
-                            aria-label={`${title} — home`}
+                            aria-label={`${title}: home`}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onLogo();

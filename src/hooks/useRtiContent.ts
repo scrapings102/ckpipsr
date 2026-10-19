@@ -23,8 +23,9 @@ export interface RtiNote {
  * Accreditation → RTI.
  *
  * The officer's name arrives already resolved: the panel holds a link to the
- * Deans or Faculties page, so a rename there follows here, and the line under
- * the name is filled in rather than repeating it.
+ * Faculties page, so a rename there follows here, and the line under the name
+ * is filled in rather than repeating it. The address is the campus address
+ * from Contact Us.
  *
  * The portal address was written out five times on this page — the tile note,
  * the "Portal URL:" line, the button, the shortcut and the href. It is stored
@@ -45,7 +46,7 @@ export interface RtiContent {
     kicker: string;
     heading: string;
     /** Where the name came from. */
-    source: "deans" | "faculties" | "custom";
+    source: "faculties" | "custom";
     name: string;
     /** Over the name on the card. */
     cardKicker: string;
@@ -55,6 +56,7 @@ export interface RtiContent {
     /** Already filled in with the name. */
     line: string;
     badge: string;
+    /** The campus address from Contact Us. */
     address: string;
   };
   portal: {
@@ -127,7 +129,7 @@ export const DEFAULT_RTI: RtiContent = {
     "organisation": "C.K Pithawalla Institute Of Pharmaceutical Science & Research",
     "line": "Office In-charge: Dr. Dhiren P. Shah",
     "badge": "Statutory Officer",
-    "address": "Surat-Dumas Road, Surat, Gujarat"
+    "address": "Opposite Surat Airport, Behind DPS School, Near Malvan Mandir, Dumas Road, Surat - 395007, Gujarat, India."
   },
   "portal": {
     "kicker": "National Online Portal",

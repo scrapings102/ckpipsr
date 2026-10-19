@@ -50,6 +50,7 @@ export interface ResearchAboutContent {
   mission: { kicker: string; heading: string; points: string[] };
   photo: ResearchPhoto;
   responsibilities: { kicker: string; heading: string; items: ResearchResponsibility[] };
+  /** `instituteId` is the IIC page's id, read from there. */
   structure: { kicker: string; instituteId: string; heading: string; members: RdcMember[] };
   objectives: { kicker: string; heading: string; items: string[] };
   actionPlans: { kicker: string; heading: string; items: ResearchActionPlan[] };
@@ -149,7 +150,7 @@ export const DEFAULT_RESEARCH_ABOUT: ResearchAboutContent = {
           "email": "dhiren.shah@ckpipsr.ac.in"
         },
         {
-          "name": "Dr. Vinod D. Ramani",
+          "name": "Dr. Vinodkumar D. Ramani",
           "designation": "Associate Professor",
           "role": "Coordinator",
           "responsibility": "Product Development Monitoring & Commercialization",
@@ -189,7 +190,7 @@ export const DEFAULT_RESEARCH_ABOUT: ResearchAboutContent = {
           "email": "suchi.desai@ckpipsr.ac.in"
         },
         {
-          "name": "Dr. Monika Kakadia",
+          "name": "Dr. Monika Kyada",
           "designation": "Assistant Professor",
           "role": "Member",
           "responsibility": "Product Development Monitoring & Commercialization",
@@ -201,7 +202,7 @@ export const DEFAULT_RESEARCH_ABOUT: ResearchAboutContent = {
           "designation": "Assistant Professor",
           "role": "Member",
           "responsibility": "IPR Legal & Ethical Matters",
-          "contact": "953748224",
+          "contact": "9537482224",
           "email": "dhaval.joshi@ckpipsr.ac.in"
         }
       ]

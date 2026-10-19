@@ -1,24 +1,26 @@
 import React from "react";
 import { motion } from "motion/react";
-import { 
-  CheckCircle2, 
-  Clock, 
-  Users, 
-  BookOpen, 
-  Sparkles, 
-  FileText, 
-  Download, 
-  Zap, 
+import {
+  CheckCircle2,
+  Clock,
+  Users,
+  BookOpen,
+  Sparkles,
+  FileText,
+  Download,
+  Zap,
   Target,
   ArrowRight
 } from "lucide-react";
 import type { CourseContent } from "../hooks/useCourseContent";
 import { LeafTileGallery } from "./LeafTileGallery";
+import { RichText } from "../utils/RichText";
 
 /**
- * A course button: a real link once the admin panel gives it one, otherwise
- * the plain button the page always had. Hrefs are checked by the API — a site
- * path or https — and external ones open in a new tab.
+ * A course button: a real link once the admin panel gives it one. Without a
+ * link it is left out, since a button that does nothing when pressed looks
+ * broken. Hrefs are checked by the API (a site path or https), and external
+ * ones open in a new tab.
  */
 function CourseAction({
   href,
@@ -29,13 +31,7 @@ function CourseAction({
   className: string;
   children: React.ReactNode;
 }) {
-  if (!href) {
-    return (
-      <button type="button" className={className}>
-        {children}
-      </button>
-    );
-  }
+  if (!href) return null;
   const external = /^https:\/\//i.test(href);
   return (
     <a
@@ -78,7 +74,7 @@ export const CourseDetail: React.FC<{ course: CourseContent }> = ({ course }) =>
             {course.banner.title}
           </h1>
           <p className="text-slate-200 text-xs sm:text-sm font-medium max-w-2xl">
-            {course.banner.text}
+            <RichText text={course.banner.text} />
           </p>
         </div>
       </section>
@@ -110,7 +106,7 @@ export const CourseDetail: React.FC<{ course: CourseContent }> = ({ course }) =>
               </h2>
               <div className="h-1 w-14 bg-[#D4AF37] rounded-full" />
               <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
-                "{course.overview}"
+                "<RichText text={course.overview} />"
               </p>
             </div>
 
@@ -148,7 +144,7 @@ export const CourseDetail: React.FC<{ course: CourseContent }> = ({ course }) =>
                 <Sparkles className="text-[#D4AF37]" size={20} />
               </div>
               <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                {course.integrity.body}
+                <RichText text={course.integrity.body} />
               </p>
               <div className="flex flex-wrap gap-2.5">
                 <CourseAction
@@ -170,25 +166,6 @@ export const CourseDetail: React.FC<{ course: CourseContent }> = ({ course }) =>
 
         {/* Sidebar */}
         <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-28">
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-4">
-            <h3 className="text-base font-serif font-bold text-slate-900 tracking-tight">{course.feeCard.title}</h3>
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-2">
-              <div className="flex justify-between items-center gap-3">
-                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{course.feeCard.label}</span>
-                <span className="text-sm font-bold text-[#123a1a] text-right">{course.stats.fees}</span>
-              </div>
-              {course.feeCard.note && (
-                <p className="text-[9px] text-slate-400 font-medium">* {course.feeCard.note}</p>
-              )}
-            </div>
-            <CourseAction
-              href={course.feeCard.buttonUrl}
-              className="block w-full py-2.5 bg-[#123a1a] text-white text-center rounded-xl font-bold text-xs shadow-md hover:bg-[#1a4a25] transition-all"
-            >
-              {course.feeCard.buttonLabel}
-            </CourseAction>
-          </div>
-
           <div className="bg-[#FAF8F3] rounded-2xl p-5 border border-[#D4AF37]/10 shadow-sm space-y-3">
             <h3 className="text-base font-serif font-bold text-slate-900 tracking-tight">{course.notice.title}</h3>
             <div className="flex gap-3 items-start">
@@ -196,7 +173,7 @@ export const CourseDetail: React.FC<{ course: CourseContent }> = ({ course }) =>
                 <FileText size={16} />
               </div>
               <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                {course.notice.body}
+                <RichText text={course.notice.body} />
               </p>
             </div>
           </div>
@@ -251,7 +228,7 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
               </h2>
               <div className="h-1 w-16 bg-[#D4AF37] rounded-full" />
               <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
-                "{description}"
+                "<RichText text={description} />"
               </p>
             </div>
 
@@ -267,8 +244,8 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
 
           <div className="relative group">
             <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-xl border-2 border-white">
-              <img 
-                src={image} 
+              <img
+                src={image}
                 alt={title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 loading="lazy"
@@ -287,10 +264,10 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
           <h3 className="text-lg font-serif font-bold text-slate-900 tracking-tight">{detailsHeading}</h3>
           <div className="h-px flex-1 bg-slate-100 mx-4" />
         </div>
-        
+
         <div className="grid sm:grid-cols-3 gap-3">
           {details.map((detail, dIdx) => (
-            <motion.div 
+            <motion.div
               key={dIdx}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -312,30 +289,10 @@ export const ResourceDetailLayout: React.FC<ResourceDetailProps> = ({
         <LeafTileGallery
           photos={displayPhotos}
           title={`${title} Photo Archive`}
-          subtitle={`Authentic photographs of the ${title} infrastructure and facilities at CKPIPSR.`}
+          subtitle={`Photographs of the ${title} at CKPIPSR.`}
           facilityName={title}
         />
       )}
-
-      {/* CTA Section */}
-      <div className="bg-[#123a1a] rounded-2xl sm:rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden shadow-xl">
-         <div className="absolute inset-0 opacity-10 mix-blend-overlay">
-            <img src="/images/hero/college_campus.jpg" className="w-full h-full object-cover" />
-         </div>
-         
-         <div className="relative z-10 space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">A Modern Academic Environment</h3>
-              <p className="text-slate-300 max-w-xl mx-auto text-xs sm:text-sm leading-relaxed">
-                 We invest continuously in our infrastructure to provide the best possible learning 
-                 and research environment for our students.
-              </p>
-            </div>
-            <button className="px-6 py-3 rounded-xl bg-[#123a1a] text-[#D4AF37] border border-[#D4AF37]/30 font-bold text-xs hover:bg-[#1a4a25] transition-all shadow-md active:scale-95">
-               Inquire About Facilities
-            </button>
-         </div>
-      </div>
     </div>
   );
 };

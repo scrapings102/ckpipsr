@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { withPreview } from "./previewToken";
+import { fillFieldText, fillRequired, type FieldText } from "../utils/requiredFields";
 
 /**
  * Students Corner → Student Help Desk.
@@ -37,6 +38,7 @@ export interface HelpDeskForm {
   href: string;
 }
 
+/** A nodal officer. One linked to Faculties arrives with the name, email and mobile from there. */
 export interface HelpDeskOfficer {
   name: string;
   designation: string;
@@ -53,6 +55,21 @@ export interface HelpDeskStage {
   note: string;
 }
 
+/** The ticket form's boxes, by the name the API uses for each. */
+export type HelpDeskField =
+  | "fullName"
+  | "email"
+  | "phone"
+  | "studentCode"
+  | "course"
+  | "semester"
+  | "issueCategory"
+  | "priority"
+  | "contactMethod"
+  | "subject"
+  | "description"
+  | "attachment";
+
 export interface HelpDeskContent {
   pageTitle: string;
   pageSubtitle: string;
@@ -61,6 +78,7 @@ export interface HelpDeskContent {
     issue: { heading: string; blurb: string };
     attachment: { heading: string; blurb: string; hint: string };
     categories: string[];
+    /** Switched-on courses from Courses Offered, in their order, as the server words them. */
     courses: string[];
     semesters: string[];
     priorities: HelpDeskPriority[];
@@ -83,6 +101,10 @@ export interface HelpDeskContent {
   directory: { heading: string; blurb: string; officers: HelpDeskOfficer[] };
   /** The categories the questions use, worked out by the API. */
   faqCategories: string[];
+  /** True where the ticket form will not send with the box left empty. */
+  requiredFields: Record<HelpDeskField, boolean>;
+  /** What each box is called and the hint inside it. The form adds the required star or "(Optional)" itself. */
+  fieldText: Record<HelpDeskField, FieldText>;
 }
 
 /** The page as it shipped, and what it falls back to. */
@@ -112,12 +134,13 @@ export const DEFAULT_HELP_DESK: HelpDeskContent = {
       "Library & E-Resource Access",
       "Hostel & Campus Bus Transport",
       "Website & IT Portal Access",
-      "Other General Enquiry"
+      "Other General Inquiry"
     ],
     "courses": [
+      "D.Pharm (Diploma in Pharmacy)",
       "B.Pharm (Bachelor of Pharmacy)",
-      "M.Pharm (Pharmaceutics)",
-      "D.Pharm (Diploma in Pharmacy)"
+      "M.Pharm (Master of Pharmacy)",
+      "Short Term Certificate"
     ],
     "semesters": [
       "Semester 1",
@@ -160,13 +183,13 @@ export const DEFAULT_HELP_DESK: HelpDeskContent = {
   "success": {
     "heading": "Support Ticket Successfully Registered!",
     "lead": "Your ticket has been logged into the student portal system.",
-    "note": "Keep this reference safe — you will need it, along with the email address above, to track your ticket.",
+    "note": "Keep this reference safe. You will need it, along with the email address above, to track your ticket.",
     "defaultOfficer": "Nodal Student Officer (Room 102)"
   },
   "track": {
     "heading": "Track Your Support Ticket",
     "blurb": "Enter the reference ID from your confirmation along with the email address the ticket was raised with.",
-    "referenceLabel": "Ticket Reference ID",
+    "referenceLabel": "Ticket Reference or Roll / Enrolment No",
     "emailLabel": "Email Used on the Ticket",
     "buttonLabel": "Check Status",
     "stages": [
@@ -199,7 +222,7 @@ export const DEFAULT_HELP_DESK: HelpDeskContent = {
   },
   "faqs": {
     "heading": "Frequently Asked Questions",
-    "blurb": "Search the knowledge base before raising a ticket — most routine requests are answered here.",
+    "blurb": "Search the knowledge base before raising a ticket. Most routine requests are answered here.",
     "items": [
       {
         "id": "faq-1",
@@ -342,8 +365,8 @@ export const DEFAULT_HELP_DESK: HelpDeskContent = {
         "name": "Dr. Dhiren P. Shah",
         "designation": "Principal & Appellate Grievance Officer",
         "department": "Institutional Administration",
-        "email": "principal@ckpipsr.ac.in",
-        "phone": "+91 (0261) 2727123 Ext. 101",
+        "email": "dhiren.shah@ckpipsr.ac.in",
+        "phone": "9427474602",
         "office": "Principal Office, 1st Floor, Main Academic Building"
       },
       {
@@ -394,7 +417,38 @@ export const DEFAULT_HELP_DESK: HelpDeskContent = {
     "Scholarships & Fees",
     "Library",
     "General"
-  ]
+  ],
+  // The same defaults as the server's (schemas/requiredFields.ts). Priority
+  // and contact method were never checked: they start with a choice made.
+  "requiredFields": {
+    "fullName": true,
+    "email": true,
+    "phone": false,
+    "studentCode": false,
+    "course": false,
+    "semester": false,
+    "issueCategory": true,
+    "priority": false,
+    "contactMethod": false,
+    "subject": true,
+    "description": true,
+    "attachment": false
+  },
+  // The words each form showed before they were editable.
+  "fieldText": {
+    "fullName": { "label": "Full Name", "placeholder": "Enter your full legal name as per college record" },
+    "email": { "label": "Email Address", "placeholder": "your.email@example.com" },
+    "phone": { "label": "Phone Number", "placeholder": "10-digit mobile number" },
+    "studentCode": { "label": "Student Roll Code / Enrollment No", "placeholder": "e.g. UG240015 or GTU Enrollment No" },
+    "course": { "label": "Academic Program / Course", "placeholder": "Select Pharmacy Program..." },
+    "semester": { "label": "Current Semester", "placeholder": "Select Semester..." },
+    "issueCategory": { "label": "Issue Category", "placeholder": "Select Category..." },
+    "priority": { "label": "Priority Level", "placeholder": "" },
+    "contactMethod": { "label": "Preferred Contact Method", "placeholder": "" },
+    "subject": { "label": "Subject / Short Title", "placeholder": "Brief summary of your inquiry or issue (e.g. GTU Marksheet Verification)" },
+    "description": { "label": "Detailed Description", "placeholder": "Please describe what happened, dates, GTU enrollment number, semester, or error messages encountered." },
+    "attachment": { "label": "Supporting Document", "placeholder": "Drag and drop document here, or browse files" }
+  }
 };
 
 /** Enough of a check that a malformed response cannot empty the page. */
@@ -420,7 +474,13 @@ export function useStudentHelpDeskContent(): HelpDeskContent {
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (cancelled || !body) return;
-        if (isUsable(body.helpDesk)) setContent(body.helpDesk);
+        if (isUsable(body.helpDesk)) {
+          setContent({
+            ...body.helpDesk,
+            requiredFields: fillRequired(DEFAULT_HELP_DESK.requiredFields, body.helpDesk.requiredFields),
+            fieldText: fillFieldText(DEFAULT_HELP_DESK.fieldText, body.helpDesk.fieldText),
+          });
+        }
       })
       // The page does not depend on the API being up.
       .catch(() => undefined);

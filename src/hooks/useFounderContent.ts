@@ -35,9 +35,9 @@ export interface FounderContent {
 export const DEFAULT_FOUNDER: FounderContent = {
   pageTitle: "Our Visionary Founder",
   pageSubtitle:
-    "Late Shri Chhotubhai Pithawalla — the benevolent industrialist and reformer behind C.K. Pithawalla institutions.",
+    "Late Shri Chhotubhai Pithawalla, the benevolent industrialist and reformer behind C.K. Pithawalla institutions.",
   portrait: {
-    image: "https://ckpipsr.ac.in/images/about/founder.jpg",
+    image: "/media/ipsr/images/about/founder.jpg",
     name: "Late Shri Chhotubhai Pithawalla",
     role: "Visionary Founder & Benefactor",
   },

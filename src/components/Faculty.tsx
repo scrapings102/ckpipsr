@@ -56,7 +56,7 @@ export default function Faculty() {
           {leadership.map((member) => (
             <div
               key={member.name}
-              className="group cursor-pointer bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 hover:border-[#00509d] transition-all shadow-xs hover:shadow-lg flex flex-col justify-between"
+              className="group bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 hover:border-[#00509d] transition-all shadow-xs hover:shadow-lg flex flex-col justify-between"
             >
               <div>
                 <div className="relative overflow-hidden rounded-xl aspect-[4/3] sm:aspect-[4/5] mb-3 sm:mb-5 bg-slate-100">
@@ -68,7 +68,7 @@ export default function Faculty() {
                     decoding="async"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://app.ckpcet.ac.in/webroot/files/StaffMasters/photo/1645260034.jpg";
+                      (e.target as HTMLImageElement).src = "/media/misc/ckpcet-1645260034.jpg";
                     }}
                   />
                   <div className="absolute inset-0 bg-navy/10 group-hover:bg-transparent transition-colors duration-500" />

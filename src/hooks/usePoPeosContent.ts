@@ -43,7 +43,7 @@ export interface PoPeosContent {
 const OUTCOMES: [string, string][] = [
   ["Pharmacy Knowledge", "Possess knowledge and comprehension of the core and basic knowledge associated with the profession of pharmacy, including biomedical sciences; pharmaceutical sciences; behavioral, social, and administrative pharmacy sciences; and manufacturing practices."],
   ["Planning Abilities", "Demonstrate effective planning abilities including time management, resource management, delegation skills and organizational skills. Develop and implement plans and organize work to meet deadlines."],
-  ["Problem Analysis", "Utilize the principles of scientific enquiry, thinking analytically, clearly and critically, while solving problems and making decisions during daily practice."],
+  ["Problem Analysis", "Utilize the principles of scientific inquiry, thinking analytically, clearly and critically, while solving problems and making decisions during daily practice."],
   ["Modern Tool Usage", "Learn, select, and apply appropriate methods and procedures, resources, and modern pharmacy-related computing tools with an understanding of the limitations."],
   ["Leadership Skills", "Understand and consider the human reaction to change, motivation issues, leadership and team building when planning changes required for fulfillment of core, professional and societal responsibilities."],
   ["Professional Identity", "Understand, analyze and communicate the value of their professional roles (e.g. educators, health promoters, clinicians, employers, employees)."],
@@ -109,25 +109,7 @@ export function usePoPeosContent(): PoPeosContent {
       .then((body) => {
         if (cancelled || !body) return;
         if (isUsable(body.poPeos)) {
-          const data = { ...body.poPeos };
-          if (!data.pageTitle || data.pageTitle === "PO And PEO's" || data.pageTitle === "PO and PEOs") {
-            data.pageTitle = "Program Educational Objectives & Outcomes (PO & PEOs)";
-          }
-          if (!data.peos?.headingLead || data.peos.headingLead === "PO And PEO's") {
-            data.peos = {
-              ...data.peos,
-              headingLead: "Program Educational",
-              headingAccent: "Objectives (PEOs)",
-            };
-          }
-          if (!data.pos?.headingLead || data.pos.headingLead === "PO And PEO's") {
-            data.pos = {
-              ...data.pos,
-              headingLead: "Program Outcomes",
-              headingAccent: "(POs)",
-            };
-          }
-          setContent(data);
+          setContent(body.poPeos);
         }
       })
       // The page does not depend on the API being up.

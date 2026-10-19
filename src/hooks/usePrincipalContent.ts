@@ -21,9 +21,25 @@ export interface PrincipalContent {
   portrait: { image: string; name: string; badge: string; qualifications: string };
   quote: string;
   credentials: PrincipalCredential[];
-  contact: { label: string; email: string };
   message: { title: string; eyebrow: string; body: string[] };
-  signature: { name: string; role: string; note: string };
+  /** `name` arrives as the portrait's name; only the role is stored for the signature. */
+  signature: { name: string; role: string };
+  /**
+   * The "Message from the Principal" card on the home page. Its photo, name,
+   * badge and qualifications are the ones above; only its own words live here.
+   */
+  homeCard: PrincipalHomeCard;
+}
+
+export interface PrincipalHomeCard {
+  /** Blank shows the default heading. */
+  heading: string;
+  /** Blank shows the page's quote, then the default one. */
+  quote: string;
+  /** Blank shows the default wording. */
+  buttonLabel: string;
+  /** Where the button goes; blank or missing opens The Principal page. */
+  buttonHref?: string;
 }
 
 export const DEFAULT_PRINCIPAL: PrincipalContent = {
@@ -53,10 +69,6 @@ export const DEFAULT_PRINCIPAL: PrincipalContent = {
       value: "Gujarat Technological University"
     }
   ],
-  contact: {
-    label: "Contact Principal Desk",
-    email: "dhiren.shah@ckpipsr.ac.in"
-  },
   message: {
     title: "Message from the Principal",
     eyebrow: "From the Desk of the Principal",
@@ -72,8 +84,12 @@ export const DEFAULT_PRINCIPAL: PrincipalContent = {
   },
   signature: {
     name: "Dr. Dhiren P. Shah",
-    role: "Principal, CKPIPSR",
-    note: "Gujarat Technological University Approved"
+    role: "Principal, CKPIPSR"
+  },
+  homeCard: {
+    heading: "Message from the Principal",
+    quote: "Our vision is to establish CKPIPSR as a globally recognized centre of excellence in pharmaceutical education, research, innovation, entrepreneurship, and professional development by producing competent, ethical, and socially responsible pharmacy professionals.",
+    buttonLabel: "Read Full Message"
   }
 };
 
@@ -99,7 +115,10 @@ export function usePrincipalContent(): PrincipalContent {
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (cancelled || !body) return;
-        if (isUsable(body.principal)) setContent(body.principal);
+        if (!isUsable(body.principal)) return;
+        // Content saved before the home page card read this section has no
+        // card, and the card then keeps the wording it shipped with.
+        setContent({ ...body.principal, homeCard: body.principal.homeCard ?? DEFAULT_PRINCIPAL.homeCard });
       })
       // The page does not depend on the API being up.
       .catch(() => undefined);

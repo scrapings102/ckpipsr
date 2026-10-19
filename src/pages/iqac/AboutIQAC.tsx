@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useIqacAboutContent } from "../../hooks/useIqacAboutContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
 
 /**
  * The icons a card may carry. The panel offers these names; anything else
@@ -52,6 +54,9 @@ const ICONS: Record<string, React.ComponentType<{ size?: number; className?: str
   TrendingUp,
 };
 
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
+
 /** The two colours the banner's cards come in. */
 const TONES: Record<string, string> = {
   emerald: "bg-emerald-500/20 text-emerald-400",
@@ -69,7 +74,7 @@ export default function AboutIQAC() {
       category="iqac"
       activeItemLabel="About IQAC"
     >
-      <div className="space-y-12 max-w-6xl mx-auto">
+      <div className="space-y-12 w-full">
         
         {/* Top Hero & Overview Card with Campus Imagery */}
         <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
@@ -88,7 +93,7 @@ export default function AboutIQAC() {
                 </h2>
 
                 <p className="text-slate-700 text-sm sm:text-base font-sans leading-relaxed">
-                  {overview.body}
+                  <RichText text={overview.body} />
                 </p>
               </div>
 
@@ -147,7 +152,7 @@ export default function AboutIQAC() {
             </h3>
 
             <blockquote className="text-base sm:text-lg lg:text-xl font-serif font-normal text-emerald-50 leading-relaxed italic border-l-3 border-amber-400 pl-4 py-1">
-              {vision.quote}
+              <RichText text={vision.quote} />
             </blockquote>
           </div>
         </div>
@@ -197,7 +202,7 @@ export default function AboutIQAC() {
                     {objectives.showcase.title}
                   </h4>
                   <p className="text-xs font-sans text-slate-600 leading-relaxed">
-                    {objectives.showcase.body}
+                    <RichText text={objectives.showcase.body} />
                   </p>
                 </div>
 
@@ -228,7 +233,7 @@ export default function AboutIQAC() {
                     </h4>
 
                     <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed font-normal">
-                      {obj.description}
+                      <RichText text={obj.description} />
                     </p>
                   </div>
 
@@ -267,7 +272,7 @@ export default function AboutIQAC() {
           {/* Functions Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {functions.items.map((func) => {
-              const Icon = ICONS[func.icon];
+              const Icon = iconFor(func.icon, ICONS, NoIcon);
               return (
                 <div
                   key={func.number}
@@ -288,7 +293,7 @@ export default function AboutIQAC() {
                         {func.title}
                       </h4>
                       <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed font-normal">
-                        {func.description}
+                        <RichText text={func.description} />
                       </p>
                     </div>
                   </div>
@@ -315,13 +320,13 @@ export default function AboutIQAC() {
                 {banner.heading}
               </h3>
               <p className="text-xs sm:text-sm font-sans text-slate-300 leading-relaxed max-w-2xl">
-                {banner.body}
+                <RichText text={banner.body} />
               </p>
             </div>
 
             <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
               {banner.cards.map((card, i) => {
-                const Icon = ICONS[card.icon];
+                const Icon = iconFor(card.icon, ICONS, NoIcon);
                 return (
                   <div key={i} className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-xl ${TONES[card.tone] ?? TONES.emerald} flex items-center justify-center shrink-0`}>
@@ -329,7 +334,7 @@ export default function AboutIQAC() {
                     </div>
                     <div className="text-xs font-sans">
                       <strong className="text-white block font-semibold">{card.title}</strong>
-                      <span className="text-slate-400">{card.description}</span>
+                      <span className="text-slate-400"><RichText text={card.description} /></span>
                     </div>
                   </div>
                 );

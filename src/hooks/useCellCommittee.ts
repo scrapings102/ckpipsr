@@ -110,7 +110,13 @@ export function useCellCommittee(
     setState(fallback ? "ready" : "loading");
 
     fetch(withPreview(`/api/pages/cells/${slug}`))
-      .then((res) => (res.ok ? res.json() : null))
+      // Only a 404 means there is no such committee. Any other failure, such as
+      // a server error, is treated like the API being down.
+      .then((res) => {
+        if (res.ok) return res.json();
+        if (res.status === 404) return null;
+        throw new Error(`Committee request failed with ${res.status}`);
+      })
       .then((body) => {
         if (cancelled) return;
         if (isUsable(body?.committee)) {

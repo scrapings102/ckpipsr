@@ -5,8 +5,7 @@ import SubPageLayout from '../components/SubPageLayout';
 import {
   searchSite,
   groupBySection,
-  suggestedTerms,
-  searchIndex,
+  useSearchIndex,
 } from '../utils/searchIndex';
 
 export default function Search() {
@@ -16,6 +15,7 @@ export default function Search() {
 
   const [input, setInput] = useState(urlQuery);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { index: searchIndex, suggestedTerms, sectionNames } = useSearchIndex();
 
   useEffect(() => {
     setInput(urlQuery);
@@ -23,8 +23,8 @@ export default function Search() {
 
   const groups = useMemo(() => {
     if (!urlQuery.trim()) return [];
-    return groupBySection(searchSite(urlQuery));
-  }, [urlQuery]);
+    return groupBySection(searchSite(searchIndex, urlQuery), sectionNames);
+  }, [searchIndex, urlQuery, sectionNames]);
 
   const total = useMemo(
     () => groups.reduce((n, g) => n + g.items.length, 0),
@@ -107,9 +107,9 @@ export default function Search() {
 
         {/* ── Results ── */}
         {!urlQuery.trim() ? (
-          <EmptyPrompt onPick={runSearch} />
+          <EmptyPrompt terms={suggestedTerms} onPick={runSearch} />
         ) : total === 0 ? (
-          <NoResults query={urlQuery.trim()} onPick={runSearch} />
+          <NoResults query={urlQuery.trim()} terms={suggestedTerms} onPick={runSearch} />
         ) : (
           <div className="space-y-8">
             {groups.map((group) => (
@@ -157,23 +157,31 @@ export default function Search() {
   );
 }
 
-function EmptyPrompt({ onPick }: { onPick: (q: string) => void }) {
+function EmptyPrompt({
+  terms,
+  onPick,
+}: {
+  terms: string[];
+  onPick: (q: string) => void;
+}) {
   return (
     <div className="rounded-3xl border border-[#D4AF37]/25 bg-[#FAF8F3] p-8 text-center">
       <SearchIcon size={26} className="mx-auto mb-3 text-[#B8933E]" />
       <p className="mb-6 text-sm text-[#123a1a]/75">
         Type above to find any page on the site.
       </p>
-      <TermChips terms={suggestedTerms} onPick={onPick} />
+      <TermChips terms={terms} onPick={onPick} />
     </div>
   );
 }
 
 function NoResults({
   query,
+  terms,
   onPick,
 }: {
   query: string;
+  terms: string[];
   onPick: (q: string) => void;
 }) {
   return (
@@ -184,7 +192,7 @@ function NoResults({
       <p className="mb-6 text-sm text-[#123a1a]/70">
         Search covers page and menu names. Try a shorter or more general term.
       </p>
-      <TermChips terms={suggestedTerms} onPick={onPick} />
+      <TermChips terms={terms} onPick={onPick} />
     </div>
   );
 }

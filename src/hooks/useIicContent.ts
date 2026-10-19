@@ -6,8 +6,7 @@ import { withPreview } from "./previewToken";
  *
  * Defaults are what the page shipped with and stay the fallback, so it renders
  * if the API is down. Council members arrive with their name and designation
- * already worked out: a member linked to the Deans or Faculties page is named
- * from it.
+ * already worked out: a member linked to the Faculties page is named from it.
  */
 export interface IicMember {
   no: number;
@@ -30,6 +29,7 @@ export interface IicContent {
   structure: {
     kicker: string;
     heading: string;
+    /** The bare id ("IC202217445"); the page prints the words in front of it. Research - About shows it too. */
     instituteId: string;
     /** The badge, with the member count already filled in. */
     countLabel: string;
@@ -74,12 +74,12 @@ export const DEFAULT_IIC: IicContent = {
   structure: {
     kicker: "Council Governance",
     heading: "IIC Organizational Structure",
-    instituteId: "Institute ID – IC202217445",
+    instituteId: "IC202217445",
     countLabel: "10 Council Members",
     members: [
       { no: 1, name: "Dr. Dhiren P. Shah", designation: "Principal", role: "President", responsibility: "Govern all activities under IIC", external: false },
       { no: 2, name: "Dr. Bhumika C. Desai", designation: "Asso. Professor", role: "Vice president", responsibility: "Govern and coordinate all activities under IIC", external: false },
-      { no: 3, name: "Dr. Vinod Ramani", designation: "Assoc. Professor", role: "Convener, IPR Activity Co-oridinator", responsibility: "1.Communicate all activities under IIC among faculty students, faculty and MIC 2.IPR Activity", external: false },
+      { no: 3, name: "Dr. Vinodkumar D. Ramani", designation: "Assoc. Professor", role: "Convener, IPR Activity Co-oridinator", responsibility: "1.Communicate all activities under IIC among faculty students, faculty and MIC 2.IPR Activity", external: false },
       { no: 4, name: "Mr. Dipayan Tarafder", designation: "Asst. Professor", role: "Innovation Activity Co-oridinator", responsibility: "Innovation Activity", external: false },
       { no: 5, name: "Dr. Devendra J. Vaishnav", designation: "Asst. Professor", role: "Start up activity Co-oridinator", responsibility: "Start up activity", external: false },
       { no: 6, name: "Mr. Moolla Yahya Ali", designation: "Asst. Professor", role: "Internship activity Co-oridinator", responsibility: "Internship activity", external: false },

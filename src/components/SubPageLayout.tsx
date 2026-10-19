@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { navPages, useSiteNav } from '../utils/navMenus';
+import { usePageBanners, type PageBanners } from '../hooks/usePageBanners';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +21,10 @@ interface SubPageLayoutProps {
   activeItemLabel: string;
   children: React.ReactNode;
   hideDefaultBackBar?: boolean;
+  /** The small gold line above the title; the section's name when left out. */
+  eyebrow?: string;
+  /** The search engine description; worked out from the title when left out. */
+  description?: string;
 }
 
 const CATEGORY_NAMES: Record<string, string> = {
@@ -38,21 +44,22 @@ const CATEGORY_NAMES: Record<string, string> = {
   activities: 'Activities',
 };
 
+/** The navbar menu (its id) that a page's Back and menu buttons open, by the page's address prefix. */
 const CATEGORY_TO_MENU_KEY: Record<string, string> = {
-  about: 'About Us',
-  'about-us': 'About Us',
-  academics: 'Academics',
-  courses: 'Academics',
-  committees: 'Cells',
-  cells: 'Cells',
-  iqac: 'Accreditation & Ranking',
-  staff: 'Academics',
-  'campus-life': 'Academics',
-  'student-corner': 'Students Corner',
-  'students-corner': 'Students Corner',
-  'research-and-innovation': 'Research & Innovation',
-  'training-and-placement': 'T&P',
-  activities: 'Activities',
+  about: 'about-us',
+  'about-us': 'about-us',
+  academics: 'academics',
+  courses: 'academics',
+  committees: 'cells',
+  cells: 'cells',
+  iqac: 'iqac',
+  staff: 'academics',
+  'campus-life': 'academics',
+  'student-corner': 'students-corner',
+  'students-corner': 'students-corner',
+  'research-and-innovation': 'research-and-innovation',
+  'training-and-placement': 'training-and-placement',
+  activities: 'activities',
 };
 
 const LOCAL_WEBP_IMAGES = [
@@ -198,6 +205,43 @@ function getImageForPage(activeItemLabel: string): string {
   return LOCAL_WEBP_IMAGES[index];
 }
 
+/**
+ * Pages the admin panel lists at a different address from the navbar's, or
+ * that are not in the navbar at all. Kept to the ones that also have other
+ * addresses; a page with only one address is found by that address alone.
+ */
+const PANEL_PATH_BY_LABEL: Record<string, string> = {
+  'PO and PEOs': '/about-us/po-peos',
+  // The navbar links these two at their older addresses.
+  'The Trust': '/about-us/the-trust',
+  Principal: '/about-us/principal',
+  'Course Syllabus': '/students-corner/course-syllabus',
+  'Student Help Desk': '/student-help-desk',
+};
+
+/**
+ * The picture chosen for this page in the admin panel, if there is one.
+ *
+ * `navPathByLabel` is the address the navbar links to for each page, by the
+ * page's label. Many pages can also be reached at older addresses (see
+ * App.tsx), and every one of them renders the same page with the same label,
+ * so the label leads an old address back to the one the admin panel keys its
+ * pictures by.
+ */
+function chosenBanner(
+  banners: PageBanners,
+  pathname: string,
+  activeItemLabel: string,
+  navPathByLabel: Record<string, string>,
+): string | undefined {
+  const path = pathname.replace(/\/+$/, '') || '/';
+  return (
+    banners[path] ??
+    banners[PANEL_PATH_BY_LABEL[activeItemLabel]] ??
+    banners[navPathByLabel[activeItemLabel]]
+  );
+}
+
 export default function SubPageLayout({
   title,
   subtitle,
@@ -205,6 +249,8 @@ export default function SubPageLayout({
   activeItemLabel,
   children,
   hideDefaultBackBar,
+  eyebrow,
+  description,
 }: SubPageLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -218,9 +264,17 @@ export default function SubPageLayout({
     }
   }, [location.pathname]);
 
-  const imageUrl = getImageForPage(activeItemLabel);
+  const banners = usePageBanners();
+  const { menus } = useSiteNav();
+  const navPathByLabel = React.useMemo(
+    () => Object.fromEntries(menus.flatMap((m) => navPages(m.links)).map((p) => [p.label, p.href])),
+    [menus],
+  );
+  const imageUrl =
+    chosenBanner(banners, location.pathname, activeItemLabel, navPathByLabel) ??
+    getImageForPage(activeItemLabel);
   const categoryDisplayName = CATEGORY_NAMES[category] || category;
-  const menuCategoryKey = CATEGORY_TO_MENU_KEY[category] || categoryDisplayName || 'Academics';
+  const menuCategoryKey = CATEGORY_TO_MENU_KEY[category] || category || 'academics';
 
   const handleOpenMenuCategory = () => {
     window.dispatchEvent(new CustomEvent('openMenuCategory', { detail: { category: menuCategoryKey } }));
@@ -247,13 +301,14 @@ export default function SubPageLayout({
       <SEO
         title={title}
         subtitle={subtitle}
+        description={description}
         category={category}
         activeItemLabel={activeItemLabel}
         image={imageUrl}
       />
       {/* ── BREADCRUMBS & TOP NAVIGATION SECTION WITH INTEGRATED RESPONSIVE MENU BUTTON ── */}
       <div className="bg-[#0c2411]/95 backdrop-blur-md text-white/50 text-[10px] sm:text-xs py-2 sm:py-2.5 border-b border-[#D4AF37]/20 relative z-30 sticky top-0 shadow-md">
-        <div className="w-full max-w-[1580px] mx-auto px-3 sm:px-6 lg:px-8 xl:px-12 flex items-center justify-between gap-3">
+        <div className="w-full px-3 sm:px-6 lg:px-8 xl:px-10 flex items-center justify-between gap-2.5">
           {/* Left Breadcrumb path */}
           <div className="flex items-center gap-1.5 sm:gap-2 select-none font-mono tracking-wider min-w-0 flex-1 overflow-hidden">
             <button
@@ -268,13 +323,13 @@ export default function SubPageLayout({
             <span className="text-white/30 shrink-0">/</span>
             <button
               onClick={handleOpenMenuCategory}
-              className="text-[#D4AF37] font-bold uppercase shrink-0 truncate max-w-[90px] sm:max-w-[160px] md:max-w-none hover:underline cursor-pointer"
+              className="text-[#D4AF37] font-bold uppercase shrink-0 truncate max-w-[85px] sm:max-w-[160px] md:max-w-none hover:underline cursor-pointer"
               title={`Open ${categoryDisplayName} in Menu`}
             >
               {categoryDisplayName}
             </button>
             <span className="text-white/30 shrink-0">/</span>
-            <span className="text-white font-bold uppercase truncate max-w-[110px] sm:max-w-[220px] md:max-w-none">{activeItemLabel}</span>
+            <span className="text-white font-bold uppercase truncate max-w-[105px] sm:max-w-[220px] md:max-w-none">{activeItemLabel}</span>
           </div>
 
           {/* Menu button — phones and tablets only, as on CET and CMC: on desktop
@@ -283,17 +338,15 @@ export default function SubPageLayout({
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent('ckp:menu-toggle'))}
             aria-label="Open menu"
-            className="lg:hidden ml-3 -mr-1 -my-1.5 text-[#D4AF37] shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-white/70 hover:text-white active:scale-95 transition"
+            className="lg:hidden ml-2 -mr-1 -my-1.5 text-[#D4AF37] shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-white/70 hover:text-white active:scale-95 transition cursor-pointer"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Menu size={20} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
 
       {/* ── CLASSIC HEADER BANNER WITH WEBP BACKDROP ── */}
-      <div className="relative text-white py-12 md:py-20 border-b border-[#D4AF37]/25 overflow-hidden bg-[#0c2411]">
+      <div className="relative text-white py-10 sm:py-14 md:py-20 border-b border-[#D4AF37]/25 overflow-hidden bg-[#0c2411]">
         {/* Background Image with absolute positioning */}
         <div className="absolute inset-0 z-0">
           <img
@@ -308,15 +361,12 @@ export default function SubPageLayout({
           <div className="absolute inset-0 bg-[radial-gradient(rgba(212,175,55,0.06)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
         </div>
 
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-left">
-          <span className="font-mono text-[10px] md:text-xs tracking-[0.2em] text-[#D4AF37] uppercase font-bold mb-3 block animate-pulse">
-            {categoryDisplayName}
-          </span>
-          <h1 className="font-serif font-semibold text-3xl sm:text-4xl md:text-5xl text-white leading-tight tracking-tight mb-4">
+        <div className="w-full px-3 sm:px-6 lg:px-8 xl:px-10 relative z-10 text-left">
+          <h1 className="font-serif font-semibold text-2xl sm:text-4xl md:text-5xl text-white leading-tight tracking-tight mb-2.5 sm:mb-4">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-white/85 font-sans text-xs sm:text-sm md:text-base max-w-3xl leading-relaxed">
+            <p className="text-white/85 font-sans text-xs sm:text-sm md:text-base leading-relaxed max-w-4xl">
               {subtitle}
             </p>
           )}
@@ -324,8 +374,8 @@ export default function SubPageLayout({
       </div>
 
       {/* ── MAIN CONTENT CONTAINER ── */}
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-12 lg:py-16">
-        <main className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-8 md:p-10 lg:p-12 min-h-[380px] sm:min-h-[500px] shadow-sm overflow-visible relative">
+      <div className="w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-8 md:py-10">
+        <main className="w-full bg-white rounded-xl sm:rounded-3xl border border-slate-200/80 p-3.5 sm:p-6 md:p-8 lg:p-10 xl:p-12 min-h-[380px] sm:min-h-[500px] shadow-sm overflow-visible relative">
           <AnimatePresence mode="wait">
             <motion.div
               ref={containerRef}

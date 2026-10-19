@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
+import { Select } from "../../components/ui/Select";
 
 const EMPTY_FORM = {
   name: "",
@@ -83,18 +84,20 @@ export default function StudentGrievanceComplaint() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="block font-semibold text-slate-800">Nature of Grievance *</label>
-              <select
+              <label htmlFor="student-grievance-category" className="block font-semibold text-slate-800">Nature of Grievance *</label>
+              <Select
+                id="student-grievance-category"
                 value={complaintForm.categoryType}
-                onChange={(e) => setComplaintForm({ ...complaintForm, categoryType: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-[#1a5d2e]"
-              >
-                <option value="Academic">Academic & Examination</option>
-                <option value="Admission">Admissions / Documents</option>
-                <option value="Administrative">Fee / Administrative</option>
-                <option value="Infrastructure">Infrastructure / Facilities</option>
-                <option value="Other">General / Other</option>
-              </select>
+                onChange={(categoryType) => setComplaintForm({ ...complaintForm, categoryType })}
+                options={[
+                  { value: "Academic", label: "Academic & Examination" },
+                  { value: "Admission", label: "Admissions / Documents" },
+                  { value: "Administrative", label: "Fee / Administrative" },
+                  { value: "Infrastructure", label: "Infrastructure / Facilities" },
+                  { value: "Other", label: "General / Other" },
+                ]}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-[#1a5d2e] data-[state=open]:bg-white"
+              />
             </div>
 
             <div className="space-y-1.5">

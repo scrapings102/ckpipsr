@@ -109,16 +109,16 @@ export const ACTIVITY_EVENTS: ActivityEvent[] = [
 ];
 
 export const ACTIVITY_EVENT_PHOTOS: string[] = [
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/684d5ad44c2fc.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/684d590d7b9db.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/6625e2fdd25cc.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/6623688917ff8.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/659e768a736b8.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/659e73082999a.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/653f81882016d.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/651e9735c5167.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/6517c67837f48.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/6517c5ec1fff2.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/6517c2394c161.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/events/photos/638cd09e4f470.webp"
+  "/media/trust/app/institutes/102/activity/events/photos/684d5ad44c2fc.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/684d590d7b9db.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/6625e2fdd25cc.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/6623688917ff8.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/659e768a736b8.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/659e73082999a.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/653f81882016d.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/651e9735c5167.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/6517c67837f48.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/6517c5ec1fff2.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/6517c2394c161.webp",
+  "/media/trust/app/institutes/102/activity/events/photos/638cd09e4f470.webp"
 ];

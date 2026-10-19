@@ -15,15 +15,25 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
-    // Ultra-smooth Lenis configuration for premium butter-smooth inertia scrolling
+    // Check if the current device is primarily a touch/mobile device
+    const isTouch = typeof window !== 'undefined' && (
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches
+    );
+
+    // On mobile touch devices, disable touch hijacking (touchMultiplier: 0, syncTouch: false)
+    // so native 120Hz/60Hz compositor momentum scrolling is 100% preserved with zero input lag.
+    // Desktop mouse wheel continues to enjoy luxurious, buttery smooth inertia scrolling.
     const lenisInstance = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // standard smooth
+      duration: isTouch ? 0.9 : 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
+      touchMultiplier: 0, // Disable touch hijacking: use native mobile compositor
+      syncTouch: false,
     });
 
     setLenis(lenisInstance);
@@ -37,11 +47,22 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     const updateLenis = (time: number) => {
       lenisInstance.raf(time * 1000);
     };
-    
+
     gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(500, 33);
 
+    // Stop Lenis ticker when tab is backgrounded to eliminate CPU/battery drain on mobile
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        lenisInstance.stop();
+      } else {
+        lenisInstance.start();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       gsap.ticker.remove(updateLenis);
       lenisInstance.destroy();
       setLenis(null);

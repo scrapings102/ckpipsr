@@ -32,7 +32,6 @@ const toPillar = (e: CampusEvent, i: number): Pillar => ({
   locationTag: e.locationTag,
   stats: e.stats,
   primaryImage: e.primaryImage,
-  sideImage: e.sideImage,
   tags: e.tags ?? [],
 });
 
@@ -59,7 +58,6 @@ function galleryFrom(pillars: Pillar[], archive: LaneItem[]): GalleryItem[] {
   };
   pillars.forEach((p) => {
     add(p.primaryImage, p.category);
-    add(p.sideImage, p.title);
   });
   archive.forEach((a) => add(a.url, a.caption));
   return items;
@@ -137,7 +135,7 @@ export default function CampusLife() {
       const mobileHaloEl = mobileHaloPathRef.current;
       const steps = stepRefs.current.filter(Boolean) as HTMLDivElement[];
       if (!section || !container || !svgEl || !guideEl || !drawnEl || !underlineEl || !archiveEl ||
-          !mobileSvgEl || !mobileGuideEl || !mobileHaloEl || steps.length === 0) return;
+        !mobileSvgEl || !mobileGuideEl || !mobileHaloEl || steps.length === 0) return;
 
       const scrollY = window.scrollY;
       const sectionRect = section.getBoundingClientRect();
@@ -455,12 +453,12 @@ export default function CampusLife() {
                     className="transition-all duration-300 shadow-md"
                   />
                   <circle r={isActive ? "12" : "8"} fill={isActive ? accentColor : "#2D2424"} className="transition-all duration-300" />
-                  <text x="0" y="3.5" textAnchor="middle" fill="#ffffff" fontSize={isActive ? "10" : "8"} fontWeight="700" fontFamily="monospace" className="pointer-events-none select-none transition-all duration-300">
+                  <text x="0" y="3.5" textAnchor="middle" fill="#ffffff" fontSize={isActive ? "10" : "8"} fontWeight="700" fontFamily="inherit" className="pointer-events-none select-none transition-all duration-300">
                     0{i + 1}
                   </text>
                   <g transform={`translate(${tagOffset}, 0)`}>
                     <rect x={tagX} y="-13" width={tagWidth} height="26" rx="13" fill={isActive ? "#2D2424" : "#ffffff"} stroke={isActive ? accentColor : "#E2E8F0"} strokeWidth="1.5" className="shadow-lg transition-all duration-300" />
-                    <text x={isRightSide ? tagWidth / 2 : -tagWidth / 2} y="4" textAnchor="middle" fill={isActive ? "#ffffff" : "#2D2424"} fontSize="9.5" fontWeight="700" fontFamily="sans-serif" letterSpacing="0.06em" className="pointer-events-none select-none uppercase tracking-wider">
+                    <text x={isRightSide ? tagWidth / 2 : -tagWidth / 2} y="4" textAnchor="middle" fill={isActive ? "#ffffff" : "#2D2424"} fontSize="9.5" fontWeight="700" fontFamily="inherit" letterSpacing="0.06em" className="pointer-events-none select-none uppercase tracking-wider">
                       {pillar?.category.split(' ')[0] || `Stop 0${i + 1}`}
                     </text>
                   </g>
@@ -521,7 +519,7 @@ export default function CampusLife() {
                     className="transition-all duration-300"
                   />
                   <circle r={isActive ? "6" : "4"} fill={isActive ? accentColor : "#2D2424"} className="transition-all duration-300" />
-                  <text x="0" y={isActive ? "2.5" : "2"} textAnchor="middle" fill="#ffffff" fontSize={isActive ? "6.5" : "5.5"} fontWeight="700" fontFamily="monospace" className="pointer-events-none select-none transition-all duration-300">
+                  <text x="0" y={isActive ? "2.5" : "2"} textAnchor="middle" fill="#ffffff" fontSize={isActive ? "6.5" : "5.5"} fontWeight="700" fontFamily="inherit" className="pointer-events-none select-none transition-all duration-300">
                     0{m.index + 1}
                   </text>
                 </g>
@@ -565,7 +563,8 @@ export default function CampusLife() {
           </div>
         </div>
 
-        <style dangerouslySetInnerHTML={{ __html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           @keyframes gc-scroll {
             from { transform: translate3d(0, 0, 0); }
             to { transform: translate3d(0, -33.333%, 0); }
@@ -579,7 +578,7 @@ export default function CampusLife() {
             max-width: 1280px;
             margin: 0 auto;
             padding: 1.25rem;
-            height: 115vh;
+            max-height: 115vh;
             overflow: hidden;
             position: relative;
             border-radius: 1.5rem;
@@ -592,7 +591,7 @@ export default function CampusLife() {
           }
           @media (min-width: 768px) {
             .gc-stage {
-              height: 135vh;
+              max-height: 135vh;
               padding: 1.5rem;
               gap: 1.5rem;
             }
@@ -755,7 +754,7 @@ export default function CampusLife() {
             line-height: 1;
           }
           .gc-snap span:last-child {
-            font-family: monospace;
+            font-family: var(--font-sans);
             font-size: 0.54rem;
             color: #D4AF37;
             letter-spacing: 0.04em;
@@ -766,7 +765,7 @@ export default function CampusLife() {
               padding: 0.75rem;
               gap: 0.75rem;
               border-radius: 1.25rem;
-              height: 105vh;
+              max-height: 105vh;
             }
             .gc-track {
               gap: 0.75rem;

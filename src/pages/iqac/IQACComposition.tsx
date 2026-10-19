@@ -20,6 +20,11 @@ import {
   type IqacMember,
   type IqacTone,
 } from "../../hooks/useIqacCompositionContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
 
 /** The icons a summary tile can carry; the panel offers these same names. */
 const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -84,7 +89,7 @@ export default function IQACComposition() {
       category="iqac"
       activeItemLabel="IQAC Composition"
     >
-      <div className="space-y-10 max-w-6xl mx-auto">
+      <div className="space-y-10 w-full">
         
         {/* Mandate & Core Mechanism Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -120,14 +125,14 @@ export default function IQACComposition() {
               <span>{intro.statement.kicker}</span>
             </div>
             <p className="text-sm sm:text-base font-sans text-slate-800 leading-relaxed font-normal">
-              {intro.statement.body}
+              <RichText text={intro.statement.body} />
             </p>
           </div>
 
           {/* Summary Pillars */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
             {intro.pillars.map((pillar, i) => {
-              const Icon = ICONS[pillar.icon];
+              const Icon = iconFor(pillar.icon, ICONS, NoIcon);
               return (
                 <div
                   key={i}
@@ -264,7 +269,7 @@ export default function IQACComposition() {
             <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 space-y-3">
               <Users size={32} className="mx-auto text-slate-300" />
               <h4 className="text-base font-serif font-bold text-slate-800">{empty.title}</h4>
-              <p className="text-xs text-slate-500">{empty.body}</p>
+              <p className="text-xs text-slate-500"><RichText text={empty.body} /></p>
               <button
                 onClick={() => { setSearchQuery(""); setSelectedFilter("all"); }}
                 className="text-xs font-mono font-bold text-[#1a5d2e] hover:underline cursor-pointer"

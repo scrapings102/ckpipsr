@@ -36,7 +36,9 @@ import {
   UserCheck
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
-import { useAlumniContent } from "../../hooks/useAlumniContent";
+import { Select } from "../../components/ui/Select";
+import { useAlumniContent, type AlumniField } from "../../hooks/useAlumniContent";
+import { RichText } from "../../utils/RichText";
 
 export default function Alumni() {
   const [activeTab, setActiveTab] = useState<"about" | "rules" | "managing" | "executive" | "registration">("about");
@@ -65,6 +67,10 @@ export default function Alumni() {
 
   const content = useAlumniContent();
   const { about, rules, managing, executive, registration } = content;
+  const required = content.requiredFields;
+  const text = content.fieldText;
+  /** What follows a label: a star when the panel made the box required, "(Optional)" when not. */
+  const mark = (field: AlumniField) => (required[field] ? " *" : " (Optional)");
   const objectives = about.objectives.items;
   const aimsAndObjectives = rules.aims.items;
   const membershipRules = rules.membership;
@@ -108,8 +114,14 @@ export default function Alumni() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitting(true);
     setFormError("");
+    // The browser checks the boxes marked required; the ways to help are
+    // buttons, so that one is checked here.
+    if (required.interests && formData.interests.length === 0) {
+      setFormError("Please choose at least one way you would like to help.");
+      return;
+    }
+    setFormSubmitting(true);
     try {
       const res = await fetch("/api/alumni/registrations", {
         method: "POST",
@@ -211,7 +223,7 @@ export default function Alumni() {
                         <span>{about.badge}</span>
                       </div>
                       <p className="text-slate-800 text-base sm:text-lg font-serif font-semibold leading-snug">
-                        {about.lead}
+                        <RichText text={about.lead} />
                       </p>
                     </div>
 
@@ -221,7 +233,7 @@ export default function Alumni() {
                         “
                       </div>
                       <p className="text-slate-700 text-sm leading-relaxed italic font-serif">
-                        {about.quote}
+                        <RichText text={about.quote} />
                       </p>
                     </div>
 
@@ -232,7 +244,7 @@ export default function Alumni() {
                         <span>{about.purpose.title}</span>
                       </div>
                       <p className="text-slate-700 text-xs sm:text-[13.5px] leading-relaxed">
-                        {about.purpose.body}
+                        <RichText text={about.purpose.body} />
                       </p>
                     </div>
                   </div>
@@ -298,7 +310,7 @@ export default function Alumni() {
                   {about.cta.title}
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-xl font-sans">
-                  {about.cta.body}
+                  <RichText text={about.cta.body} />
                 </p>
               </div>
 
@@ -355,7 +367,7 @@ export default function Alumni() {
                     {rules.name.title}
                   </h4>
                   <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed font-sans">
-                    {rules.name.body}
+                    <RichText text={rules.name.body} />
                   </p>
                 </div>
 
@@ -368,7 +380,7 @@ export default function Alumni() {
                     {rules.office.title}
                   </h4>
                   <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed font-sans">
-                    {rules.office.body}
+                    <RichText text={rules.office.body} />
                   </p>
                 </div>
               </div>
@@ -504,7 +516,7 @@ export default function Alumni() {
               </div>
 
               <p className="text-xs sm:text-sm text-slate-600 font-sans italic">
-                {rules.structure.intro}
+                <RichText text={rules.structure.intro} />
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -527,7 +539,7 @@ export default function Alumni() {
                     </div>
 
                     <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed font-sans">
-                      {item.responsibility}
+                      <RichText text={item.responsibility} />
                     </p>
 
                     {item.duties.length > 0 && (
@@ -570,10 +582,10 @@ export default function Alumni() {
 
                 <div className="space-y-3 text-xs sm:text-[13px] text-slate-700 font-sans leading-relaxed">
                   <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100 font-medium text-slate-800">
-                    {rules.agm.highlight}
+                    <RichText text={rules.agm.highlight} />
                   </div>
                   <p className="px-1">
-                    {rules.agm.body}
+                    <RichText text={rules.agm.body} />
                   </p>
                   
                   <div className="pt-2 space-y-2">
@@ -611,17 +623,17 @@ export default function Alumni() {
 
                   <div className="p-5 rounded-2xl bg-amber-50/40 border border-amber-200/70 text-xs sm:text-[13.5px] text-slate-800 font-sans leading-relaxed space-y-3">
                     <p>
-                      {rules.extraordinary.body}
+                      <RichText text={rules.extraordinary.body} />
                     </p>
                     <p className="p-3 bg-white rounded-xl border border-amber-200/80 font-medium">
-                      {rules.extraordinary.highlight}
+                      <RichText text={rules.extraordinary.highlight} />
                     </p>
                   </div>
                 </div>
 
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 flex items-center gap-2">
                   <Clock size={15} className="text-[#1a5d2e]" />
-                  <span>{rules.extraordinary.note}</span>
+                  <span><RichText text={rules.extraordinary.note} /></span>
                 </div>
               </div>
             </div>
@@ -692,7 +704,8 @@ export default function Alumni() {
                       >
                         {clause.paragraphs.map((paragraph, pIdx) => (
                           <p key={pIdx}>
-                            {clause.paragraphs.length > 1 ? `• ${paragraph}` : paragraph}
+                            {clause.paragraphs.length > 1 && "• "}
+                            <RichText text={paragraph} />
                           </p>
                         ))}
                       </div>
@@ -889,7 +902,7 @@ export default function Alumni() {
                     {registration.success.title}
                   </h4>
                   <p className="text-sm text-slate-600 font-sans leading-relaxed">
-                    Thank you, <strong className="text-slate-900">{formData.fullName}</strong>. {registration.success.body}
+                    Thank you, <strong className="text-slate-900">{formData.fullName}</strong>. <RichText text={registration.success.body} />
                   </p>
                   <button
                     onClick={() => {
@@ -925,7 +938,7 @@ export default function Alumni() {
                     <AlertCircle size={28} />
                   </div>
                   <p className="text-sm text-slate-700 font-sans leading-relaxed">
-                    {registration.closedMessage}
+                    <RichText text={registration.closedMessage} />
                   </p>
                 </div>
               ) : (
@@ -940,89 +953,82 @@ export default function Alumni() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Full Name *
+                          {text.fullName.label}{mark("fullName")}
                         </label>
                         <input
                           type="text"
-                          required
+                          required={required.fullName}
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                          placeholder="e.g. Dr. Rajesh Patel"
+                          placeholder={text.fullName.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Email Address *
+                          {text.email.label}{mark("email")}
                         </label>
                         <input
                           type="email"
-                          required
+                          required={required.email}
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          placeholder="e.g. rajesh.patel@pharma.com"
+                          placeholder={text.email.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Phone / WhatsApp *
+                          {text.phone.label}{mark("phone")}
                         </label>
                         <input
                           type="tel"
-                          required
+                          required={required.phone}
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="+91 98765 43210"
+                          placeholder={text.phone.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Degree Completed *
+                        <label htmlFor="alumni-degree" className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
+                          {text.degree.label}{mark("degree")}
                         </label>
-                        <select
+                        <Select
+                          id="alumni-degree"
                           value={formData.degree}
-                          onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
-                        >
-                          {registration.degrees.map((degree) => (
-                            <option key={degree} value={degree}>
-                              {degree}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={(degree) => setFormData({ ...formData, degree })}
+                          options={registration.degrees.map((degree) => ({ value: degree, label: degree }))}
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e] data-[state=open]:ring-2 data-[state=open]:ring-[#1a5d2e]/30"
+                        />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Year of Passing *
+                        <label htmlFor="alumni-passingYear" className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
+                          {text.passingYear.label}{mark("passingYear")}
                         </label>
-                        <select
+                        <Select
+                          id="alumni-passingYear"
                           value={formData.passingYear}
-                          onChange={(e) => setFormData({ ...formData, passingYear: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
-                        >
-                          {passingYears.map((yr) => (
-                            <option key={yr} value={yr}>
-                              {yr}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={(passingYear) => setFormData({ ...formData, passingYear })}
+                          options={passingYears.map((yr) => ({ value: yr, label: yr }))}
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e] data-[state=open]:ring-2 data-[state=open]:ring-[#1a5d2e]/30"
+                        />
                       </div>
 
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          GTU Enrollment / Roll No (Optional)
+                          {text.enrollmentNo.label}{mark("enrollmentNo")}
                         </label>
                         <input
                           type="text"
+                          required={required.enrollmentNo}
                           value={formData.enrollmentNo}
                           onChange={(e) => setFormData({ ...formData, enrollmentNo: e.target.value })}
-                          placeholder="e.g. 192540290001"
+                          placeholder={text.enrollmentNo.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
@@ -1039,42 +1045,42 @@ export default function Alumni() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Current Designation *
+                          {text.designation.label}{mark("designation")}
                         </label>
                         <input
                           type="text"
-                          required
+                          required={required.designation}
                           value={formData.currentDesignation}
                           onChange={(e) => setFormData({ ...formData, currentDesignation: e.target.value })}
-                          placeholder="e.g. Senior Research Scientist"
+                          placeholder={text.designation.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          Organization / Company *
+                          {text.company.label}{mark("company")}
                         </label>
                         <input
                           type="text"
-                          required
+                          required={required.company}
                           value={formData.companyName}
                           onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                          placeholder="e.g. Sun Pharma / Zydus / Torrent"
+                          placeholder={text.company.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
-                          City & Country *
+                          {text.workCity.label}{mark("workCity")}
                         </label>
                         <input
                           type="text"
-                          required
+                          required={required.workCity}
                           value={formData.workCity}
                           onChange={(e) => setFormData({ ...formData, workCity: e.target.value })}
-                          placeholder="e.g. Ahmedabad, India / New Jersey, USA"
+                          placeholder={text.workCity.placeholder}
                           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e]"
                         />
                       </div>
@@ -1084,7 +1090,7 @@ export default function Alumni() {
                   {/* Contribution & Engagement */}
                   <div className="space-y-4">
                     <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                      <span>{registration.sections.contribution}</span>
+                      <span>{registration.sections.contribution}{mark("interests")}</span>
                       <div className="flex-1 h-px bg-slate-100" />
                     </h4>
 
@@ -1112,6 +1118,24 @@ export default function Alumni() {
                         );
                       })}
                     </div>
+
+                    {/* The form had no message box. It appears only once the panel makes a message required. */}
+                    {required.message && (
+                      <div>
+                        <label className="block text-xs font-mono font-bold text-slate-700 mb-1.5">
+                          {text.message.label}{mark("message")}
+                        </label>
+                        <textarea
+                          required
+                          rows={4}
+                          maxLength={1000}
+                          value={formData.message}
+                          placeholder={text.message.placeholder}
+                          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1a5d2e]/30 focus:border-[#1a5d2e] resize-y"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* What went wrong, including the one-a-day limit */}

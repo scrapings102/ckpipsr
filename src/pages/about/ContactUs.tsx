@@ -154,7 +154,7 @@ export default function ContactUs() {
               allowFullScreen={false}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title={`${content.map.title} — map`}
+              title={`Map: ${content.map.title}`}
               className="filter contrast-125 saturate-50 grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
             />
           </div>

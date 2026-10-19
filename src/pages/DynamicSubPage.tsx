@@ -2,7 +2,9 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { HelpCircle, ExternalLink, Video, CheckCircle2, FileText, Download, Image as ImageIcon, Quote, Sparkles, Mail, Phone, MapPin, Clock } from "lucide-react";
 import SubPageLayout from "../components/SubPageLayout";
-import { getCkpipsrPage } from "../data/ckpipsrContent";
+import { categoryDisplayNames, categoryUrlPrefixes, getCkpipsrPage } from "../data/ckpipsrContent";
+import { useSimplePage } from "../hooks/useSimplePage";
+import { RichText } from "../utils/RichText";
 import { 
   FounderLayout, 
   TrustLayout, 
@@ -13,7 +15,25 @@ import {
 
 export default function DynamicSubPage() {
   const location = useLocation();
-  const pageInfo = getCkpipsrPage(location.pathname);
+  const scraped = getCkpipsrPage(location.pathname);
+  // A page with an editor in the panel (SSIP - Mentors, IIQA…) is drawn from
+  // what was published there, through the same markup as the scraped copy it
+  // replaces. Until that arrives — or with the API down — the scraped copy shows.
+  const edited = useSimplePage(location.pathname);
+  const pageInfo =
+    scraped && edited
+      ? {
+          ...scraped,
+          page: {
+            ...scraped.page,
+            Title: edited.title,
+            Sections: edited.sections.map((s) => ({ heading: s.heading || null, text: s.body })),
+            Images: [],
+            Videos: [],
+            Documents: edited.documents.map((d) => d.url),
+          },
+        }
+      : scraped;
 
   if (!pageInfo) {
     return (
@@ -35,15 +55,31 @@ export default function DynamicSubPage() {
   }
 
   const { page, categoryLabel } = pageInfo;
+  // SubPageLayout knows the sections by their address prefix ("iqac",
+  // "training-and-placement"), not by a slug of their name, which would give
+  // "accreditation-ranking" or "t-p" and open an empty menu.
+  const categoryKey = Object.keys(categoryDisplayNames).find((k) => categoryDisplayNames[k] === categoryLabel);
 
   return (
     <SubPageLayout
       title={page.Title || page.Page}
-      subtitle={`Academic Portal — ${categoryLabel}`}
-      category={categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
+      subtitle={edited ? edited.subtitle : categoryLabel}
+      category={
+        (categoryKey && categoryUrlPrefixes[categoryKey]) ||
+        categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+      }
       activeItemLabel={page.Page}
     >
       <div className="space-y-12">
+        {/* An edited page with nothing on it yet says so, rather than showing a blank page. */}
+        {edited && edited.sections.length === 0 && edited.documents.length === 0 && (
+          <div className="text-center py-20 space-y-3">
+            <Clock size={40} className="mx-auto text-[#D4AF37]" />
+            <h2 className="text-xl font-bold font-serif text-slate-800">This page is being prepared</h2>
+            <p className="text-slate-600 max-w-md mx-auto">Please check back soon.</p>
+          </div>
+        )}
+
         {/* Tailored Governance & Leadership Layouts */}
         {page.Page === "The Founder" && (
           <FounderLayout />
@@ -61,8 +97,35 @@ export default function DynamicSubPage() {
           <DeansLayout />
         )}
 
+        {/* A page edited in the admin panel: its own words and formatting, as written. */}
+        {edited && edited.sections.length > 0 && (
+          <div className="space-y-12">
+            {edited.sections.map((section, idx) => (
+              <div key={idx} className="space-y-6">
+                {section.heading && (
+                  <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                    <div className="w-1.5 h-6 bg-[#D4AF37] rounded-full shrink-0" />
+                    <h3 className="font-serif font-bold text-2xl text-slate-900 leading-tight">{section.heading}</h3>
+                  </div>
+                )}
+                <div className="space-y-4">
+                  {section.body
+                    .split(/\n\s*\n|\n/)
+                    .map((p) => p.trim())
+                    .filter(Boolean)
+                    .map((p, pIdx) => (
+                      <p key={pIdx} className="text-slate-700 text-base sm:text-lg leading-relaxed font-sans">
+                        <RichText text={p} linkClassName="font-semibold text-[#123a1a] underline underline-offset-2 hover:text-[#D4AF37]" />
+                      </p>
+                    ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* 1. Page sections and Top Images (Fallback for standard pages) */}
-        {!["The Founder", "The Trust", "Governing Body", "Principal", "Deans and Faculty In-charges"].includes(page.Page) && (page.Sections?.length > 0 || page.Images?.length > 0) && (
+        {!edited && !["The Founder", "The Trust", "Governing Body", "Principal", "Deans and Faculty In-charges"].includes(page.Page) && (page.Sections?.length > 0 || page.Images?.length > 0) && (
           <div className="space-y-12">
             <div className="grid lg:grid-cols-12 gap-8 items-start">
               <div className={`space-y-12 ${page.Images?.length > 0 ? 'lg:col-span-7 xl:col-span-8' : 'lg:col-span-12'}`}>
@@ -282,7 +345,7 @@ export default function DynamicSubPage() {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {page.Documents.map((docUrl, idx) => {
-                const docName = docUrl.split("/").pop() || `Document ${idx + 1}`;
+                const docName = edited?.documents[idx]?.title || docUrl.split("/").pop() || `Document ${idx + 1}`;
                 return (
                   <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-shadow group flex flex-col justify-between">
                     <div className="space-y-3">

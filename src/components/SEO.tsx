@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { useFooterContent } from "../hooks/useFooterContent";
 
 export interface SEOProps {
   title?: string;
@@ -36,27 +37,15 @@ interface RouteMetadata {
 const ROUTE_METADATA_MAP: Record<string, RouteMetadata> = {
   "/": {
     title: "C.K. Pithawalla Institute of Pharmaceutical Science and Research | CKPIPSR Surat",
-    description: "Surat's premier Pharmacy Council of India (PCI) approved institute offering B.Pharm, M.Pharm, and Pharm.D degree programs. Established under Navyug Vidyabhavan Trust.",
-    keywords: "CKPIPSR, C K Pithawalla Pharmacy Surat, PCI Approved Pharmacy College, B.Pharm College Surat, M.Pharm College Surat, Pharm.D Surat, Navyug Vidyabhavan Trust, Surat colleges",
+    description: "Surat's premier Pharmacy Council of India (PCI) approved institute offering D.Pharm, B.Pharm and M.Pharm programs. Established under Navyug Vidyabhavan Trust.",
+    keywords: "CKPIPSR, C K Pithawalla Pharmacy Surat, PCI Approved Pharmacy College, D.Pharm College Surat, B.Pharm College Surat, M.Pharm College Surat, Navyug Vidyabhavan Trust, Surat colleges",
     aiSummary: "C.K. Pithawalla Institute of Pharmaceutical Science and Research (CKPIPSR) is a top-ranked higher education pharmacy institution in Surat, Gujarat, offering undergraduate and postgraduate programs in Pharmacy with state-of-the-art laboratory infrastructure."
-  },
-  "/about/overview": {
-    title: "College Overview & Institutional History | CKPIPSR Surat",
-    description: "Discover C.K. Pithawalla Institute of Pharmaceutical Science and Research. Established in 2005 under Navyug Vidyabhavan Trust, offering top-tier academic curricula in Surat.",
-    keywords: "CKPIPSR overview, about CK Pithawalla pharmacy college, Surat pharmacy colleges, pharmacy college history Surat, Navyug Vidyabhavan Trust, higher education Gujarat",
-    aiSummary: "C.K. Pithawalla Institute of Pharmaceutical Science and Research (CKPIPSR) in Surat offers integrated pharmaceutical curricula, research synergy, and standard-setting mentorship under Navyug Vidyabhavan Trust."
   },
   "/about/vision-mission": {
     title: "Vision, Mission & Core Values | CKPIPSR Surat",
     description: "Explore CKPIPSR's vision to become an internationally benchmarked center of higher learning in pharmacy and our mission to foster academic excellence, ethical research, and clinical innovation.",
     keywords: "CKPIPSR vision and mission, college core values Surat, educational objectives, pharmacy academic goals, Navyug Trust vision, leadership in education",
     aiSummary: "CKPIPSR's vision is to emerge as an internationally benchmarked center of higher learning in pharmaceutical sciences, fostering ethical clinical research and academic rigor."
-  },
-  "/about/mission": {
-    title: "Institutional Mission & Academic Goals | CKPIPSR Surat",
-    description: "Our institutional commitment to delivering syllabus-compliant education, holistic student development, and continuous mentorship for future clinical and research leaders.",
-    keywords: "CKPIPSR mission, institutional objectives, student mentorship Surat, pharmacy academic goals, commerce education Gujarat",
-    aiSummary: "The mission of CKPIPSR Surat is to deliver robust pharmacy undergraduate and postgraduate programs through practical lab exposure and value-based education."
   },
   "/about/founder": {
     title: "Our Founder - Late Shri C. K. Pithawalla | CKPIPSR Surat",
@@ -70,77 +59,11 @@ const ROUTE_METADATA_MAP: Record<string, RouteMetadata> = {
     keywords: "Navyug Vidyabhavan Trust, Surat educational trust, CK Pithawalla management trust, educational philanthropy Gujarat, college trust board",
     aiSummary: "Established in 1965, Navyug Vidyabhavan Trust operates premier educational institutions in Surat, providing strategic governance and state-of-the-art campus infrastructure."
   },
-  "/about/trustees": {
-    title: "Management Trustees & Leadership Board | CKPIPSR Surat",
-    description: "Meet the governing board and trustees of Navyug Vidyabhavan Trust guiding CKPIPSR towards global academic compliance, scientific innovation, and institutional distinction.",
-    keywords: "CKPIPSR trustees, Navyug Trust board members, college management Surat, educational leadership team, board of governors",
-    aiSummary: "The management trustees of Navyug Vidyabhavan Trust provide visionary governance, industry integration, and resource allocation to maintain global standards at CKPIPSR Surat."
-  },
-  "/about/directors-message": {
-    title: "Director's Message | CKPIPSR Surat",
-    description: "Read the inspiring message from our Director regarding academic discipline, industry synergy, research excellence, and student development at C.K. Pithawalla Institute.",
-    keywords: "CKPIPSR director message, academic leadership, college director Surat, higher education vision, student mentorship",
-    aiSummary: "The Director of CKPIPSR emphasizes rigorous academic standards, corporate synergy, and holistic clinical development to prepare pharmacy graduates for global leadership."
-  },
   "/about/principals-message": {
     title: "Principal's Message | CKPIPSR Surat",
     description: "Welcome message from the Principal of CKPIPSR emphasizing character building, academic competence, research mindset, and future-ready career preparation.",
     keywords: "CKPIPSR principal message, college principal Surat, student leadership, academic standards, pharmacy education",
-    aiSummary: "The Principal of CKPIPSR welcomes students to an institution dedicated to academic intelligence, integrity, and outstanding professional research under VNSGU and PCI guidelines."
-  },
-  "/about/hods-message": {
-    title: "HODs' Messages - Pharmacy Programs | CKPIPSR Surat",
-    description: "Insights, academic roadmaps, and career guidance from the Heads of Departments (HODs) across B.Pharm, M.Pharm, and Pharm.D programs at CKPIPSR Surat.",
-    keywords: "CKPIPSR HOD message, pharmacy department head, faculty guidance",
-    aiSummary: "The Heads of Departments at CKPIPSR Surat lead the B.Pharm, M.Pharm, and Pharm.D programs with curriculum innovation, industry lectures, and practical laboratory mentorship."
-  },
-  "/courses/bpharm": {
-    title: "B.Pharm (Bachelor of Pharmacy) Degree Program | CKPIPSR Surat",
-    description: "Premier B.Pharm program at CKPIPSR Surat approved by PCI and VNSGU. Advanced training in pharmaceutics, pharmacology, pharmaceutical chemistry, and pharmacognosy.",
-    keywords: "B.Pharm college Surat, Bachelor of Pharmacy Surat, PCI approved college Surat, clinical pharmacy Surat, best pharmacy college Surat",
-    aiSummary: "The B.Pharm program at CKPIPSR Surat is a 4-year undergraduate degree approved by PCI and VNSGU, offering foundational and advanced coursework in biochemistry, formulation, and pharmacology.",
-    courseDetails: {
-      name: "Bachelor of Pharmacy (B.Pharm)",
-      credential: "Bachelor of Pharmacy",
-      duration: "P4Y",
-      career: "Clinical Pharmacist, Drug Inspector, Formulation Scientist, Quality Assurance Officer, R&D Specialist"
-    },
-    faq: [
-      { q: "What is the duration of the B.Pharm course at CKPIPSR?", a: "The B.Pharm program is a 4-year full-time undergraduate degree divided into 8 semesters under VNSGU affiliation and PCI approval." },
-      { q: "Is CKPIPSR approved by the Pharmacy Council of India (PCI)?", a: "Yes, CKPIPSR is fully approved by the Pharmacy Council of India (PCI), New Delhi." }
-    ]
-  },
-  "/courses/mpharm": {
-    title: "M.Pharm (Master of Pharmacy) Program | CKPIPSR Surat",
-    description: "Leading M.Pharm college in Surat. 2-year full-time postgraduate research degree featuring advanced specializations in Pharmaceutics, Pharmacology, and Quality Assurance.",
-    keywords: "M.Pharm college Surat, Master of Pharmacy VNSGU, postgraduate pharmacy degree Surat, pharmaceutical research, top drug formulation course",
-    aiSummary: "CKPIPSR Surat offers a 2-year Master of Pharmacy (M.Pharm) research degree affiliated with VNSGU, training future researchers through advanced laboratories and industrial thesis work.",
-    courseDetails: {
-      name: "Master of Pharmacy (M.Pharm)",
-      credential: "Master of Pharmacy",
-      duration: "P2Y",
-      career: "Research Scientist, Regulatory Affairs Lead, Formulation Developer, Drug Safety Associate, Academician"
-    },
-    faq: [
-      { q: "What are the specializations in M.Pharm at CKPIPSR?", a: "Specializations include Pharmaceutics, Quality Assurance, and Pharmacology, featuring rigorous thesis research." },
-      { q: "Does the M.Pharm program include laboratory research?", a: "Yes, the second year is dedicated to a comprehensive research project and industrial dissertation." }
-    ]
-  },
-  "/courses/pharmd": {
-    title: "Pharm.D (Doctor of Pharmacy) Program | CKPIPSR Surat",
-    description: "Top-tier 6-year clinical doctorate Pharm.D degree in Surat. Focusing on clinical pharmacy, ward rounds, therapeutic drug monitoring, and patient counseling.",
-    keywords: "Pharm.D college Surat, Doctor of Pharmacy VNSGU, clinical pharmacy degree Surat, hospital training, patient counseling course Surat",
-    aiSummary: "The Pharm.D program at CKPIPSR Surat is a 6-year clinical doctoral degree approved by PCI, equipping students with practical medical expertise, bedside rounds, and pharmacotherapy skills.",
-    courseDetails: {
-      name: "Doctor of Pharmacy (Pharm.D)",
-      credential: "Doctor of Pharmacy",
-      duration: "P6Y",
-      career: "Clinical Pharmacist, Ward Round Consultant, Medical Writer, Pharmacovigilance Specialist, Hospital Pharmacy Director"
-    },
-    faq: [
-      { q: "What is the duration of the Pharm.D program?", a: "The Doctor of Pharmacy (Pharm.D) is a 6-year professional doctorate, including 5 years of academic and clinical study and 1 year of mandatory internship in a hospital." },
-      { q: "Does Pharm.D include hospital ward rounds?", a: "Yes, students participate in daily hospital ward rounds alongside physicians to optimize patient pharmacotherapy." }
-    ]
+    aiSummary: "The Principal of CKPIPSR welcomes students to an institution dedicated to academic intelligence, integrity, and outstanding professional research under GTU and PCI guidelines."
   }
 };
 
@@ -177,6 +100,7 @@ function formatPathToTitle(pathname: string): string {
 export default function SEO(props: SEOProps) {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { contact } = useFooterContent();
 
   // Attempt to fetch exact route match from dictionary
   const matchedRoute = ROUTE_METADATA_MAP[currentPath];
@@ -201,11 +125,11 @@ export default function SEO(props: SEOProps) {
   let derivedDesc = props.description || (matchedRoute ? matchedRoute.description : undefined);
   if (!derivedDesc) {
     const topic = props.activeItemLabel || props.title || formatPathToTitle(currentPath);
-    derivedDesc = `Explore ${topic} at C.K. Pithawalla Institute of Pharmaceutical Science and Research (CKPIPSR), Surat. Approved by PCI and affiliated with VNSGU, offering premier education since 2005.`;
+    derivedDesc = `Explore ${topic} at C.K. Pithawalla Institute of Pharmaceutical Science and Research (CKPIPSR), Surat. Approved by PCI and affiliated with GTU, offering premier education since 2005.`;
   }
 
   // Derive final keywords
-  const baseKeywords = "CKPIPSR, C K Pithawalla Pharmacy Surat, VNSGU Pharmacy College, B.Pharm College Surat, M.Pharm College Surat, Navyug Vidyabhavan Trust, Surat education";
+  const baseKeywords = "CKPIPSR, C K Pithawalla Pharmacy Surat, GTU Pharmacy College, B.Pharm College Surat, M.Pharm College Surat, Navyug Vidyabhavan Trust, Surat education";
   let derivedKeywords = props.keywords || (matchedRoute ? matchedRoute.keywords : undefined);
   if (!derivedKeywords) {
     const topic = props.activeItemLabel || props.title || formatPathToTitle(currentPath);
@@ -218,12 +142,12 @@ export default function SEO(props: SEOProps) {
   let derivedAiSummary = matchedRoute ? matchedRoute.aiSummary : undefined;
   if (!derivedAiSummary) {
     const topic = props.activeItemLabel || props.title || formatPathToTitle(currentPath);
-    derivedAiSummary = `${topic} is part of C.K. Pithawalla Institute of Pharmaceutical Science and Research (CKPIPSR) Surat, an esteemed VNSGU-affiliated and PCI-approved institution committed to academic excellence, student mentorship, and healthcare compliance.`;
+    derivedAiSummary = `${topic} is part of C.K. Pithawalla Institute of Pharmaceutical Science and Research (CKPIPSR) Surat, an esteemed GTU-affiliated and PCI-approved institution committed to academic excellence, student mentorship, and healthcare compliance.`;
   }
 
   // Derive Canonical URL and Image
   const canonicalUrl = `https://ckpipsr.ac.in${currentPath === "/" ? "" : currentPath}`;
-  const defaultImage = "https://ckpipsr.ac.in/images/logo.png";
+  const defaultImage = "/media/ipsr/images/logo.png";
   const ogImage = props.image || (matchedRoute ? matchedRoute.image : undefined) || defaultImage;
 
   // Derive Course & FAQ Details
@@ -240,22 +164,22 @@ export default function SEO(props: SEOProps) {
       "url": "https://ckpipsr.ac.in",
       "logo": defaultImage,
       "foundingDate": "2005",
-      "description": "Surat's premier PCI-approved pharmacy college offering VNSGU-affiliated B.Pharm, M.Pharm, and Pharm.D degree programs.",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Near Malvan Temple, Surat-Dumas Road, Bharthana (Vesu)",
-        "addressLocality": "Surat",
-        "addressRegion": "Gujarat",
-        "postalCode": "395007",
-        "addressCountry": "IN"
-      },
+      "description": "Surat's premier PCI-approved pharmacy college offering D.Pharm, B.Pharm and M.Pharm programs.",
+      // The address, phone and email are the ones on the Contact Us page, so they are only typed in one place.
+      ...(contact?.address && {
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": contact.address,
+          "addressCountry": "IN"
+        }
+      }),
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": "21.1444",
         "longitude": "72.7411"
       },
-      "telephone": "+91-261-2728282",
-      "email": "ckpipsr@gmail.com",
+      ...(contact?.phones[0] && { "telephone": contact.phones[0] }),
+      ...(contact?.emails[0] && { "email": contact.emails[0] }),
       "sameAs": [
         "https://ckpipsr.ac.in",
         "https://www.facebook.com/ckpipsr",

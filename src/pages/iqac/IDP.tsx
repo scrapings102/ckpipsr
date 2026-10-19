@@ -21,6 +21,11 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useIdpContent, type IdpTone } from "../../hooks/useIdpContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
 
 /** The icons a summary tile can carry; the panel offers these same names. */
 const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -60,7 +65,7 @@ export default function IDP() {
       category="iqac"
       activeItemLabel="IDP"
     >
-      <div className="space-y-10 max-w-5xl mx-auto">
+      <div className="space-y-10 w-full">
 
         {/* Header Introduction Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -90,13 +95,13 @@ export default function IDP() {
           </div>
 
           <p className="text-sm sm:text-base font-sans text-slate-700 leading-relaxed font-normal">
-            {intro.body}
+            <RichText text={intro.body} />
           </p>
 
           {/* Key Strategic Focus Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
             {intro.stats.map((stat, i) => {
-              const Icon = ICONS[stat.icon];
+              const Icon = iconFor(stat.icon, ICONS, NoIcon);
               return (
                 <div
                   key={i}
@@ -159,7 +164,7 @@ export default function IDP() {
                   </div>
 
                   <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed max-w-2xl">
-                    {plan.description}
+                    <RichText text={plan.description} />
                   </p>
                 </div>
               </div>
@@ -197,7 +202,7 @@ export default function IDP() {
               {quick.title}
             </h4>
             <p className="text-xs text-slate-600">
-              {quick.body}
+              <RichText text={quick.body} />
             </p>
           </div>
 

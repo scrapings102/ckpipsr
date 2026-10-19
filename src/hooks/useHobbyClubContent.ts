@@ -150,7 +150,7 @@ export const DEFAULT_HOBBY_CLUB: HobbyClubContent = {
         "title": "Science Club",
         "badge": "Innovation & Prototypes",
         "icon": "Cpu",
-        "image": "https://ckpipsr.ac.in/images/students/hobbyclub/science.png",
+        "image": "/media/ipsr/images/students/hobbyclub/science.png",
         "description": "The main intention of the Science Club is to encourage, inspire and nurture young students by supporting them to work on new innovative ideas and transform them to prototypes for applicable manner. The students will get mentorship from industry experts, patent experts and alumni of the institution. There will be opportunity for the students to showcase their talents in Competitions."
       },
       {
@@ -158,7 +158,7 @@ export const DEFAULT_HOBBY_CLUB: HobbyClubContent = {
         "title": "Arts and Crafts Club",
         "badge": "Creative & Performing Arts",
         "icon": "Palette",
-        "image": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=80",
+        "image": "/media/unsplash/photo-1513364776144-60967b0f800f-1002ea.jpg",
         "description": "The purpose of the Performing Art Club is to make all round development of students. Through this club, students increase their confidence and expose them to different types of arts. Through the medium of this club, the quality of leadership comes to the student. Here mime, drama and poetry, story writing, debate, group discussion are connected in many ways."
       },
       {
@@ -166,7 +166,7 @@ export const DEFAULT_HOBBY_CLUB: HobbyClubContent = {
         "title": "Photography Club",
         "badge": "Visual Storytelling",
         "icon": "Camera",
-        "image": "https://ckpipsr.ac.in/images/students/hobbyclub/photography.png",
+        "image": "/media/ipsr/images/students/hobbyclub/photography.png",
         "description": "Photography club is committed to promote photography skills among young generation. A world without photography is hard to imagine; photography is a beautiful way to express one's art and feelings. This photography needs passion and required lot of maturity like golden ager and child like curiosity. Indeed, photography is an art and science. The aim of the club is to nurture the talent among students to see the things differently. The club ethos is to provide a platform where the like- minded students to enjoy, share and advance their photographic skills and explore the beauty of the world."
       },
       {
@@ -174,7 +174,7 @@ export const DEFAULT_HOBBY_CLUB: HobbyClubContent = {
         "title": "Charity Club",
         "badge": "Social Service & Humanity",
         "icon": "Heart",
-        "image": "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=1200&q=80",
+        "image": "/media/unsplash/photo-1532629345422-7515f3d16bb6-836068.jpg",
         "description": "Charity is the act of extending love and kindness to others unconditionally, which is a conscious act but the decision is made by the heart, without expecting a reward. When Charity is carried out selflessly, it is a one-way act where a person gives but asks for nothing in return.Charity Club helps raise awareness amongst students about the situation of people and their well being. It helps them serve society and the less fortunate. It develops in them a heart for the poor and needy. The Charity Club functions as a humanitarian organization which conducts various programmes to help improve the society. Student volunteers and teacher co-ordinators arrange frequent visits to non-profitable organizations or needy people of nearby community /village These visits help in instilling a sense of humanness in the club members and encourages them to take up various societal issues."
       },
       {
@@ -182,7 +182,7 @@ export const DEFAULT_HOBBY_CLUB: HobbyClubContent = {
         "title": "Music and Dance Club",
         "badge": "Harmony & Cultural Expression",
         "icon": "Music",
-        "image": "https://ckpipsr.ac.in/images/students/hobbyclub/music.png",
+        "image": "/media/ipsr/images/students/hobbyclub/music.png",
         "description": "Music and Dance are very important disciplines for a constructive sublimation of instincts and expression of inner sentiments. The Music and Dance club provides them with training in instrumental & vocal music. In addition to it, students learn to dance on Indian & Western tunes. It helps them synchronise their body, mind and soul. The Music and Dance enable the students to promote sense of unity and love as our nation is diverse in its music and arts. While providing knowledge of different forms of Music and Dances of our country, it also enables the students to nurture and identify the talents in music and dance."
       }
     ]

@@ -59,7 +59,7 @@ export const DEFAULT_CONTACT: ContactContent = {
     title: "Geographic Location",
     subtitle: "Strategically located near Surat International Airport.",
     buttonLabel: "Get Directions",
-    directionsUrl: "https://goo.gl/maps/embed?pb=!1m14!1m8!1m3!1d5923.654116328731!2d72.71618443860855!3d21.13191122833264!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be052ae998fda3d%3A0x23340ab807f12d7!2sC.K.%20Pthawalla%20Institute%20of%20Pharmaceutical%20Science%20and%20Research!5e0!3m2!1sen!2sin!4v1679122645038!5m2!1sen!2sin",
+    directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=21.13191122833264,72.71618443860855",
     embedUrl: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5923.654116328731!2d72.71618443860855!3d21.13191122833264!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be052ae998fda3d%3A0x23340ab807f12d7!2sC.K.%20Pthawalla%20Institute%20of%20Pharmaceutical%20Science%20and%20Research!5e0!3m2!1sen!2sin!4v1679122645038!5m2!1sen!2sin"
   }
 };

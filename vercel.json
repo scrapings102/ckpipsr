@@ -1,8 +1,7 @@
 {
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/:path*", "destination": "https://ckpipsr-api.onrender.com/api/:path*" },
+    { "source": "/chatbot-api/:path*", "destination": "https://ckpipsr-chatbot.onrender.com/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

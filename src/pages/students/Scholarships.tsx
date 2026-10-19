@@ -10,7 +10,9 @@ import {
   RotateCcw
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { Select } from "../../components/ui/Select";
 import { useScholarshipsContent } from "../../hooks/useScholarshipsContent";
+import { RichText } from "../../utils/RichText";
 
 export default function Scholarships() {
   const content = useScholarshipsContent();
@@ -45,7 +47,8 @@ export default function Scholarships() {
         org.organization.toLowerCase().includes(q) ||
         org.name.toLowerCase().includes(q) ||
         org.website.toLowerCase().includes(q) ||
-        org.degreeApplicable.toLowerCase().includes(q);
+        org.degreeApplicable.toLowerCase().includes(q) ||
+        org.eligibility.toLowerCase().includes(q);
 
       return matchesCat && matchesSearch;
     });
@@ -91,7 +94,7 @@ export default function Scholarships() {
       category="students-corner"
       activeItemLabel="Scholorships"
     >
-      <div className="space-y-8 max-w-7xl mx-auto py-2">
+      <div className="space-y-8 w-full py-2">
         {/* ── TOP INTERACTIVE TAB BAR ── */}
         <div className="flex justify-center border-b border-slate-200">
           <div className="inline-flex gap-8 sm:gap-12">
@@ -180,7 +183,7 @@ export default function Scholarships() {
             {/* Organizations Table Container */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-[540px] text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-700 text-xs sm:text-[13px] font-sans font-bold">
                       <th className="py-4 px-5 sm:px-6 w-[28%]">Organization</th>
@@ -213,6 +216,11 @@ export default function Scholarships() {
                           {org.degreeApplicable && (
                             <div className="text-[11px] text-slate-500 font-sans mt-1">
                               Applicable for: <span className="font-medium text-slate-700">{org.degreeApplicable}</span>
+                            </div>
+                          )}
+                          {org.eligibility && (
+                            <div className="text-[11px] text-slate-500 font-sans mt-1 leading-relaxed">
+                              Eligibility: <span className="font-medium text-slate-700">{org.eligibility}</span>
                             </div>
                           )}
                         </td>
@@ -271,7 +279,7 @@ export default function Scholarships() {
                       {orgs.notice.heading}
                     </h4>
                     <p className="text-xs text-slate-600 font-sans">
-                      {orgs.notice.blurb}
+                      <RichText text={orgs.notice.blurb} />
                     </p>
                   </div>
                 </div>
@@ -282,7 +290,7 @@ export default function Scholarships() {
                       <div className="font-bold text-slate-800 font-mono text-[11px] text-[#1a5d2e]">
                         • {card.title}
                       </div>
-                      <p>{card.body}</p>
+                      <p><RichText text={card.body} /></p>
                     </div>
                   ))}
                 </div>
@@ -316,7 +324,7 @@ export default function Scholarships() {
                       {awarded.heading}
                     </h3>
                     <p className="text-white/80 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                      {awarded.blurb}
+                      <RichText text={awarded.blurb} />
                     </p>
                   </div>
                 </div>
@@ -368,38 +376,33 @@ export default function Scholarships() {
 
                 {/* Scheme Filter */}
                 <div className="md:col-span-4">
-                  <select
+                  <Select
                     value={selectedScheme}
-                    onChange={(e) => setSelectedScheme(e.target.value)}
+                    onChange={setSelectedScheme}
                     aria-label="Filter by scholarship scheme"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all cursor-pointer"
-                  >
-                    <option value="ALL">
-                      {awarded.allSchemesLabel.replaceAll("{count}", String(awarded.schemes.length))}
-                    </option>
-                    {awarded.schemes.map((sch) => (
-                      <option key={sch.value} value={sch.value}>
-                        {sch.value}
-                      </option>
-                    ))}
-                  </select>
+                    options={[
+                      {
+                        value: "ALL",
+                        label: awarded.allSchemesLabel.replaceAll("{count}", String(awarded.schemes.length)),
+                      },
+                      ...awarded.schemes.map((sch) => ({ value: sch.value, label: sch.value })),
+                    ]}
+                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all cursor-pointer data-[state=open]:ring-2 data-[state=open]:ring-[#1a5d2e]/20"
+                  />
                 </div>
 
                 {/* Class Filter */}
                 <div className="md:col-span-3">
-                  <select
+                  <Select
                     value={selectedClass}
-                    onChange={(e) => setSelectedClass(e.target.value)}
+                    onChange={setSelectedClass}
                     aria-label="Filter by class level"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all cursor-pointer"
-                  >
-                    <option value="ALL">{awarded.allClassesLabel}</option>
-                    {awarded.classes.map((cls) => (
-                      <option key={cls.value} value={cls.value}>
-                        {cls.value}
-                      </option>
-                    ))}
-                  </select>
+                    options={[
+                      { value: "ALL", label: awarded.allClassesLabel },
+                      ...awarded.classes.map((cls) => ({ value: cls.value, label: cls.value })),
+                    ]}
+                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:border-[#1a5d2e] focus:ring-2 focus:ring-[#1a5d2e]/20 outline-hidden transition-all cursor-pointer data-[state=open]:ring-2 data-[state=open]:ring-[#1a5d2e]/20"
+                  />
                 </div>
 
                 {/* Reset Filters */}
@@ -434,7 +437,7 @@ export default function Scholarships() {
             {/* Official Table */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-[700px] text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider">
                       <th className="py-4 px-4 sm:px-5 w-[11%]">Academic Year</th>
@@ -507,7 +510,7 @@ export default function Scholarships() {
                     {filteredAwardedStudents.length === 0 && (
                       <tr>
                         <td colSpan={6} className="text-center py-16 text-slate-500 text-sm">
-                          <p className="font-medium">{awarded.emptyMessage}</p>
+                          <p className="font-medium"><RichText text={awarded.emptyMessage} /></p>
                           <button
                             type="button"
                             onClick={resetAwardedFilters}

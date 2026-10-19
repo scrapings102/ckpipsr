@@ -31,12 +31,17 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     experience: "28 Year(s), 6 Month(s)",
     profile: "Dr. Dhiren P. Shah is Professor and Principal at C. K. Pithawalla Institute of Pharmaceutical Science & Research (CKPIPSR) with over 28 years of academic, administrative, and research experience in Pharmaceutics. He serves as Associate Dean (South Zone) and Chairman of the Board of Studies (Pharmaceutics) at Gujarat Technological University (GTU), Ahmedabad. He has authored over 78 national and international publications, published 4 books, and guided numerous M.Pharm and Ph.D. research scholars.",
     achievements: [
-      "Publications 26 – International and 52 - National Books published As a capacity of co-authors -04 Others 🗲 Associate Dean (South Zone) & Chair Person, Board of Studies (Pharmaceutics), Gujarat Technological University, Ahmedabad. 🗲 Selected as a Mentor for “International Experience Program” run by GTU, Ahmedabad, in Association with Laurentian University, Sudbury, Canada Industrial Projects Worth Rs. 2.0 lacs No of students M. Pharm. – 30 and Ph. D - 03"
+      "Publications: 26 international and 52 national",
+      "Books published as co-author: 4",
+      "Associate Dean (South Zone) and Chair Person, Board of Studies (Pharmaceutics), Gujarat Technological University, Ahmedabad",
+      "Selected as a mentor for the \"International Experience Program\" run by GTU, Ahmedabad, in association with Laurentian University, Sudbury, Canada",
+      "Industrial projects worth Rs. 2.0 lakh",
+      "Students guided: M.Pharm 30, Ph.D. 3"
     ],
     email: "dhiren.shah@ckpipsr.ac.in",
     contactNumber: "-",
     officeLocation: "Principal's Office, Ground Floor, Admin Block",
-    joiningDate: "15/06/2005",
+    joiningDate: "2005-06-15",
     researchLinks: {
       vidwan: "https://vidwan.inflibnet.ac.in/profile/443677",
       orcid: "https://orcid.org/orcid-search/search?searchQuery=Dhiren%20P.%20Shah",
@@ -62,7 +67,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "bhumika.desai@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 104",
     officeLocation: "Pharmaceutics Research Lab, 1st Floor",
-    specializations: ["Bioavailability Enhancement", "Gastro-Retentive Systems", "Polymer Chemistry in Formulation", "Quality by Design (QbD)"]
+    specializations: ["Bioavailability Enhancement", "Gastro-Retentive Systems", "Polymer Chemistry in Formulation", "Quality by Design (QbD)"],
+    joiningDate: "2011-07-01"
   },
   "vinodkumar d ramani": {
     name: "Dr. Vinodkumar D. Ramani",
@@ -81,7 +87,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "vinod.ramani@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 106",
     officeLocation: "Department of Pharmaceutics, Room 108",
-    specializations: ["Solid Dosage Formulations", "Transdermal Delivery", "Modified Release Tablets", "Industrial Pharmacy"]
+    specializations: ["Solid Dosage Formulations", "Transdermal Delivery", "Modified Release Tablets", "Industrial Pharmacy"],
+    joiningDate: "2016-01-15"
   },
   "moolla yahya ali": {
     name: "Mr. Moolla Yahya Ali",
@@ -99,7 +106,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "yahya.moolla@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 112",
     officeLocation: "Pharmaceutics Department, Room 114",
-    specializations: ["Ocular Drug Delivery", "Vesicular Drug Carriers", "Physical Pharmaceutics", "Cleanroom Technologies"]
+    specializations: ["Ocular Drug Delivery", "Vesicular Drug Carriers", "Physical Pharmaceutics", "Cleanroom Technologies"],
+    joiningDate: "2020-07-15"
   },
   "dipayan tarafder": {
     name: "Mr. Dipayan Tarafder",
@@ -117,7 +125,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "dipayan.tarafder@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 108",
     officeLocation: "Pharmacology Laboratory & Animal Facility, Ground Floor",
-    specializations: ["Neuropharmacology", "Behavioral Animal Models", "Pre-clinical Toxicity Screening", "Cardiovascular Pharmacology"]
+    specializations: ["Neuropharmacology", "Behavioral Animal Models", "Pre-clinical Toxicity Screening", "Cardiovascular Pharmacology"],
+    joiningDate: "2013-01-16"
   },
   "prakruti p gotawala": {
     name: "Mrs. Prakruti P. Gotawala",
@@ -135,7 +144,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "prakruti.jadav@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 114",
     officeLocation: "Pharmacology Department, Room 102",
-    specializations: ["Metabolic Syndrome Pharmacology", "Herbal Toxicology", "Clinical Pharmacokinetics", "In-Vivo Bioassays"]
+    specializations: ["Metabolic Syndrome Pharmacology", "Herbal Toxicology", "Clinical Pharmacokinetics", "In-Vivo Bioassays"],
+    joiningDate: "2022-01-10"
   },
   "shuchi p desai": {
     name: "Dr. Shuchi P. Desai",
@@ -153,7 +163,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "shuchi.desai@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 110",
     officeLocation: "Medicinal Chemistry Research Lab, 2nd Floor",
-    specializations: ["Computer-Aided Drug Design (CADD)", "Heterocyclic Synthesis", "Molecular Docking", "Antimicrobial Profiling"]
+    specializations: ["Computer-Aided Drug Design (CADD)", "Heterocyclic Synthesis", "Molecular Docking", "Antimicrobial Profiling"],
+    joiningDate: "2018-07-02"
   },
   "monika kyada": {
     name: "Dr. Monika Kyada",
@@ -171,7 +182,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "monika.kakadiya@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 111",
     officeLocation: "Central Analytical Instrumentation Lab, 2nd Floor",
-    specializations: ["HPLC & UV-Vis Method Development", "Stability-Indicating Assays", "ICH Q2 Validation", "Spectroscopic Profiling"]
+    specializations: ["HPLC & UV-Vis Method Development", "Stability-Indicating Assays", "ICH Q2 Validation", "Spectroscopic Profiling"],
+    joiningDate: "2019-07-15"
   },
   "naishadh ishwarbhai solanki": {
     name: "Dr. Naishadh Ishwarbhai Solanki",
@@ -189,7 +201,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "Naishadh.solanki@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 115",
     officeLocation: "Organic Chemistry Laboratory, 2nd Floor",
-    specializations: ["Green Chemistry Syntheses", "Microwave-Assisted Synthesis", "Structure-Activity Relationship (SAR)", "Heterocyclic Compounds"]
+    specializations: ["Green Chemistry Syntheses", "Microwave-Assisted Synthesis", "Structure-Activity Relationship (SAR)", "Heterocyclic Compounds"],
+    joiningDate: "2017-08-01"
   },
   "dhaval b joshi": {
     name: "Mr. Dhaval B. Joshi",
@@ -207,7 +220,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "dhaval.joshi@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 116",
     officeLocation: "Pharmacology Department, Room 105",
-    specializations: ["Pharmacovigilance & ADR Monitoring", "GPAT/NIPER Academic Mentoring", "Cardiovascular Pathophysiology", "Clinical Pharmacy"]
+    specializations: ["Pharmacovigilance & ADR Monitoring", "GPAT/NIPER Academic Mentoring", "Cardiovascular Pathophysiology", "Clinical Pharmacy"],
+    joiningDate: "2020-08-17"
   },
   "kinjalkumari sumanbhai gamit": {
     name: "Ms. Kinjalkumari Sumanbhai Gamit",
@@ -225,7 +239,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "kinjal.gamit@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 117",
     officeLocation: "Pharmacology Department, Room 107",
-    specializations: ["Ethnopharmacology", "Neuroprotective Natural Products", "Human Anatomy & Physiology", "Public Health Education"]
+    specializations: ["Ethnopharmacology", "Neuroprotective Natural Products", "Human Anatomy & Physiology", "Public Health Education"],
+    joiningDate: "2024-01-15"
   },
   "nirmal t mehta": {
     name: "Mr. Nirmal T. Mehta",
@@ -243,7 +258,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "nirmal.mehta@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 118",
     officeLocation: "Pharmaceutical Chemistry Lab, 2nd Floor",
-    specializations: ["Pharmaceutical Analysis", "Quality Assurance (QA)", "Spectrophotometry", "Laboratory Safety Compliance"]
+    specializations: ["Pharmaceutical Analysis", "Quality Assurance (QA)", "Spectrophotometry", "Laboratory Safety Compliance"],
+    joiningDate: "2025-07-01"
   },
   "kajal chintan solanki": {
     name: "Mrs. Kajal Chintan Solanki",
@@ -261,7 +277,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "kajal.solanki@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 119",
     officeLocation: "Pharmaceutical Chemistry Lab 2, 2nd Floor",
-    specializations: ["Inorganic Pharmaceutical Chemistry", "Benzimidazole Derivatives", "Quality Control Protocols", "Chemical Synthesis"]
+    specializations: ["Inorganic Pharmaceutical Chemistry", "Benzimidazole Derivatives", "Quality Control Protocols", "Chemical Synthesis"],
+    joiningDate: "2021-08-02"
   },
   "zulekha s gamit": {
     name: "Ms. Zulekha S. Gamit",
@@ -279,7 +296,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "Zulekha.gamit@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 120",
     officeLocation: "Pharmaceutics Department, Room 115",
-    specializations: ["Polymeric Nano-carriers", "Dosage Form Design", "Pharmaceutical Unit Operations", "Gastrointestinal Formulations"]
+    specializations: ["Polymeric Nano-carriers", "Dosage Form Design", "Pharmaceutical Unit Operations", "Gastrointestinal Formulations"],
+    joiningDate: "2023-08-01"
   },
   "hema v badgujar": {
     name: "Dr. Hema V. Badgujar",
@@ -297,7 +315,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "hema.kamlja@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 121",
     officeLocation: "Medicinal Chemistry Lab, 2nd Floor",
-    specializations: ["Enzyme Inhibitor Design", "Condensed Pyrimidine Synthesis", "Molecular Modeling", "Medicinal Chemistry"]
+    specializations: ["Enzyme Inhibitor Design", "Condensed Pyrimidine Synthesis", "Molecular Modeling", "Medicinal Chemistry"],
+    joiningDate: "2023-01-09"
   },
   "shweta g vaghela": {
     name: "Mrs. Shweta G. Vaghela",
@@ -315,7 +334,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "shweta.vaghela@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 122",
     officeLocation: "Pharmaceutical Chemistry Department, Room 204",
-    specializations: ["Pharmaceutical Organic Analysis", "Quinazolinone Chemistry", "Spectral Identification", "Laboratory Pedagogy"]
+    specializations: ["Pharmaceutical Organic Analysis", "Quinazolinone Chemistry", "Spectral Identification", "Laboratory Pedagogy"],
+    joiningDate: "2025-08-01"
   },
   "tarkeshwari t ahire": {
     name: "Mrs. Tarkeshwari T. Ahire",
@@ -333,7 +353,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "tarkeshwari.ahire@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 123",
     officeLocation: "Quality Assurance Lab, 2nd Floor",
-    specializations: ["Drug Regulatory Affairs", "Green Synthetic Chemistry", "Impurity Profiling", "Quality Assurance Systems"]
+    specializations: ["Drug Regulatory Affairs", "Green Synthetic Chemistry", "Impurity Profiling", "Quality Assurance Systems"],
+    joiningDate: "2022-08-01"
   },
   "shivangi k shrivastav": {
     name: "Ms. Shivangi K. Shrivastav",
@@ -351,7 +372,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "shivangi.shrivastav@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 124",
     officeLocation: "Cosmetics & Topical Formulation Lab, 1st Floor",
-    specializations: ["Cosmetic Science", "Topical Hydrogels", "Microemulsion Systems", "Dermal Permeation"]
+    specializations: ["Cosmetic Science", "Topical Hydrogels", "Microemulsion Systems", "Dermal Permeation"],
+    joiningDate: "2023-07-17"
   },
   "richa indravadan champaneria": {
     name: "Ms. Richa Indravadan Champaneria",
@@ -369,7 +391,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "richa.champaneria@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 125",
     officeLocation: "Biochemistry & Organic Lab, 2nd Floor",
-    specializations: ["Pharmaceutical Biochemistry", "Bioanalytical Assay Validation", "Organic Chemistry", "Community Health Programs"]
+    specializations: ["Pharmaceutical Biochemistry", "Bioanalytical Assay Validation", "Organic Chemistry", "Community Health Programs"],
+    joiningDate: "2023-09-01"
   },
   "hetvi r shah": {
     name: "Mrs. Hetvi R. Shah",
@@ -387,7 +410,8 @@ export const FACULTY_PROFILES: Record<string, FacultyDetail> = {
     email: "Hetvi.shah@ckpipsr.ac.in",
     contactNumber: "+91 261 2723967 Ext. 126",
     officeLocation: "Pharmaceutics Department, Room 116",
-    specializations: ["Fast-Dissolving Oral Films", "Solubility Enhancement", "BCS Class II Formulations", "Physical Pharmaceutics"]
+    specializations: ["Fast-Dissolving Oral Films", "Solubility Enhancement", "BCS Class II Formulations", "Physical Pharmaceutics"],
+    joiningDate: "2024-07-15"
   }
 };
 
@@ -401,48 +425,6 @@ export function normalizeFacultyName(name: string): string {
     .replace(/[.,]/g, "")
     .replace(/\s+/g, " ")
     .trim();
-}
-
-export function computeJoiningDate(joiningDate?: string, experience?: string): string {
-  if (joiningDate && joiningDate.trim()) return joiningDate;
-  if (experience) {
-    const matchYears = experience.match(/(\d+)\s*(?:years?|year\(s\)|yrs?)/i);
-    const matchMonths = experience.match(/(\d+)\s*(?:months?|month\(s\)|mths?)/i);
-
-    const yrs = matchYears ? parseInt(matchYears[1], 10) : 0;
-    const mths = matchMonths ? parseInt(matchMonths[1], 10) : 0;
-
-    if (yrs > 0 || mths > 0) {
-      const refDate = new Date(2026, 9, 1); // Current reference date (Oct 2026)
-      refDate.setFullYear(refDate.getFullYear() - yrs);
-      refDate.setMonth(refDate.getMonth() - mths);
-
-      // Capped at college establishment year (2005)
-      if (refDate.getFullYear() < 2005) {
-        return "15/06/2005";
-      }
-
-      const day = String(refDate.getDate()).padStart(2, "0");
-      const month = String(refDate.getMonth() + 1).padStart(2, "0");
-      const year = refDate.getFullYear();
-      return `${day}/${month}/${year}`;
-    }
-  }
-  return "01/08/2018";
-}
-
-export function getResearchLinks(member: { name: string; profile?: string; researchLinks?: Partial<ResearchLinks> }): ResearchLinks {
-  const custom = member.researchLinks || {};
-  const cleanName = member.name.replace(/^(dr|mr|mrs|ms|prof)\.?\s+/i, "").trim();
-  const encodedClean = encodeURIComponent(cleanName);
-
-  const vidwan = custom.vidwan || (member.profile && member.profile.includes("vidwan.inflibnet.ac.in") ? member.profile : `https://vidwan.inflibnet.ac.in/search/search_result?search_by=name&search_val=${encodedClean}`);
-  const orcid = custom.orcid || `https://orcid.org/orcid-search/search?searchQuery=${encodedClean}`;
-  const googleScholar = custom.googleScholar || `https://scholar.google.com/citations?view_op=search_authors&mauthors=${encodedClean}`;
-  const researchGate = custom.researchGate || `https://www.researchgate.net/search/researcher?q=${encodedClean}`;
-  const linkedIn = custom.linkedIn || `https://www.linkedin.com/search/results/people/?keywords=${encodedClean}+CKPIPSR`;
-
-  return { vidwan, orcid, googleScholar, researchGate, linkedIn };
 }
 
 /**
@@ -490,7 +472,7 @@ export function getFacultyDetails(member: {
     contactNumber: detailed?.contactNumber || "+91 261 2723967 Ext. 101",
     officeLocation: detailed?.officeLocation || "Academic Block, CKPIPSR Campus",
     specializations: detailed?.specializations || ["Pharmaceutical Research", "Academic Pedagogy", "Formulation Science"],
-    joiningDate: computeJoiningDate(detailed?.joiningDate || (member as any).joiningDate, expStr),
-    researchLinks: getResearchLinks({ name: member.name, profile: detailed?.profile, researchLinks: detailed?.researchLinks }),
+    joiningDate: detailed?.joiningDate || "",
+    researchLinks: detailed?.researchLinks,
   };
 }

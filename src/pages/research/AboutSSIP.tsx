@@ -23,7 +23,9 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useSsipAbout, type SsipCommittee } from "../../hooks/useSsipAbout";
-import { withEmphasis } from "../../utils/emphasis";
+import { RichText } from "../../utils/RichText";
+import { iconFor } from "../../utils/iconFor";
+import { telHref, withIndiaCode } from "../../utils/phone";
 
 type TabType = "about" | "core-committee" | "scrutiny-committee" | "contact";
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
@@ -102,7 +104,7 @@ function CommitteeTab({ committee, look }: { committee: SsipCommittee; look: (ty
         </div>
 
         {committee.body && (
-          <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed">{committee.body}</p>
+          <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed"><RichText text={committee.body} /></p>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -173,7 +175,7 @@ export default function AboutSSIP() {
       category="research-and-innovation"
       activeItemLabel="SSIP - About"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
 
         {/* Tab Navigation Bar */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
@@ -230,7 +232,7 @@ export default function AboutSSIP() {
                   </div>
                 )}
                 <p className="text-slate-700 text-sm sm:text-base font-sans leading-relaxed">
-                  {withEmphasis(about.body, "")}
+                  <RichText text={about.body} strongClassName="" />
                 </p>
               </div>
             </div>
@@ -253,7 +255,7 @@ export default function AboutSSIP() {
                     <h3 className="text-xl font-serif font-bold text-slate-900 mt-0.5">{about.theme.title}</h3>
                   </div>
                   <p className="text-sm sm:text-base font-sans text-slate-700 leading-relaxed font-medium">
-                    {about.theme.body}
+                    <RichText text={about.theme.body} />
                   </p>
                 </div>
 
@@ -280,7 +282,7 @@ export default function AboutSSIP() {
                     <h3 className="text-xl font-serif font-bold text-slate-900 mt-0.5">{about.focus.title}</h3>
                   </div>
                   <p className="text-sm sm:text-base font-sans text-slate-700 leading-relaxed font-medium">
-                    {about.focus.body}
+                    <RichText text={about.focus.body} />
                   </p>
                 </div>
 
@@ -324,7 +326,7 @@ export default function AboutSSIP() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {about.objectives.items.map((obj, idx) => {
-                    const Icon = OBJECTIVE_ICONS[obj.icon] ?? Lightbulb;
+                    const Icon = iconFor(obj.icon, OBJECTIVE_ICONS, Lightbulb);
                     return (
                       <div
                         key={idx}
@@ -343,7 +345,7 @@ export default function AboutSSIP() {
 
                           <h4 className="font-serif font-bold text-slate-900 text-base sm:text-lg">{obj.title}</h4>
 
-                          <p className="text-xs sm:text-sm font-sans text-slate-700 leading-relaxed">{obj.text}</p>
+                          <p className="text-xs sm:text-sm font-sans text-slate-700 leading-relaxed"><RichText text={obj.text} /></p>
                         </div>
 
                         {about.objectives.footer && (
@@ -443,7 +445,7 @@ export default function AboutSSIP() {
               </div>
 
               {contact.body && (
-                <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed">{contact.body}</p>
+                <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed"><RichText text={contact.body} /></p>
               )}
 
               {/* Contact Cards Grid */}
@@ -500,18 +502,21 @@ export default function AboutSSIP() {
                         </a>
                       </div>
 
+                      {/* A linked person without a Faculties mobile has none to show. */}
+                      {person.mobileNo && (
                       <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
                         <div className="flex items-center gap-2 text-xs font-sans text-emerald-900">
                           <Phone size={14} className="text-[#1a5d2e]" />
                           <span className="font-medium">Mobile No.:</span>
                         </div>
                         <a
-                          href={`tel:${person.mobileNo.replace(/[^\d+]/g, "")}`}
+                          href={telHref(withIndiaCode(person.mobileNo))}
                           className="font-mono text-xs font-bold text-[#1a5d2e] hover:text-[#144723] hover:underline"
                         >
-                          +91 {person.mobileNo}
+                          {withIndiaCode(person.mobileNo)}
                         </a>
                       </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -536,7 +541,7 @@ export default function AboutSSIP() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <ShieldCheck size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && <span className="font-mono text-slate-400">{content.note.tagline}</span>}

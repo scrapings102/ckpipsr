@@ -4,8 +4,9 @@ import { withPreview } from "./previewToken";
 /**
  * Training & Placement → Committee.
  *
- * Every officer is a link to the Deans or Faculties page, so the name and the
- * email arrive already resolved from whichever page the link names.
+ * An officer is a link to the Faculties page or someone typed in. A link's
+ * name, email and phone arrive already resolved from Faculties, and the office
+ * text arrives with the hours from Contact Us filled in.
  *
  * Three things the page used to store are worked out: the badge counted its own
  * members ("3 Key Officers"), each member carried a `badgeColor` that was only
@@ -27,7 +28,7 @@ export interface TnpCommitteePillar {
 export interface TnpCommitteeMember {
   role: CommitteeRole;
   /** Where the name came from. */
-  source: "deans" | "faculties" | "custom";
+  source: "faculties" | "custom";
   name: string;
   designation: string;
   contactNo: string;
@@ -36,7 +37,7 @@ export interface TnpCommitteeMember {
   badgeColor: string;
   /** Whether this is the one who heads the cell. */
   isHead: boolean;
-  /** The number as a dialable href, country code included. */
+  /** The number as a dialable href, country code included; blank when there is no number. */
   telHref: string;
 }
 
@@ -97,7 +98,7 @@ export const DEFAULT_TNP_COMMITTEE: TnpCommitteeContent = {
       "objectiveLabel": "Cell Objective & Mission"
     },
     "office": {
-      "body": "Students seeking guidance regarding on-campus recruitment, industrial training, higher education counseling (GPAT / NIPER), or startup incubation support can reach out to the T&P Cell coordinators during institute working hours (Monday to Saturday, 9:00 AM to 5:00 PM).",
+      "body": "Students seeking guidance regarding on-campus recruitment, industrial training, higher education counseling (GPAT / NIPER), or startup incubation support can reach out to the T&P Cell coordinators during institute working hours (Monday to Saturday, 09:30 AM – 05:00 PM).",
       "facts": [
         "Location: Ground Floor, Admin Block",
         "C.K. Pithawalla IP&SR Campus, Surat"
@@ -130,11 +131,11 @@ export const DEFAULT_TNP_COMMITTEE: TnpCommitteeContent = {
         "source": "faculties",
         "name": "Dr. Naishadh Ishwarbhai Solanki",
         "designation": "Assistant Professor",
-        "contactNo": "9033080481",
+        "contactNo": "9825809165",
         "email": "naishadh.solanki@ckpipsr.ac.in",
         "badgeColor": "bg-emerald-100 text-emerald-900 border border-emerald-300",
         "isHead": false,
-        "telHref": "tel:+919033080481"
+        "telHref": "tel:+919825809165"
       },
       {
         "role": "Member",

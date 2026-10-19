@@ -65,9 +65,12 @@ export const DEFAULT_CELLS_MENU: CellsMenuItem[] = [
   },
 ];
 
-/** Enough of a check that a malformed response cannot empty the menu. */
+/**
+ * Enough of a check that a malformed response cannot empty the menu. An empty
+ * list is allowed: it means every committee is switched off in the panel.
+ */
 function isUsable(value: unknown): value is CellsMenuItem[] {
-  return Array.isArray(value) && value.length > 0 && value.every((c) => !!(c as CellsMenuItem)?.slug);
+  return Array.isArray(value) && value.every((c) => !!(c as CellsMenuItem)?.slug);
 }
 
 let cache: CellsMenuItem[] | null = null;

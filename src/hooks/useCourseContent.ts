@@ -65,12 +65,12 @@ export const SHARED_COURSE_SECTIONS: Pick<
 
 export const DEFAULT_DPHARM: CourseContent = {
   pageTitle: "Diploma in Pharmacy",
-  pageSubtitle: "D.Pharm — 2 Year Professional Diploma",
+  pageSubtitle: "D.Pharm, 2 Year Professional Diploma",
   banner: {
     image: "/images/hero/pharmacy_lab.jpg",
     badge: "Professional Program",
     title: "D.Pharm.",
-    text: "Diploma in Pharmacy (Full Time) — Empowering the next generation of pharmacy leaders with specialized expertise.",
+    text: "Diploma in Pharmacy (Full Time). Empowering the next generation of pharmacy leaders with specialized expertise.",
   },
   stats: {
     intake: "60 Seats",
@@ -83,11 +83,11 @@ export const DEFAULT_DPHARM: CourseContent = {
   ...SHARED_COURSE_SECTIONS,
 };
 
-const TAGLINE = " — Empowering the next generation of pharmacy leaders with specialized expertise.";
+const TAGLINE = ". Empowering the next generation of pharmacy leaders with specialized expertise.";
 
 export const DEFAULT_BPHARM: CourseContent = {
   pageTitle: "Bachelor of Pharmacy",
-  pageSubtitle: "B.Pharm — 4 Year Degree Program",
+  pageSubtitle: "B.Pharm, 4 Year Degree Program",
   banner: {
     image: "/images/hero/students_learning.jpg",
     badge: "Professional Program",
@@ -107,7 +107,7 @@ export const DEFAULT_BPHARM: CourseContent = {
 
 export const DEFAULT_MPHARM: CourseContent = {
   pageTitle: "Master of Pharmacy",
-  pageSubtitle: "M.Pharm — 2 Year Postgraduate Research Program",
+  pageSubtitle: "M.Pharm, 2 Year Postgraduate Research Program",
   banner: {
     image: "/images/hero/66e153e687221.webp",
     badge: "Professional Program",
@@ -118,7 +118,7 @@ export const DEFAULT_MPHARM: CourseContent = {
     intake: "15 Seats",
     duration: "2 Years",
     eligibility: "B.Pharm with valid GPAT score / PGCET rank",
-    fees: "₹1,31,250 (Subject to FRC)",
+    fees: "₹1,37,812 (Subject to FRC)",
   },
   overview:
     "M.Pharm is a postgraduate program focused on advanced research and specialization. At CKPIPSR, we focus on producing researchers who can lead innovations in pharmaceutical formulation and quality assurance.",

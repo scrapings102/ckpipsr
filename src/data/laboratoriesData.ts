@@ -71,17 +71,17 @@ export const LABORATORIES: Laboratory[] = [
 ];
 
 export const LABORATORY_PHOTOS: string[] = [
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403216c64574.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6479c163675d6.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6479c1ae14eec.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/640321920e8de.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/640321c9d4148.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403268a865b0.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403224b51291.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6479c1ef4d053.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403233970a5a.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/640322b0b1622.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403229476c50.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403245e4e03f.webp",
-  "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403242b359d7.webp"
+  "/media/trust/app/institutes/102/resource/lab/photos/6403216c64574.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6479c163675d6.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6479c1ae14eec.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/640321920e8de.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/640321c9d4148.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6403268a865b0.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6403224b51291.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6479c1ef4d053.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6403233970a5a.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/640322b0b1622.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6403229476c50.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6403245e4e03f.webp",
+  "/media/trust/app/institutes/102/resource/lab/photos/6403242b359d7.webp"
 ];

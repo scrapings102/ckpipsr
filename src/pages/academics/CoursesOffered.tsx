@@ -22,6 +22,9 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { courseHref, useCourses, visibleCourses } from "../../hooks/useCourses";
+import { iconFor } from "../../utils/iconFor";
+import { cdn } from "../../utils/image";
+import { RichText } from "../../utils/RichText";
 
 /** The icons an editor can choose — the other half of COURSE_ICONS in the API. */
 const ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
@@ -96,7 +99,7 @@ export default function CoursesOffered() {
             </h2>
             <div className="h-1 w-16 bg-[#D4AF37] rounded-full" />
             <p className="text-slate-600 max-w-3xl text-sm leading-relaxed font-medium">
-              {content.intro.body}
+              <RichText text={content.intro.body} />
             </p>
           </div>
         </section>
@@ -109,7 +112,7 @@ export default function CoursesOffered() {
         ) : (
           <div className="grid sm:grid-cols-2 gap-4 relative">
             {courses.map((course, idx) => {
-              const Icon = ICONS[course.card.icon] ?? GraduationCap;
+              const Icon = iconFor(course.card.icon, ICONS, GraduationCap);
               const color = GRADIENTS[course.card.color] ?? GRADIENTS.slate;
               return (
                 <motion.div
@@ -146,7 +149,7 @@ export default function CoursesOffered() {
                         {course.card.fullName}
                       </p>
                       <p className="text-slate-600 text-xs leading-relaxed line-clamp-2 italic">
-                        "{course.card.description}"
+                        "<RichText text={course.card.description} />"
                       </p>
                     </div>
 
@@ -188,7 +191,7 @@ export default function CoursesOffered() {
         {/* Why Choose Us Section */}
         <div className="bg-[#123a1a] rounded-[4rem] p-12 md:p-20 text-white relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 opacity-10 mix-blend-soft-light">
-            <img src="/images/hero/students_learning.jpg" className="w-full h-full object-cover" />
+            <img src={cdn(content.support.image || "/images/hero/students_learning.jpg", 1600, 90)} className="w-full h-full object-cover" />
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl -mr-48 -mt-48" />
 
@@ -197,7 +200,7 @@ export default function CoursesOffered() {
               <div className="space-y-4">
                 <h3 className="text-3xl md:text-5xl font-serif font-bold tracking-tight">{content.support.title}</h3>
                 <p className="text-slate-300 text-lg leading-relaxed">
-                  {content.support.body}
+                  <RichText text={content.support.body} />
                 </p>
               </div>
 

@@ -19,6 +19,11 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useRtiContent, type RtiTone } from "../../hooks/useRtiContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
 
 /** The icons a tile or a statement can carry; the panel offers these names. */
 const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -58,7 +63,7 @@ export default function RTI() {
       category="iqac"
       activeItemLabel="RTI"
     >
-      <div className="space-y-10 max-w-5xl mx-auto">
+      <div className="space-y-10 w-full">
 
         {/* Header Introduction Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -89,7 +94,7 @@ export default function RTI() {
 
           {/* The statements under the heading */}
           {intro.notes.map((note, i) => {
-            const Icon = ICONS[note.icon];
+            const Icon = iconFor(note.icon, ICONS, NoIcon);
             return note.highlighted ? (
               <div
                 key={i}
@@ -100,7 +105,7 @@ export default function RTI() {
                   <span>{note.label}</span>
                 </div>
                 <p className="text-sm sm:text-base font-sans text-slate-800 leading-relaxed font-normal">
-                  {note.body}
+                  <RichText text={note.body} />
                 </p>
               </div>
             ) : (
@@ -113,7 +118,7 @@ export default function RTI() {
                   <span>{note.label}</span>
                 </div>
                 <p className="text-sm sm:text-base font-sans text-slate-700 leading-relaxed font-normal">
-                  {note.body}
+                  <RichText text={note.body} />
                 </p>
               </div>
             );
@@ -122,7 +127,7 @@ export default function RTI() {
           {/* Key Pillars */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
             {intro.stats.map((stat, i) => {
-              const Icon = ICONS[stat.icon];
+              const Icon = iconFor(stat.icon, ICONS, NoIcon);
               return (
                 <div
                   key={i}
@@ -239,7 +244,7 @@ export default function RTI() {
                   {portal.cardHeading}
                 </h4>
                 <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
-                  {portal.body}
+                  <RichText text={portal.body} />
                 </p>
                 {/* The address itself is underlined wherever it falls in the line. */}
                 <div className="pt-1 text-xs font-mono text-emerald-200">
@@ -278,7 +283,7 @@ export default function RTI() {
               {quick.title}
             </h4>
             <p className="text-xs text-slate-600">
-              {quick.body}
+              <RichText text={quick.body} />
             </p>
           </div>
 

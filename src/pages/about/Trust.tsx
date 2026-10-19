@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useTrustContent } from "../../hooks/useTrustContent";
-import { withEmphasis } from "../../utils/emphasis";
+import { RichText } from "../../utils/RichText";
+import { iconFor } from "../../utils/iconFor";
 
 /**
  * The icons an editor can choose from for the charter cards — the other half of
@@ -100,7 +101,7 @@ export default function Trust() {
 
           <div className="text-slate-700 leading-relaxed font-sans text-sm sm:text-base space-y-4">
             {content.narrative.body.map((paragraph, idx) => (
-              <p key={idx}>{withEmphasis(paragraph, "font-bold")}</p>
+              <p key={idx}><RichText text={paragraph} strongClassName="font-bold" /></p>
             ))}
           </div>
         </section>
@@ -119,7 +120,7 @@ export default function Trust() {
           {/* The table can outrun a narrow screen, so it scrolls inside its own
               box rather than widening the page. */}
           <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
-            <table className="w-full text-left border-collapse bg-white">
+            <table className="w-full min-w-[360px] text-left border-collapse bg-white">
               <thead>
                 <tr className="bg-slate-900 text-white font-serif">
                   <th className="px-6 py-4 text-sm font-bold border-b border-slate-800">
@@ -145,7 +146,7 @@ export default function Trust() {
         {/* TRUST CHARTER */}
         <div className="grid md:grid-cols-2 gap-6">
           {content.charter.map((card, idx) => {
-            const Icon = ICONS[card.icon] ?? ShieldCheck;
+            const Icon = iconFor(card.icon, ICONS, ShieldCheck);
             const tone = TONES[card.tone] ?? TONES.dark;
             return (
               <div key={idx} className={tone.card}>
@@ -153,7 +154,7 @@ export default function Trust() {
                   <Icon size={24} />
                 </div>
                 <h4 className={tone.title}>{card.title}</h4>
-                <p className={tone.body}>{card.description}</p>
+                <p className={tone.body}><RichText text={card.description} /></p>
               </div>
             );
           })}

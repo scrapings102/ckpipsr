@@ -52,7 +52,7 @@ export const DEFAULT_CENTRAL_FACILITIES: ResourcePageContent = {
     body: "For the convenience of students, a stationary store has been set-up within the campus. All the daily utility items like stationery, cosmetics, record files, and textbooks are available in the stationary store. This helps the students to procure all their stationery requirements within the campus at reasonable rates."
   },
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/central/clp.jpg"
+    "/media/ipsr/images/resources/central/clp.jpg"
   ]
 };
 
@@ -80,10 +80,10 @@ export const DEFAULT_LIBRARY: ResourcePageContent = {
     "Dedicated reference section for competitive exam preparation"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/library/1.jpg",
-    "https://ckpipsr.ac.in/images/resources/library/2.jpg",
-    "https://ckpipsr.ac.in/images/resources/library/3.jpg",
-    "https://ckpipsr.ac.in/images/resources/library/4.jpg"
+    "/media/ipsr/images/resources/library/1.jpg",
+    "/media/ipsr/images/resources/library/2.jpg",
+    "/media/ipsr/images/resources/library/3.jpg",
+    "/media/ipsr/images/resources/library/4.jpg"
   ]
 };
 
@@ -137,13 +137,13 @@ export const DEFAULT_HOSTEL: ResourcePageContent = {
     "Resident warden available for student welfare and discipline"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/hostel/02.jpg",
-    "https://ckpipsr.ac.in/images/resources/hostel/03.jpg",
-    "https://ckpipsr.ac.in/images/resources/hostel/04.jpg",
-    "https://ckpipsr.ac.in/images/resources/hostel/05.jpg",
-    "https://ckpipsr.ac.in/images/resources/hostel/06.jpg",
-    "https://ckpipsr.ac.in/images/resources/hostel/07.jpeg",
-    "https://ckpipsr.ac.in/images/resources/hostel/08.jpeg"
+    "/media/ipsr/images/resources/hostel/02.jpg",
+    "/media/ipsr/images/resources/hostel/03.jpg",
+    "/media/ipsr/images/resources/hostel/04.jpg",
+    "/media/ipsr/images/resources/hostel/05.jpg",
+    "/media/ipsr/images/resources/hostel/06.jpg",
+    "/media/ipsr/images/resources/hostel/07.jpeg",
+    "/media/ipsr/images/resources/hostel/08.jpeg"
   ]
 };
 
@@ -171,13 +171,13 @@ export const DEFAULT_MEDICAL: ResourcePageContent = {
     "Confidential counseling support for student wellbeing"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/medical/01.jpg",
-    "https://ckpipsr.ac.in/images/resources/medical/02.jpg",
-    "https://ckpipsr.ac.in/images/resources/medical/03.jpg",
-    "https://ckpipsr.ac.in/images/resources/medical/04.jpg",
-    "https://ckpipsr.ac.in/images/resources/medical/05.jpg",
-    "https://ckpipsr.ac.in/images/resources/medical/06.jpg",
-    "https://ckpipsr.ac.in/images/resources/medical/07.jpg"
+    "/media/ipsr/images/resources/medical/01.jpg",
+    "/media/ipsr/images/resources/medical/02.jpg",
+    "/media/ipsr/images/resources/medical/03.jpg",
+    "/media/ipsr/images/resources/medical/04.jpg",
+    "/media/ipsr/images/resources/medical/05.jpg",
+    "/media/ipsr/images/resources/medical/06.jpg",
+    "/media/ipsr/images/resources/medical/07.jpg"
   ]
 };
 
@@ -186,7 +186,7 @@ export const DEFAULT_TRANSPORTATION: ResourcePageContent = {
   badge: "Campus Facility",
   title: "Transportation",
   description: "Excellent connectivity to Surat city via public and dedicated transport systems.",
-  image: "/images/hero/66e1522d09fc0.webp",
+  image: "/images/transportation/colbus.jpeg",
   features: [
     "BRTS Connectivity",
     "College Bus Service",
@@ -205,11 +205,11 @@ export const DEFAULT_TRANSPORTATION: ResourcePageContent = {
     "Well-lit internal campus roads for pedestrian safety"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/transportation/brts-map.jpg",
-    "https://ckpipsr.ac.in/images/resources/transportation/bus.jpeg",
-    "https://ckpipsr.ac.in/images/resources/transportation/colbus.jpeg",
-    "https://ckpipsr.ac.in/images/resources/transportation/coltiming.jpeg",
-    "https://ckpipsr.ac.in/images/resources/transportation/timing.jpg"
+    "/images/transportation/brts-map.jpg",
+    "/images/transportation/bus.jpeg",
+    "/images/transportation/colbus.jpeg",
+    "/images/transportation/coltiming.jpeg",
+    "/images/transportation/timing.jpg"
   ]
 };
 
@@ -237,12 +237,12 @@ export const DEFAULT_SEMINAR_HALL: ResourcePageContent = {
     "Comfortable tiered seating for optimal visibility"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/seminar-hall/1.jpg",
-    "https://ckpipsr.ac.in/images/resources/seminar-hall/2.jpg",
-    "https://ckpipsr.ac.in/images/resources/seminar-hall/3.jpg",
-    "https://ckpipsr.ac.in/images/resources/seminar-hall/4.jpg",
-    "https://ckpipsr.ac.in/images/resources/seminar-hall/5.jpg",
-    "https://ckpipsr.ac.in/images/resources/seminar-hall/6.jpg"
+    "/media/ipsr/images/resources/seminar-hall/1.jpg",
+    "/media/ipsr/images/resources/seminar-hall/2.jpg",
+    "/media/ipsr/images/resources/seminar-hall/3.jpg",
+    "/media/ipsr/images/resources/seminar-hall/4.jpg",
+    "/media/ipsr/images/resources/seminar-hall/5.jpg",
+    "/media/ipsr/images/resources/seminar-hall/6.jpg"
   ]
 };
 
@@ -270,12 +270,12 @@ export const DEFAULT_CAFETERIA: ResourcePageContent = {
     "Convenient location adjacent to main academic blocks"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/cafeteria/1.jpeg",
-    "https://ckpipsr.ac.in/images/resources/cafeteria/2.jpeg",
-    "https://ckpipsr.ac.in/images/resources/cafeteria/3.jpeg",
-    "https://ckpipsr.ac.in/images/resources/cafeteria/4.jpeg",
-    "https://ckpipsr.ac.in/images/resources/cafeteria/5.jpeg",
-    "https://ckpipsr.ac.in/images/resources/cafeteria/6.jpeg"
+    "/media/ipsr/images/resources/cafeteria/1.jpeg",
+    "/media/ipsr/images/resources/cafeteria/2.jpeg",
+    "/media/ipsr/images/resources/cafeteria/3.jpeg",
+    "/media/ipsr/images/resources/cafeteria/4.jpeg",
+    "/media/ipsr/images/resources/cafeteria/5.jpeg",
+    "/media/ipsr/images/resources/cafeteria/6.jpeg"
   ]
 };
 
@@ -303,7 +303,7 @@ export const DEFAULT_EV_CHARGING: ResourcePageContent = {
     "Encourages eco-conscious commuting among the campus community"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/echarging.jpg"
+    "/media/ipsr/images/resources/echarging.jpg"
   ]
 };
 
@@ -331,10 +331,10 @@ export const DEFAULT_MEDICINAL_GARDEN: ResourcePageContent = {
     "Contributes to conservation of native medicinal flora"
   ],
   gallery: [
-    "https://ckpipsr.ac.in/images/resources/garden/garden-1.png",
-    "https://ckpipsr.ac.in/images/resources/garden/garden-2.png",
-    "https://ckpipsr.ac.in/images/resources/garden/garden-3.png",
-    "https://ckpipsr.ac.in/images/resources/garden/garden-4.png"
+    "/media/ipsr/images/resources/garden/garden-1.png",
+    "/media/ipsr/images/resources/garden/garden-2.png",
+    "/media/ipsr/images/resources/garden/garden-3.png",
+    "/media/ipsr/images/resources/garden/garden-4.png"
   ]
 };
 

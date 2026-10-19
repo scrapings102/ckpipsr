@@ -26,7 +26,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import { useResearchEthics, type EthicsTone } from "../../hooks/useResearchEthics";
+import { iconFor } from "../../utils/iconFor";
 
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
 
@@ -92,7 +94,7 @@ export default function Ethics() {
       category="research-and-innovation"
       activeItemLabel="Research - Ethics"
     >
-      <div className="space-y-10 max-w-6xl mx-auto">
+      <div className="space-y-10 w-full">
 
         {/* Core Banner / Philosophy Card */}
         <motion.div
@@ -134,7 +136,7 @@ export default function Ethics() {
               <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-[#1a5d2e] flex items-center justify-center shrink-0 mt-0.5">
                 <FileCheck2 size={18} />
               </div>
-              <p>{content.intro.body}</p>
+              <p><RichText text={content.intro.body} /></p>
             </div>
           )}
 
@@ -176,7 +178,7 @@ export default function Ethics() {
 
         {/* One section per code of ethics */}
         {shownGroups.map((group, groupIndex) => {
-          const GroupIcon = ICONS[group.icon] ?? Shield;
+          const GroupIcon = iconFor(group.icon, ICONS, Shield);
           const tone = TONES[group.tone] ?? TONES.emerald;
 
           return (
@@ -212,7 +214,7 @@ export default function Ethics() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {group.directives.map((item, idx) => {
-                  const IconComponent = ICONS[item.icon] ?? Shield;
+                  const IconComponent = iconFor(item.icon, ICONS, Shield);
                   const number = idx + 1;
                   const footer = group.footer.replace(/\{n\}/g, String(number));
 
@@ -252,7 +254,7 @@ export default function Ethics() {
                         </h5>
 
                         <p className="text-slate-600 font-sans text-xs sm:text-sm leading-relaxed">
-                          {item.description}
+                          <RichText text={item.description} />
                         </p>
 
                         {item.note && (
@@ -260,7 +262,7 @@ export default function Ethics() {
                             {group.noteLabel && (
                               <span className="font-bold text-slate-900 block mb-0.5">{group.noteLabel}</span>
                             )}
-                            {item.note}
+                            <RichText text={item.note} />
                           </div>
                         )}
                       </div>
@@ -312,7 +314,7 @@ export default function Ethics() {
 
             {content.banner.body && (
               <p className="text-slate-300 font-sans text-xs sm:text-sm leading-relaxed">
-                {content.banner.body}
+                <RichText text={content.banner.body} />
               </p>
             )}
           </div>
@@ -324,7 +326,7 @@ export default function Ethics() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && (

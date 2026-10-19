@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { CheckCircle2, Target, ShieldCheck } from "lucide-react";
 import { usePoPeosContent } from "../../hooks/usePoPeosContent";
+import { RichText } from "../../utils/RichText";
 
 /**
  * The objectives and outcomes are edited in the admin panel under
@@ -16,14 +17,9 @@ import { usePoPeosContent } from "../../hooks/usePoPeosContent";
 export default function POAndPEOs() {
   const content = usePoPeosContent();
 
-  const pageTitle =
-    !content.pageTitle || content.pageTitle === "PO And PEO's" || content.pageTitle === "PO and PEOs"
-      ? "Program Educational Objectives & Outcomes (PO & PEOs)"
-      : content.pageTitle;
-
   return (
     <SubPageLayout
-      title={pageTitle}
+      title={content.pageTitle}
       subtitle={content.pageSubtitle}
       category="about-us"
       activeItemLabel="PO and PEOs"
@@ -39,7 +35,7 @@ export default function POAndPEOs() {
               {content.peos.headingLead} <span className="text-[#123a1a]">{content.peos.headingAccent}</span>
             </h2>
             <p className="text-slate-500 max-w-2xl mx-auto text-sm md:text-lg font-medium">
-              {content.peos.intro}
+              <RichText text={content.peos.intro} />
             </p>
             <div className="h-1.5 w-24 bg-[#D4AF37] rounded-full mx-auto" />
           </div>
@@ -65,7 +61,7 @@ export default function POAndPEOs() {
                       {peo.title}
                     </h3>
                     <p className="text-slate-600 text-sm leading-relaxed font-medium group-hover:text-white/80 transition-colors">
-                      {peo.description}
+                      <RichText text={peo.description} />
                     </p>
                   </div>
                 </div>
@@ -90,7 +86,7 @@ export default function POAndPEOs() {
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight">
                 {content.pos.headingLead} <span className="text-[#123a1a]">{content.pos.headingAccent}</span>
               </h2>
-              <p className="text-slate-500 font-medium italic text-xs sm:text-sm">{content.pos.note}</p>
+              <p className="text-slate-500 font-medium italic text-xs sm:text-sm"><RichText text={content.pos.note} /></p>
             </div>
             <div className="text-right hidden md:block">
               <span className="text-5xl lg:text-6xl font-black text-slate-100 uppercase tracking-tighter">
@@ -106,17 +102,17 @@ export default function POAndPEOs() {
                 initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: idx * 0.05 }}
-                className="bg-white p-6 sm:p-8 rounded-[1.75rem] sm:rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 flex gap-5 sm:gap-6 items-start group hover:border-[#123a1a]/20"
+                className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 flex gap-4 sm:gap-6 items-start group hover:border-[#123a1a]/20"
               >
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 text-slate-400 font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-inner group-hover:bg-[#123a1a] group-hover:text-[#D4AF37] transition-all duration-500">
                   {po.num}
                 </div>
-                <div className="space-y-2.5">
+                <div className="space-y-2.5 min-w-0">
                   <h3 className="font-serif font-bold text-lg sm:text-xl text-slate-900 group-hover:text-[#123a1a] transition-colors leading-tight">
                     {po.title}
                   </h3>
                   <p className="text-slate-500 font-medium text-xs sm:text-sm leading-relaxed">
-                    {po.description}
+                    <RichText text={po.description} />
                   </p>
                 </div>
               </motion.div>
@@ -125,7 +121,7 @@ export default function POAndPEOs() {
         </section>
 
         {/* OUTCOME BASED EDUCATION CTA */}
-        <div className="bg-[#123a1a] rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 md:p-16 relative overflow-hidden group">
+        <div className="bg-[#123a1a] rounded-2xl sm:rounded-[3rem] p-5 sm:p-12 md:p-16 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-[#D4AF37]/5 rounded-full blur-[100px] -mr-40 -mt-40 pointer-events-none" />
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
             <div className="space-y-4 sm:space-y-6 text-center lg:text-left">
@@ -134,7 +130,7 @@ export default function POAndPEOs() {
                 <span className="text-[#D4AF37]">{content.cta.headingAccent}</span>
               </h4>
               <p className="text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed font-medium">
-                {content.cta.body}
+                <RichText text={content.cta.body} />
               </p>
             </div>
             <div className="flex justify-center lg:justify-end">

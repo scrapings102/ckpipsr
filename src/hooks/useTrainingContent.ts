@@ -7,9 +7,10 @@ import { withPreview } from "./previewToken";
  * The cell's vision, the objectives of industrial training, and the committee
  * that runs it.
  *
- * A committee member arrives already worked out: one linked to the Deans and
- * Faculty In-charges page or to Faculties is named, titled and pictured from
- * it, and a member typed into this page is printed as typed. The page never
+ * A committee member arrives already worked out: one linked to Faculties is
+ * named, titled, pictured and given their phone from it, and a member typed
+ * into this page is printed as typed. The office notes arrive with the hours
+ * from Contact Us filled in. The page never
  * sees the link itself — only the card.
  *
  * The objectives' badge arrives with its number filled in, and the cards are
@@ -179,7 +180,7 @@ export const DEFAULT_TRAINING: TrainingContent = {
         "department": "Institutional Leadership & Administration",
         "phone": "9427474602",
         "email": "dhiren.shah@ckpipsr.ac.in",
-        "image": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
+        "image": "/images/faculty/dhiren-p-shah.jpg",
         "name": "Dr. Dhiren P. Shah"
       },
       {
@@ -188,8 +189,8 @@ export const DEFAULT_TRAINING: TrainingContent = {
         "department": "Department of Pharmaceutics",
         "phone": "9913792913",
         "email": "vinod.ramani@ckpipsr.ac.in",
-        "image": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-        "name": "Dr. Vinod D. Ramani"
+        "image": "/images/faculty/vinod-d-ramani.jpg",
+        "name": "Dr. Vinodkumar D. Ramani"
       },
       {
         "role": "Member",
@@ -197,7 +198,7 @@ export const DEFAULT_TRAINING: TrainingContent = {
         "department": "Department of Pharmaceutical Chemistry",
         "phone": "8733826684",
         "email": "suchi.desai@ckpipsr.ac.in",
-        "image": "https://ckpipsr.ac.in/images/about/shuchi-desai.png",
+        "image": "/api/avatar?name=Dr.+Suchi+P.+Desai&background=1a5d2e&color=ffffff&size=256",
         "name": "Dr. Suchi P. Desai"
       },
       {
@@ -206,8 +207,8 @@ export const DEFAULT_TRAINING: TrainingContent = {
         "department": "Department of Pharmaceutics",
         "phone": "7201932423",
         "email": "yahya.moolla@ckpipsr.ac.in",
-        "image": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d543b19366a.webp",
-        "name": "Mr. Yahya A. Moolla"
+        "image": "/images/faculty/yahya-ali-moolla.jpg",
+        "name": "Mr. Moolla Yahya Ali"
       },
       {
         "role": "Member",
@@ -215,8 +216,8 @@ export const DEFAULT_TRAINING: TrainingContent = {
         "department": "Department of Pharmacology",
         "phone": "9687198278",
         "email": "kinjal.gamit@ckpipsr.ac.in",
-        "image": "https://ui-avatars.com/api/?name=Kinjal+Gamit&background=1a5d2e&color=ffffff&size=256",
-        "name": "Ms. Kinjal S. Gamit"
+        "image": "/images/faculty/kinjalkumari-s-gamit.jpg",
+        "name": "Ms. Kinjalkumari Sumanbhai Gamit"
       }
     ]
   },
@@ -225,7 +226,7 @@ export const DEFAULT_TRAINING: TrainingContent = {
     "body": "The Industrial Training Committee coordinates with recognized pharmaceutical companies for mandatory student summer internships, plant visits, and hands-on skill development programs. Students can consult coordinator Dr. Vinod D. Ramani and committee members for training allotment and certificates.",
     "notes": [
       "Training Cell: C.K. Pithawalla IP&SR Campus",
-      "Timings: Mon - Sat, 9:00 AM to 5:00 PM"
+      "Timings: Mon - Sat, 09:30 AM – 05:00 PM"
     ]
   }
 };

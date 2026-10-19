@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { LaneItem } from './campusLifeData';
 
 interface GalleryColumnProps {
@@ -16,13 +16,37 @@ export default function GalleryColumn({
   className = "",
   onSelect
 }: GalleryColumnProps) {
-  // Repeat items 3 times for seamless 33.333% translation loop
-  const displayItems = [...items, ...items, ...items];
+  // Repeated 3 times for a seamless 33.333% loop, but only when two sets fill
+  // the stage. A column with one or two photos would otherwise show the same
+  // photo stacked three times with an empty gap below, so it shows them once.
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [loops, setLoops] = useState(false);
+  const displayItems = loops ? [...items, ...items, ...items] : items;
+
+  // Measured with a single set on screen, before the browser paints, and again
+  // when the window is resized (a hidden column measures nothing until shown).
+  useLayoutEffect(() => {
+    setLoops(false);
+  }, [items]);
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    const stage = track?.parentElement?.parentElement;
+    if (!track || !stage || loops) return;
+    const measure = () => {
+      const room = parseFloat(getComputedStyle(stage).maxHeight) || stage.clientHeight;
+      if (track.offsetHeight > 0 && track.offsetHeight * 2 >= room) setLoops(true);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, [items, loops]);
 
   return (
     <div className={`gc-col ${className}`}>
       <div
-        className={`gc-track ${reverse ? "gc-anim-rev" : "gc-anim"}`}
+        ref={trackRef}
+        className={`gc-track ${loops ? (reverse ? "gc-anim-rev" : "gc-anim") : ""}`}
         style={{ animationDuration: `${duration}s` }}
       >
         {displayItems.map((item, idx) => (

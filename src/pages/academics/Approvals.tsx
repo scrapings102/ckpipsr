@@ -16,6 +16,9 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useApprovalsContent } from "../../hooks/useApprovalsContent";
+import { iconFor } from "../../utils/iconFor";
+import { cdn } from "../../utils/image";
+import { RichText } from "../../utils/RichText";
 
 /** Card colours, by the name the panel stores. */
 const COLORS: Record<string, { tile: string; icon: string }> = {
@@ -65,7 +68,7 @@ export default function Approvals() {
             </h2>
             <div className="h-1 w-16 bg-[#D4AF37] rounded-full" />
             <p className="text-slate-600 max-w-3xl text-sm leading-relaxed font-medium">
-              {content.intro.body}
+              <RichText text={content.intro.body} />
             </p>
           </div>
         </section>
@@ -98,7 +101,7 @@ export default function Approvals() {
                     {approval.body}
                  </h3>
                  <p className="text-xs text-slate-500 leading-relaxed font-medium line-clamp-3">
-                    {approval.description}
+                    <RichText text={approval.description} />
                  </p>
                  <div className="flex items-center gap-1.5 pt-1">
                     <Calendar size={12} className="text-[#D4AF37]" />
@@ -155,20 +158,20 @@ export default function Approvals() {
         {/* Global Compliance Stats */}
         <div className="bg-[#123a1a] rounded-2xl sm:rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden shadow-xl">
            <div className="absolute inset-0 opacity-10 mix-blend-overlay">
-              <img src="/images/hero/college_campus.jpg" className="w-full h-full object-cover" />
+              <img src={cdn(content.compliance.image || "/images/hero/college_campus.jpg", 1600, 90)} className="w-full h-full object-cover" />
            </div>
 
            <div className="relative z-10 space-y-6">
               <div className="space-y-2">
                 <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">{content.compliance.title}</h3>
                 <p className="text-slate-300 max-w-xl mx-auto text-xs sm:text-sm leading-relaxed">
-                   {content.compliance.body}
+                   <RichText text={content.compliance.body} />
                 </p>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
                  {content.compliance.stats.map((stat, sIdx) => {
-                   const Icon = STAT_ICONS[stat.icon] ?? ShieldCheck;
+                   const Icon = iconFor(stat.icon, STAT_ICONS, ShieldCheck);
                    return (
                    <div key={sIdx} className="bg-white/5 backdrop-blur-md px-4 py-4 rounded-xl border border-white/10 group hover:bg-white/10 transition-all">
                       <Icon className="mx-auto mb-2 text-[#D4AF37]" size={20} />

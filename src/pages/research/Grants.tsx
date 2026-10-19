@@ -18,6 +18,7 @@ import {
   Clock
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import { useResearchGrants, type GrantTone } from "../../hooks/useResearchGrants";
 
 /** The card badge colours a filter can choose from. */
@@ -44,7 +45,7 @@ export default function Grants() {
       category="research-and-innovation"
       activeItemLabel="Research - Grants"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
         
         {/* Header Overview Card */}
         <motion.div
@@ -83,7 +84,7 @@ export default function Grants() {
           </div>
 
           <p className="text-slate-600 font-sans text-sm sm:text-base leading-relaxed">
-            {content.intro.body}
+            <RichText text={content.intro.body} />
           </p>
 
           {/* Filter Pills — the panel decides which buttons these are. */}
@@ -238,7 +239,7 @@ export default function Grants() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && (

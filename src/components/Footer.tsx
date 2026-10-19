@@ -5,6 +5,7 @@ import CkpcmcLogo from './CkpcmcLogo';
 import CampusEngraving from './CampusEngraving';
 import './ckpipsr-footer.css';
 import { courseHref, useCourses, visibleCourses } from '../hooks/useCourses';
+import { useFooterContent } from '../hooks/useFooterContent';
 
 
 /**
@@ -21,37 +22,14 @@ import { courseHref, useCourses, visibleCourses } from '../hooks/useCourses';
 
 type Item = { label: string; to: string };
 
-const INSTITUTE: Item[] = [
-  { label: 'Profile', to: '/about/profile' },
-  { label: 'Vision & Mission', to: '/about/vision-mission' },
-  { label: 'The Founder', to: '/about/founder' },
-  { label: 'Navyug Vidyabhavan Trust', to: '/about/trust' },
-  { label: 'PO and PEOs', to: '/about/po-peos' },
-  { label: 'Campus Map & Directions', to: '/about/campus-map' },
-];
-
-const GOVERNANCE: Item[] = [
-  { label: 'Governing Body', to: '/about/governing-body' },
-  { label: 'The Principal', to: '/about/principal' },
-  { label: 'Deans & Faculty In-charges', to: '/about/deans-faculty' },
-  { label: 'Faculty', to: '/academics/faculties' },
-  { label: 'IQAC', to: '/about/iqac' },
-  { label: 'Contact Us', to: '/about/contact-us' },
-];
-
-const STUDENT_HUB: Item[] = [
-  { label: 'Gazette & Circulars', to: '/#university-gazette' },
-  { label: 'Pharma Blogs', to: '/#pharma-blogs' },
-  { label: 'The College Newsletter', to: '/#college-newsletter' },
-  { label: 'Research Labs & Herbal Garden', to: '/#campus-life' },
-  { label: 'Admissions FAQs', to: '/#admissions' },
-];
-
 const LINK_CLS =
   'block text-[13px] leading-snug text-[#3d4f40] hover:text-[#1C592F] transition-colors';
 
 export default function Footer() {
   const navigate = useNavigate();
+  // Everything but the courses column is edited under Whole site, Footer in the
+  // admin panel; the contact details come from the Contact Us page.
+  const footer = useFooterContent();
   // the programs column lists the courses switched on in the admin panel
   const { content: coursesContent } = useCourses();
   const PROGRAMS: Item[] = visibleCourses(coursesContent).map((course) => ({
@@ -98,7 +76,9 @@ export default function Footer() {
   };
 
   const renderItem = (item: Item) =>
-    item.to.startsWith('/#') ? (
+    /^https:\/\//.test(item.to) ? (
+      <a href={item.to} target="_blank" rel="noopener noreferrer" className={LINK_CLS}>{item.label}</a>
+    ) : item.to.startsWith('/#') ? (
       <button type="button" onClick={() => handleAnchor(item.to)} className={`${LINK_CLS} text-left cursor-pointer`}>
         {item.label}
       </button>
@@ -110,7 +90,7 @@ export default function Footer() {
     <div>
       <h3 className="ckpf-h">{title}</h3>
       <ul className="space-y-2.5">
-        {items.map((it) => <li key={it.to}>{renderItem(it)}</li>)}
+        {items.map((it, i) => <li key={`${it.to}-${i}`}>{renderItem(it)}</li>)}
       </ul>
     </div>
   );
@@ -122,10 +102,19 @@ export default function Footer() {
           go straight to the links. */}
       {isHome && (
         <div className="ckpf-sky relative">
-          <div className="relative mx-auto max-w-[1580px] px-6 pt-12 text-center sm:px-10 lg:px-16 lg:pt-16">
+          <div className="relative mx-auto max-w-[1580px] px-4 pt-10 text-center sm:px-10 lg:px-16 lg:pt-16">
             <div className={`ckpf-write ${seen ? 'is-written' : ''}`}>
-              <p className="ckpf-script" aria-label="Until we meet on campus">
-                <span className="ckpf-inner">Until we meet <br className="sm:hidden" />on campus</span>
+              <p className="ckpf-script" aria-label={`${footer.farewell.lead} ${footer.farewell.accent}`.trim()}>
+                <span className="ckpf-inner">
+                  {footer.farewell.lead}
+                  {footer.farewell.accent && (
+                    <>
+                      {' '}
+                      <br className="sm:hidden" />
+                      {footer.farewell.accent}
+                    </>
+                  )}
+                </span>
               </p>
               {/* hand-drawn marker squiggle; draws in after the writing finishes */}
               <span className="ckpf-uwin" aria-hidden="true">
@@ -146,9 +135,9 @@ export default function Footer() {
 
       {/* ───────── LINKS ───────── */}
       <div className="bg-white">
-        <div className="mx-auto grid max-w-[1580px] grid-cols-2 gap-x-6 gap-y-9 px-6 pb-12 pt-10 sm:px-10 lg:grid-cols-[1.35fr_1fr_1fr_1fr_1fr] lg:gap-8 lg:px-16">
+        <div className="mx-auto grid max-w-[1580px] grid-cols-1 gap-x-6 gap-y-9 px-4 pb-12 pt-10 sm:grid-cols-2 sm:px-10 lg:grid-cols-[1.35fr_1fr_1fr_1fr_1fr] lg:gap-8 lg:px-16">
           {/* identity + contact — spans both columns on mobile */}
-          <div className="col-span-2 lg:col-span-1">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-3.5">
               {/* the college seal — ringed in the site accent */}
               <span
@@ -164,45 +153,54 @@ export default function Footer() {
                 </p>
               </div>
             </div>
-            <ul className="mt-5 space-y-3 text-[13px] text-[#4d5f50]">
-              <li className="flex gap-2.5">
-                <MapPin size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
-                <span>Opposite Surat Airport, Behind DPS School, Near Malvan Mandir, Dumas Road, Surat - 395007, Gujarat, India</span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <Phone size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
-                <span>
-                  <a href="tel:+916355065636" className="hover:text-[#1C592F] transition-colors">+91 63550 65636</a>
-                  <span className="mx-1 text-[#2c7a47]/60">|</span>
-                  <a href="tel:+919099063116" className="hover:text-[#1C592F] transition-colors">+91 90990 63116</a>
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail size={14} className="shrink-0 text-[#2c7a47]" aria-hidden="true" />
-                <a href="mailto:ckpipsr@gmail.com" className="hover:text-[#1C592F] transition-colors">ckpipsr@gmail.com</a>
-              </li>
-            </ul>
+            {footer.contact && (
+              <ul className="mt-5 space-y-3 text-[13px] text-[#4d5f50]">
+                <li className="flex gap-2.5">
+                  <MapPin size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
+                  <span>{footer.contact.address}</span>
+                </li>
+                {footer.contact.phones.length > 0 && (
+                  <li className="flex items-start gap-2.5">
+                    <Phone size={14} className="mt-0.5 shrink-0 text-[#2c7a47]" aria-hidden="true" />
+                    <span>
+                      {footer.contact.phones.map((phone, i) => (
+                        <React.Fragment key={phone}>
+                          {i > 0 && <span className="mx-1 text-[#2c7a47]/60">|</span>}
+                          <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="hover:text-[#1C592F] transition-colors">{phone}</a>
+                        </React.Fragment>
+                      ))}
+                    </span>
+                  </li>
+                )}
+                {footer.contact.emails.map((email) => (
+                  <li key={email} className="flex items-center gap-2.5">
+                    <Mail size={14} className="shrink-0 text-[#2c7a47]" aria-hidden="true" />
+                    <a href={`mailto:${email}`} className="hover:text-[#1C592F] transition-colors">{email}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          {column('Pharmacy Programs', PROGRAMS)}
-          {column('Institute', INSTITUTE)}
-          {column('Governance', GOVERNANCE)}
-          {column('Student Hub', STUDENT_HUB)}
+          {column(footer.programsTitle, PROGRAMS)}
+          {footer.columns.map((c, i) => (
+            <React.Fragment key={`${c.title}-${i}`}>{column(c.title, c.links)}</React.Fragment>
+          ))}
         </div>
 
         {/* bottom bar */}
-        <div className="mx-auto max-w-[1580px] px-6 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-[1580px] px-4 sm:px-10 lg:px-16">
           <div className="flex flex-col items-center justify-between gap-3 border-t border-[#dfe7dc] py-6 text-center sm:flex-row sm:text-left">
             <p className="text-[10.5px] uppercase tracking-[0.16em] text-[#7f8f82]">
-              © {new Date().getFullYear()} C. K. Pithawalla Institute of Pharmaceutical Science &amp; Research
+              © {new Date().getFullYear()} {footer.copyright}
             </p>
             <a
-              href="https://www.gtu.ac.in"
+              href={footer.bottomLink.to}
               target="_blank"
               rel="noopener noreferrer"
               className="group/v inline-flex items-center gap-1 text-[10.5px] uppercase tracking-[0.16em] text-[#7f8f82] hover:text-[#1C592F] transition-colors"
             >
-              GTU Portal
+              {footer.bottomLink.label}
               <ArrowUpRight size={12} className="opacity-60 group-hover/v:opacity-100" aria-hidden="true" />
             </a>
           </div>

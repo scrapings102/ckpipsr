@@ -32,6 +32,11 @@ import {
   useIqacInitiativesContent,
   type InitiativeTone,
 } from "../../hooks/useIqacInitiativesContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText, plainText } from "../../utils/RichText";
+
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
 
 /** The icons a card can carry; the panel offers these same names. */
 const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -88,7 +93,7 @@ export default function IQACInitiatives() {
   const query = searchQuery.toLowerCase();
   const filteredInitiatives = content.initiatives.filter((item) => {
     const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
-    return matchesCategory && item.text.toLowerCase().includes(query);
+    return matchesCategory && plainText(item.text).toLowerCase().includes(query);
   });
 
   // The first pill shows everything; the rest arrive already counted.
@@ -104,7 +109,7 @@ export default function IQACInitiatives() {
       category="iqac"
       activeItemLabel="IQAC Initiatives and Activities"
     >
-      <div className="space-y-10 max-w-6xl mx-auto">
+      <div className="space-y-10 w-full">
         
         {/* Top Hero & Scope Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -140,7 +145,7 @@ export default function IQACInitiatives() {
               <span>{intro.overview.kicker}</span>
             </div>
             <p className="text-sm sm:text-base font-sans text-slate-800 leading-relaxed font-normal">
-              {intro.overview.body}
+              <RichText text={intro.overview.body} />
             </p>
           </div>
 
@@ -209,7 +214,7 @@ export default function IQACInitiatives() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             <AnimatePresence>
               {filteredInitiatives.map((item) => {
-                const Icon = ICONS[item.icon];
+                const Icon = iconFor(item.icon, ICONS, NoIcon);
 
                 return (
                   <motion.div
@@ -235,7 +240,7 @@ export default function IQACInitiatives() {
                       {/* Initiative Description */}
                       <div className="space-y-1">
                         <p className="text-xs sm:text-sm font-sans font-medium text-slate-800 leading-relaxed">
-                          {item.text}
+                          <RichText text={item.text} />
                         </p>
                       </div>
                     </div>
@@ -257,7 +262,7 @@ export default function IQACInitiatives() {
             <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 space-y-3">
               <Search size={32} className="mx-auto text-slate-300" />
               <h4 className="text-base font-serif font-bold text-slate-800">{empty.title}</h4>
-              <p className="text-xs text-slate-500">{empty.body}</p>
+              <p className="text-xs text-slate-500"><RichText text={empty.body} /></p>
               <button
                 onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }}
                 className="text-xs font-mono font-bold text-[#1a5d2e] hover:underline cursor-pointer"
@@ -280,7 +285,7 @@ export default function IQACInitiatives() {
                 {banner.heading}
               </h3>
               <p className="text-xs sm:text-sm font-sans text-emerald-100 leading-relaxed">
-                {banner.body}
+                <RichText text={banner.body} />
               </p>
             </div>
 

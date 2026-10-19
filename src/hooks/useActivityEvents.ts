@@ -35,6 +35,8 @@ export interface ActivityEventCard {
   categoryId: string;
   /** A tab of the homepage gazette board, or blank to stay off it. */
   gazetteTab: string;
+  /** False keeps the tab but takes the event off the board. Missing counts as on. */
+  gazetteShow?: boolean;
   /** yyyy-mm-dd, the date the board prints. */
   gazetteDate: string;
   /** The category's name, as the pill prints it. */
@@ -63,11 +65,10 @@ export interface ActivityEventsContent {
   gallery: { heading: string; subtitle: string; photos: string[] };
   counts: Record<string, number>;
   /**
-   * The events an editor put on the homepage gazette board, by tab, at most
-   * gazetteLimit of each and in the order they are listed on the page.
+   * The events an editor put on the homepage gazette board and left switched
+   * on, by tab and in the order they are listed on the page.
    */
   gazette: Record<string, GazetteEntry[]>;
-  gazetteLimit: number;
 }
 
 const idFor = (label: string) =>
@@ -96,7 +97,7 @@ const DEFAULT_EVENTS: ActivityEventCard[] = ACTIVITY_EVENTS.map((event) => ({
 
 export const DEFAULT_ACTIVITY_EVENTS: ActivityEventsContent = {
   pageTitle: "Campus Events",
-  pageSubtitle: "Academic Portal — Activities",
+  pageSubtitle: "Activities",
   banner: {
     badge: "Co-Curricular Hub",
     heading: "Symposia, Contests & Initiatives",
@@ -124,7 +125,6 @@ export const DEFAULT_ACTIVITY_EVENTS: ActivityEventsContent = {
     DEFAULT_CATEGORIES.map((c) => [c.id, DEFAULT_EVENTS.filter((e) => e.categoryId === c.id).length]),
   ),
   gazette: {},
-  gazetteLimit: 6,
 };
 
 /** Enough of a check that a malformed response cannot empty the page. */
@@ -149,7 +149,7 @@ export function useActivityEvents(): ActivityEventsContent {
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (cancelled || !body) return;
-        if (isUsable(body.events)) setContent({ counts: {}, gazette: {}, gazetteLimit: 6, ...body.events });
+        if (isUsable(body.events)) setContent({ counts: {}, gazette: {}, ...body.events });
       })
       // The page does not depend on the API being up.
       .catch(() => undefined);

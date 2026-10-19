@@ -80,7 +80,7 @@ export interface IqacAboutContent {
 /** The page as it shipped, and what it falls back to. */
 export const DEFAULT_IQAC_ABOUT: IqacAboutContent = {
   "pageTitle": "About IQAC",
-  "pageSubtitle": "Internal Quality Assurance Cell — Ensuring Continuous Academic & Institutional Excellence",
+  "pageSubtitle": "Internal Quality Assurance Cell: Ensuring Continuous Academic & Institutional Excellence",
   "overview": {
     "badge": "NAAC Quality Sustenance Measure",
     "heading": "Internal Quality Assurance Cell (IQAC)",

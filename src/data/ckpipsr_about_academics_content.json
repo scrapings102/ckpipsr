@@ -102,7 +102,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/about/founder.jpg"
+        "/media/ipsr/images/about/founder.jpg"
       ],
       "Videos": [
         "https://www.youtube.com/embed/EvKkq81l18k",
@@ -123,17 +123,17 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/about/bhumika-desai.webp",
-        "https://ckpipsr.ac.in/images/about/dhiren-shah.png",
-        "https://ckpipsr.ac.in/images/about/kamlesh-zota.png",
-        "https://ckpipsr.ac.in/images/about/rajesh-patel.jpg",
-        "https://ckpipsr.ac.in/images/about/shailesh-shah.jpg",
-        "https://ckpipsr.ac.in/images/about/vinod-ramani.webp",
-        "https://ckpipsr.ac.in/images/trustees/ajit-c-p.jpg",
-        "https://ckpipsr.ac.in/images/trustees/biren-m-p.jpg",
-        "https://ckpipsr.ac.in/images/trustees/mahesh-c-p.jpg",
-        "https://ckpipsr.ac.in/images/trustees/rahul-a-p.jpg",
-        "https://ckpipsr.ac.in/images/trustees/ramesh-a-m.jpg"
+        "/media/ipsr/images/about/bhumika-desai.webp",
+        "/media/ipsr/images/about/dhiren-shah.png",
+        "/media/ipsr/images/about/kamlesh-zota.png",
+        "/media/ipsr/images/about/rajesh-patel.jpg",
+        "/media/ipsr/images/about/shailesh-shah.jpg",
+        "/media/ipsr/images/about/vinod-ramani.webp",
+        "/media/ipsr/images/trustees/ajit-c-p.jpg",
+        "/media/ipsr/images/trustees/biren-m-p.jpg",
+        "/media/ipsr/images/trustees/mahesh-c-p.jpg",
+        "/media/ipsr/images/trustees/rahul-a-p.jpg",
+        "/media/ipsr/images/trustees/ramesh-a-m.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -152,7 +152,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/about/dhiren-shah-desk.png"
+        "/media/ipsr/images/about/dhiren-shah-desk.png"
       ],
       "Videos": [],
       "Documents": [],
@@ -287,10 +287,10 @@
       "Images": [],
       "Videos": [],
       "Documents": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/63f5f6fb749d2.pdf",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e2c74f855a9.pdf",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e2c80a7a232.pdf",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/69d87ef327173.pdf"
+        "/media/trust/app/institutes/102/departments/docs/63f5f6fb749d2.pdf",
+        "/media/trust/app/institutes/102/departments/docs/66e2c74f855a9.pdf",
+        "/media/trust/app/institutes/102/departments/docs/66e2c80a7a232.pdf",
+        "/media/trust/app/institutes/102/departments/docs/69d87ef327173.pdf"
       ],
       "SourcePageTitle": "CKPIPSR",
       "Page": "Approvals",
@@ -306,26 +306,26 @@
         }
       ],
       "Images": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d543b19366a.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d678047de6f.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d7dd1998fd9.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/63ff22878d587.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/64ca266c229e1.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6508142a9ac31.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/650829bcc4509.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/653b985d358b2.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/653b9920c1ad8.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/66d2f8a318da8.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6808cc9d539c0.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/691ab1b1c820a.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6946489cad2e2.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/69465a922aac3.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/69465b778086e.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/69465e027f603.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a6308854a00a.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a6aedc18032e.webp"
+        "/media/trust/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/62d543b19366a.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/62d678047de6f.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/62d7dd1998fd9.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/63abcf6a28997.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/63ff22878d587.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/64ca266c229e1.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/6508142a9ac31.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/650829bcc4509.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/653b985d358b2.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/653b9920c1ad8.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/66d2f8a318da8.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/6808cc9d539c0.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/691ab1b1c820a.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/6946489cad2e2.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/69465a922aac3.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/69465b778086e.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/69465e027f603.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/6a6308854a00a.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/6a6aedc18032e.webp"
       ],
       "Videos": [],
       "Documents": [],
@@ -354,10 +354,10 @@
         }
       ],
       "Images": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6403216c64574.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/640321c9d4148.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6479c163675d6.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/resource/lab/photos/6479c1ae14eec.webp"
+        "/media/trust/app/institutes/102/resource/lab/photos/6403216c64574.webp",
+        "/media/trust/app/institutes/102/resource/lab/photos/640321c9d4148.webp",
+        "/media/trust/app/institutes/102/resource/lab/photos/6479c163675d6.webp",
+        "/media/trust/app/institutes/102/resource/lab/photos/6479c1ae14eec.webp"
       ],
       "Videos": [],
       "Documents": [],
@@ -379,10 +379,10 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/library/1.jpg",
-        "https://ckpipsr.ac.in/images/resources/library/2.jpg",
-        "https://ckpipsr.ac.in/images/resources/library/3.jpg",
-        "https://ckpipsr.ac.in/images/resources/library/4.jpg"
+        "/media/ipsr/images/resources/library/1.jpg",
+        "/media/ipsr/images/resources/library/2.jpg",
+        "/media/ipsr/images/resources/library/3.jpg",
+        "/media/ipsr/images/resources/library/4.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -420,13 +420,13 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/hostel/02.jpg",
-        "https://ckpipsr.ac.in/images/resources/hostel/03.jpg",
-        "https://ckpipsr.ac.in/images/resources/hostel/04.jpg",
-        "https://ckpipsr.ac.in/images/resources/hostel/05.jpg",
-        "https://ckpipsr.ac.in/images/resources/hostel/06.jpg",
-        "https://ckpipsr.ac.in/images/resources/hostel/07.jpeg",
-        "https://ckpipsr.ac.in/images/resources/hostel/08.jpeg"
+        "/media/ipsr/images/resources/hostel/02.jpg",
+        "/media/ipsr/images/resources/hostel/03.jpg",
+        "/media/ipsr/images/resources/hostel/04.jpg",
+        "/media/ipsr/images/resources/hostel/05.jpg",
+        "/media/ipsr/images/resources/hostel/06.jpg",
+        "/media/ipsr/images/resources/hostel/07.jpeg",
+        "/media/ipsr/images/resources/hostel/08.jpeg"
       ],
       "Videos": [],
       "Documents": [],
@@ -444,13 +444,13 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/medical/01.jpg",
-        "https://ckpipsr.ac.in/images/resources/medical/02.jpg",
-        "https://ckpipsr.ac.in/images/resources/medical/03.jpg",
-        "https://ckpipsr.ac.in/images/resources/medical/04.jpg",
-        "https://ckpipsr.ac.in/images/resources/medical/05.jpg",
-        "https://ckpipsr.ac.in/images/resources/medical/06.jpg",
-        "https://ckpipsr.ac.in/images/resources/medical/07.jpg"
+        "/media/ipsr/images/resources/medical/01.jpg",
+        "/media/ipsr/images/resources/medical/02.jpg",
+        "/media/ipsr/images/resources/medical/03.jpg",
+        "/media/ipsr/images/resources/medical/04.jpg",
+        "/media/ipsr/images/resources/medical/05.jpg",
+        "/media/ipsr/images/resources/medical/06.jpg",
+        "/media/ipsr/images/resources/medical/07.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -468,11 +468,11 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/transportation/brts-map.jpg",
-        "https://ckpipsr.ac.in/images/resources/transportation/bus.jpeg",
-        "https://ckpipsr.ac.in/images/resources/transportation/colbus.jpeg",
-        "https://ckpipsr.ac.in/images/resources/transportation/coltiming.jpeg",
-        "https://ckpipsr.ac.in/images/resources/transportation/timing.jpg"
+        "/media/ipsr/images/resources/transportation/brts-map.jpg",
+        "/media/ipsr/images/resources/transportation/bus.jpeg",
+        "/media/ipsr/images/resources/transportation/colbus.jpeg",
+        "/media/ipsr/images/resources/transportation/coltiming.jpeg",
+        "/media/ipsr/images/resources/transportation/timing.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -490,12 +490,12 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/seminar-hall/1.jpg",
-        "https://ckpipsr.ac.in/images/resources/seminar-hall/2.jpg",
-        "https://ckpipsr.ac.in/images/resources/seminar-hall/3.jpg",
-        "https://ckpipsr.ac.in/images/resources/seminar-hall/4.jpg",
-        "https://ckpipsr.ac.in/images/resources/seminar-hall/5.jpg",
-        "https://ckpipsr.ac.in/images/resources/seminar-hall/6.jpg"
+        "/media/ipsr/images/resources/seminar-hall/1.jpg",
+        "/media/ipsr/images/resources/seminar-hall/2.jpg",
+        "/media/ipsr/images/resources/seminar-hall/3.jpg",
+        "/media/ipsr/images/resources/seminar-hall/4.jpg",
+        "/media/ipsr/images/resources/seminar-hall/5.jpg",
+        "/media/ipsr/images/resources/seminar-hall/6.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -521,12 +521,12 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/cafeteria/1.jpeg",
-        "https://ckpipsr.ac.in/images/resources/cafeteria/2.jpeg",
-        "https://ckpipsr.ac.in/images/resources/cafeteria/3.jpeg",
-        "https://ckpipsr.ac.in/images/resources/cafeteria/4.jpeg",
-        "https://ckpipsr.ac.in/images/resources/cafeteria/5.jpeg",
-        "https://ckpipsr.ac.in/images/resources/cafeteria/6.jpeg"
+        "/media/ipsr/images/resources/cafeteria/1.jpeg",
+        "/media/ipsr/images/resources/cafeteria/2.jpeg",
+        "/media/ipsr/images/resources/cafeteria/3.jpeg",
+        "/media/ipsr/images/resources/cafeteria/4.jpeg",
+        "/media/ipsr/images/resources/cafeteria/5.jpeg",
+        "/media/ipsr/images/resources/cafeteria/6.jpeg"
       ],
       "Videos": [],
       "Documents": [],
@@ -552,7 +552,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/central/clp.jpg"
+        "/media/ipsr/images/resources/central/clp.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -570,7 +570,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/echarging.jpg"
+        "/media/ipsr/images/resources/echarging.jpg"
       ],
       "Videos": [],
       "Documents": [],
@@ -588,10 +588,10 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/resources/garden/garden-1.png",
-        "https://ckpipsr.ac.in/images/resources/garden/garden-2.png",
-        "https://ckpipsr.ac.in/images/resources/garden/garden-3.png",
-        "https://ckpipsr.ac.in/images/resources/garden/garden-4.png"
+        "/media/ipsr/images/resources/garden/garden-1.png",
+        "/media/ipsr/images/resources/garden/garden-2.png",
+        "/media/ipsr/images/resources/garden/garden-3.png",
+        "/media/ipsr/images/resources/garden/garden-4.png"
       ],
       "Videos": [],
       "Documents": [],

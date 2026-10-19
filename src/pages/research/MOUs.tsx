@@ -21,7 +21,9 @@ import {
   Globe,
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText, plainText } from "../../utils/RichText";
 import { useResearchMous, type MouTone } from "../../hooks/useResearchMous";
+import { iconFor } from "../../utils/iconFor";
 
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
 
@@ -72,7 +74,7 @@ export default function MOUs() {
       const matchesSector = !selectedSector || item.sectorId === selectedSector;
       const matchesSearch =
         item.organization.toLowerCase().includes(q) ||
-        item.purpose.toLowerCase().includes(q) ||
+        plainText(item.purpose).toLowerCase().includes(q) ||
         item.location.toLowerCase().includes(q) ||
         item.effectiveFrom.includes(searchQuery);
       return matchesSector && matchesSearch;
@@ -88,7 +90,7 @@ export default function MOUs() {
       category="research-and-innovation"
       activeItemLabel="Research - MOUs"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
 
         {/* Header Overview Card */}
         <motion.div
@@ -201,7 +203,7 @@ export default function MOUs() {
           {filteredMOUs.map((item, index) => {
             const sector = sectorOf(item.sectorId);
             const theme = THEMES[sector?.tone ?? "slate"] ?? THEMES.slate;
-            const SectorIcon = (sector && ICONS[sector.icon]) || Handshake;
+            const SectorIcon = iconFor(sector?.icon, ICONS, Handshake);
             const number = content.mous.indexOf(item) + 1;
 
             return (
@@ -257,7 +259,7 @@ export default function MOUs() {
                       <span>Scope & Purpose of MOU</span>
                     </span>
                     <p className="text-xs sm:text-sm font-sans font-medium text-slate-800 leading-relaxed">
-                      {item.purpose}
+                      <RichText text={item.purpose} />
                     </p>
                   </div>
 
@@ -324,7 +326,7 @@ export default function MOUs() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   MapPin, 
   ExternalLink, 
@@ -12,100 +12,73 @@ import {
   CheckCircle2, 
   Clock, 
   ShieldCheck,
-  Compass
+  Compass,
+  Car,
+  Plane,
+  Trees,
+  FlaskConical,
+  Maximize2,
+  ZoomIn,
+  X,
+  type LucideIcon,
 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { useModalScrollLock } from "../../hooks/useModalScrollLock";
+
+/** The icons a zone or a route can name in the admin panel. Keep in step with CAMPUS_MAP_ICONS there. */
+const CAMPUS_MAP_ICONS: Record<string, LucideIcon> = {
+  Building2, BookOpen, Coffee, Home, Train, Bus, Car, Plane, Trees, FlaskConical,
+};
 import SubPageLayout from "../../components/SubPageLayout";
-import { CONTACT, INSTITUTE } from "../../data/institute";
+import { useCampusMapContent } from "../../hooks/useCampusMapContent";
 import { cdn } from "../../utils/image";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+import campusMapImage from "../../assets/images/campus_map.jpg";
 
 export default function CampusMap() {
-  const [activeZone, setActiveZone] = useState<"all" | "academic" | "central" | "amenities" | "hostel">("all");
+  // Edited under About Us, Campus Map in the admin panel. The map, phone
+  // number and visiting hours come from the Contact Us page.
+  const content = useCampusMapContent();
+  // The filter tab chosen: "all", or a zone's position in the list.
+  const [activeZone, setActiveZone] = useState<"all" | number>("all");
+  const [isEnlarged, setIsEnlarged] = useState(false);
 
-  const mapImageUrl = "/images/hero/college_campus.jpg";
-  const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=C.+K.+Pithawalla+Institute+of+Pharmaceutical+Science+and+Research+Surat";
+  useModalScrollLock(isEnlarged);
 
-  const campusZones = [
-    {
-      id: "academic",
-      title: "Academic & Laboratory Blocks",
-      icon: Building2,
-      description: "State-of-the-art department blocks housing lecture halls, high-tech pharmaceutical science laboratories, and research units.",
-      facilities: [
-        "Main Administrative & Academic Building",
-        "Pharmaceutics & Formulation Research Labs",
-        "Pharmaceutical Chemistry & Synthesis Laboratory",
-        "Pharmacology & Animal Simulation (CAL) Lab",
-        "Pharmacognosy & Phytochemistry Research Wing",
-        "Central Instrumentation Room (HPLC, FTIR, UV-Vis)"
-      ]
-    },
-    {
-      id: "central",
-      title: "Central Facilities & Research",
-      icon: BookOpen,
-      description: "Core institutional resources supporting academic research, digital learning, and university administration.",
-      facilities: [
-        "Central Pharmacy Library with Digital E-Resources",
-        "Computer Center & High-Speed Wi-Fi Research Hub",
-        "Air-Conditioned Central Seminar Hall (Auditorium)",
-        "Student Startup & Innovation Policy (SSIP) Cell",
-        "Institutional Innovation Council (IIC) Ideation Room",
-        "Training & Placement Cell Office"
-      ]
-    },
-    {
-      id: "amenities",
-      title: "Student Life & Amenities",
-      icon: Coffee,
-      description: "Vibrant spaces dedicated to recreation, sports, dining, and overall student wellness.",
-      facilities: [
-        "Medicinal Plants Botanical Garden",
-        "Hygienic Multi-Cuisine Student Cafeteria",
-        "Cricket & Sports Playing Grounds",
-        "Volleyball & Badminton Courts",
-        "Indoor Sports Arena (Table Tennis, Chess, Carrom)",
-        "First-Aid Medical & Health Observation Center"
-      ]
-    },
-    {
-      id: "hostel",
-      title: "Hostels & Residential Complex",
-      icon: Home,
-      description: "Safe, comfortable, and well-equipped residential quarters for students, faculty, and visiting scholars.",
-      facilities: [
-        "In-Campus Boys Hostel Complex",
-        "Secure Girls Hostel Complex with 24/7 Warden",
-        "Faculty & Staff Residential Quarters",
-        "Institutional Guest House for Visiting Scholars",
-        "Solar Water Heating & RO Drinking Water Stations",
-        "Campus Security Control & CCTV Surveillance"
-      ]
-    }
+  // Close modal on Escape key
+  useEffect(() => {
+    if (!isEnlarged) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsEnlarged(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isEnlarged]);
+
+  const isRelativeSrcPath =
+    content.layout.image?.startsWith("./") ||
+    content.layout.image?.startsWith("../") ||
+    content.layout.image?.includes("campus_m");
+
+  const mapImageUrl =
+    content.layout.image &&
+    content.layout.image !== "/images/hero/college_campus.jpg" &&
+    !isRelativeSrcPath
+      ? content.layout.image
+      : campusMapImage;
+  const zoneTabs = [
+    { id: "all" as const, label: content.zones.allLabel },
+    ...content.zones.items.map((zone, i) => ({ id: i, label: zone.tab })),
   ];
-
-  const travelGuides = [
-    {
-      mode: "By Train (Surat Railway Station)",
-      icon: Train,
-      time: "30-35 Mins (~15 km)",
-      detail: "Surat Railway Junction (ST) connects to all major Indian cities. Direct city buses, auto-rickshaws, and cab services operate frequently to Dumas Road."
-    },
-    {
-      mode: "By City Bus / BRTS Transit",
-      icon: Bus,
-      time: "Direct Connectivity",
-      detail: "Surat City Bus and BRTS routes have dedicated stops directly at the C. K. Pithawalla Educational Complex gate on Dumas Road."
-    }
-  ];
-
-  const filteredZones = activeZone === "all" 
-    ? campusZones 
-    : campusZones.filter(z => z.id === activeZone);
+  const filteredZones = activeZone === "all"
+    ? content.zones.items
+    : content.zones.items.filter((_, i) => i === activeZone);
 
   return (
     <SubPageLayout
-      title="Campus Map & Location"
-      subtitle="Explore our sprawling educational complex located on Surat-Dumas Road opposite Surat Airport."
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="about-us"
       activeItemLabel="Campus Map"
     >
@@ -115,35 +88,39 @@ export default function CampusMap() {
         <div className="bg-[#182f1d] text-white rounded-3xl p-8 md:p-10 shadow-xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 max-w-4xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider">
-              <Compass size={14} />
-              <span>Surat-Dumas Road Campus</span>
-            </div>
+            {content.intro.badge && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider">
+                <Compass size={14} />
+                <span>{content.intro.badge}</span>
+              </div>
+            )}
             
             <h2 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-white leading-tight">
-              100-Acre Lush Green Educational Complex
+              {content.intro.heading}
             </h2>
             
             <p className="text-white/90 text-sm md:text-base leading-relaxed max-w-3xl">
-              Situated in the clean, green coastal belt of Dumas, Surat, {INSTITUTE.fullName} offers a world-class environment with modern academic blocks, advanced engineering workshops, digital library facilities, and peaceful residential quarters.
+              <RichText text={content.intro.body} />
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <a
-                href={googleMapsUrl}
+                href={content.intro.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-black/30 hover:bg-black/45 text-white border border-white/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md"
               >
                 <Navigation size={14} />
-                <span>Navigate via Google Maps</span>
+                <span>{content.intro.mapsLabel}</span>
                 <ExternalLink size={14} className="opacity-80" />
               </a>
 
-              <div className="flex items-center gap-2 text-xs text-white/90 bg-white/15 px-3.5 py-2 rounded-xl border border-white/20">
-                <MapPin size={14} className="text-white" />
-                <span>Near Gujarat Maritime Board, Via Magdalla Port, Surat - 395007</span>
-              </div>
+              {content.intro.addressLine && (
+                <div className="flex items-center gap-2 text-xs text-white/90 bg-white/15 px-3.5 py-2 rounded-xl border border-white/20">
+                  <MapPin size={14} className="text-white" />
+                  <span>{content.intro.addressLine}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -152,33 +129,53 @@ export default function CampusMap() {
         <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
-              <h3 className="font-serif font-bold text-xl text-slate-900">CKPIPSR Campus Layout &amp; Facilities</h3>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Geographical map showing location of academic departments, laboratories, library, hostels, and sports grounds.
-              </p>
+              <h3 className="font-serif font-bold text-xl text-slate-900">{content.layout.title}</h3>
+              {content.layout.text && (
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">{content.layout.text}</p>
+              )}
             </div>
-            <a
-              href={mapImageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-semibold transition-all shrink-0"
-            >
-              <span>View Full Campus View</span>
-              <ExternalLink size={14} />
-            </a>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsEnlarged(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-[#1a5d2e] hover:bg-emerald-100 border border-emerald-200/70 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+              >
+                <Maximize2 size={14} />
+                <span>Enlarge Map</span>
+              </button>
+              <a
+                href={mapImageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-semibold transition-all"
+              >
+                <span>{content.layout.buttonLabel}</span>
+                <ExternalLink size={14} />
+              </a>
+            </div>
           </div>
 
-          <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 p-2 shadow-inner flex items-center justify-center">
+          {/* Full natural aspect ratio with horizontal pan on small devices to prevent text clipping */}
+          <div
+            onClick={() => setIsEnlarged(true)}
+            className="group relative rounded-2xl border border-slate-200 bg-[#fbf0d9]/25 p-1 sm:p-3 overflow-x-auto cursor-zoom-in transition-all hover:border-[#1a5d2e]/40 hover:shadow-md"
+            title="Click to view full layout"
+          >
             <img
               src={mapImageUrl}
-              alt="CKPIPSR Campus Layout"
-              className="w-full h-auto max-h-[650px] object-cover rounded-xl"
-              decoding="async" loading="lazy"
+              alt={content.layout.title}
+              className="w-full h-auto min-w-[650px] md:min-w-0 object-contain block mx-auto select-none"
+              decoding="async"
+              loading="lazy"
               referrerPolicy="no-referrer"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/images/hero/college_campus.jpg";
+                (e.target as HTMLImageElement).src = campusMapImage;
               }}
             />
+            <div className="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 opacity-0 sm:group-hover:opacity-100 transition-opacity pointer-events-none shadow-md">
+              <ZoomIn size={14} />
+              <span>Click to enlarge</span>
+            </div>
           </div>
         </div>
 
@@ -186,17 +183,21 @@ export default function CampusMap() {
         <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h3 className="font-serif font-bold text-lg text-slate-900">Interactive Satellite Location</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Explore real-time directions, surrounding landmarks, and transit options on Google Maps.</p>
+              <h3 className="font-serif font-bold text-lg text-slate-900">{content.satellite.title}</h3>
+              {content.satellite.text && (
+                <p className="text-xs text-slate-500 mt-0.5">{content.satellite.text}</p>
+              )}
             </div>
-            <span className="text-xs font-semibold text-[#00509d] bg-blue-50 px-3 py-1 rounded-full border border-blue-100 self-start sm:self-auto">
-              Surat-Dumas Road (Opp. Airport)
-            </span>
+            {content.satellite.badge && (
+              <span className="text-xs font-semibold text-[#00509d] bg-blue-50 px-3 py-1 rounded-full border border-blue-100 self-start sm:self-auto">
+                {content.satellite.badge}
+              </span>
+            )}
           </div>
           <div className="w-full h-[420px] bg-slate-100 relative">
             <iframe
-              title="CKPIPSR Location Google Map"
-              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5923.654116328731!2d72.71618443860855!3d21.13191122833264!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be052ae998fda3d%3A0x23340ab807f12d7!2sC.K.%20Pthawalla%20Institute%20of%20Pharmaceutical%20Science%20and%20Research!5e0!3m2!1sen!2sin!4v1679122645038!5m2!1sen!2sin"
+              title={`Map: ${content.satellite.title}`}
+              src={content.mapEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -211,22 +212,16 @@ export default function CampusMap() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-3">
             <div>
-              <h3 className="font-serif font-bold text-xl sm:text-2xl text-slate-900">Key Campus Zones & Facilities</h3>
-              <p className="text-xs sm:text-sm text-slate-600">Structured layout of departments, laboratories, hostels, and sports infrastructure.</p>
+              <h3 className="font-serif font-bold text-xl sm:text-2xl text-slate-900">{content.zones.title}</h3>
+              {content.zones.text && <p className="text-xs sm:text-sm text-slate-600">{content.zones.text}</p>}
             </div>
 
             {/* Zone filter buttons */}
             <div className="flex flex-wrap items-center gap-2">
-              {[
-                { id: "all", label: "All Zones" },
-                { id: "academic", label: "Academic" },
-                { id: "central", label: "Central" },
-                { id: "amenities", label: "Amenities" },
-                { id: "hostel", label: "Hostels" }
-              ].map((btn) => (
+              {zoneTabs.map((btn) => (
                 <button
                   key={btn.id}
-                  onClick={() => setActiveZone(btn.id as any)}
+                  onClick={() => setActiveZone(btn.id)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     activeZone === btn.id
                       ? "bg-[#00509d] text-white shadow-sm"
@@ -241,10 +236,10 @@ export default function CampusMap() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {filteredZones.map((zone) => {
-              const ZoneIcon = zone.icon;
+              const ZoneIcon = iconFor(zone.icon, CAMPUS_MAP_ICONS, Building2);
               return (
                 <div 
-                  key={zone.id}
+                  key={zone.title}
                   className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-all space-y-4 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
@@ -256,7 +251,7 @@ export default function CampusMap() {
                     </div>
 
                     <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                      {zone.description}
+                      <RichText text={zone.description} />
                     </p>
 
                     <div className="pt-2 grid sm:grid-cols-2 gap-2">
@@ -277,13 +272,13 @@ export default function CampusMap() {
         {/* How to Reach / Connectivity Grid */}
         <div className="space-y-6">
           <div className="border-b border-slate-200 pb-3">
-            <h3 className="font-serif font-bold text-xl sm:text-2xl text-slate-900">How to Reach the Campus</h3>
-            <p className="text-xs sm:text-sm text-slate-600">Convenient connectivity from Surat railway junction and city bus transit hubs.</p>
+            <h3 className="font-serif font-bold text-xl sm:text-2xl text-slate-900">{content.travel.title}</h3>
+            {content.travel.text && <p className="text-xs sm:text-sm text-slate-600">{content.travel.text}</p>}
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {travelGuides.map((guide, idx) => {
-              const GuideIcon = guide.icon;
+            {content.travel.items.map((guide, idx) => {
+              const GuideIcon = iconFor(guide.icon, CAMPUS_MAP_ICONS, Bus);
               return (
                 <div key={idx} className="bg-[#182f1d] text-white rounded-2xl p-6 space-y-3 flex flex-col justify-between shadow-sm">
                   <div className="space-y-2">
@@ -291,11 +286,13 @@ export default function CampusMap() {
                       <GuideIcon size={20} />
                     </div>
                     <h4 className="font-bold text-base text-white">{guide.mode}</h4>
-                    <span className="inline-block text-[11px] font-semibold uppercase tracking-wider text-white bg-black/20 px-2.5 py-0.5 rounded-md border border-white/20">
-                      {guide.time}
-                    </span>
+                    {guide.time && (
+                      <span className="inline-block text-[11px] font-semibold uppercase tracking-wider text-white bg-black/20 px-2.5 py-0.5 rounded-md border border-white/20">
+                        {guide.time}
+                      </span>
+                    )}
                     <p className="text-xs text-white/90 leading-relaxed pt-1">
-                      {guide.detail}
+                      <RichText text={guide.detail} />
                     </p>
                   </div>
                 </div>
@@ -307,30 +304,98 @@ export default function CampusMap() {
         {/* Visitor Information & Gate Timings */}
         <div className="bg-[#F8FAFC] border border-slate-200/90 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
           <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00509d]">
-              <Clock size={16} />
-              <span>Visitor Entry & Campus Timings</span>
-            </div>
+            {content.visitor.badge && (
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00509d]">
+                <Clock size={16} />
+                <span>{content.visitor.badge}</span>
+              </div>
+            )}
             <h4 className="font-serif font-bold text-lg text-slate-900">
-              Campus Operating Hours & Security Registration
+              {content.visitor.title}
             </h4>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Visitors, parents, and alumni may enter the campus after registering at the main security gate. Official visiting hours are Monday to Saturday, 9:00 AM to 5:00 PM ({CONTACT.timings}).
+              <RichText text={content.visitor.body} />
             </p>
           </div>
 
+          {content.phone && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
             <a
-              href={`tel:${CONTACT.phones[0]}`}
+              href={`tel:${content.phone.replace(/[^\d+]/g, "")}`}
               className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#00509d] text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-[#003d7a] transition-all shadow-sm"
             >
               <ShieldCheck size={16} />
-              <span>Contact Security / Reception</span>
+              <span>{content.visitor.buttonLabel}</span>
             </a>
           </div>
+          )}
         </div>
 
       </div>
+
+      {/* ── FULLSCREEN MAP LIGHTBOX MODAL ── */}
+      <AnimatePresence>
+        {isEnlarged && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsEnlarged(false)}
+            className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col p-3 sm:p-6"
+          >
+            {/* Modal Header */}
+            <div
+              className="flex items-center justify-between gap-4 pb-3 border-b border-white/10 text-white max-w-7xl w-full mx-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="min-w-0">
+                <h3 className="font-serif font-bold text-base sm:text-lg text-white truncate">
+                  {content.layout.title}
+                </h3>
+                <p className="text-xs text-white/60 hidden sm:block">
+                  Complete Educational Complex Blueprint • Press Esc or click outside to close
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={mapImageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition cursor-pointer"
+                >
+                  <ExternalLink size={13} />
+                  <span className="hidden sm:inline">Open in New Tab</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setIsEnlarged(false)}
+                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition cursor-pointer border border-white/20"
+                  aria-label="Close modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Image Body with smooth view */}
+            <div
+              className="flex-1 w-full max-w-7xl mx-auto overflow-auto flex items-center justify-center py-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.img
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                src={mapImageUrl}
+                alt={content.layout.title}
+                className="max-h-[85vh] max-w-full w-auto h-auto object-contain shadow-2xl rounded-sm"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </SubPageLayout>
   );
 }

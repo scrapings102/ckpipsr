@@ -117,7 +117,7 @@ export const DEFAULT_IQAC_MOMS: IqacMomsContent = {
       "academicYear": "AY 2024-25",
       "year": 2024,
       "description": "Minutes of IQAC Meeting and Action Taken Report (ATR) - Quarter 1, 2024 session covering curriculum reviews, research seed initiatives, and academic progress.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e407764acd8.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/66e407764acd8.pdf",
       "openLabel": "Open IQAC Q1-2024",
       "hasFile": true
     },
@@ -127,7 +127,7 @@ export const DEFAULT_IQAC_MOMS: IqacMomsContent = {
       "academicYear": "AY 2023-24",
       "year": 2023,
       "description": "Minutes of IQAC Meeting and Action Taken Report (ATR) - Quarter 1, 2023 session focusing on semester planning, student mentoring reviews, and teaching innovations.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/646ef7ec109b6.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/646ef7ec109b6.pdf",
       "openLabel": "Open IQAC Q1-2023",
       "hasFile": true
     },
@@ -137,7 +137,7 @@ export const DEFAULT_IQAC_MOMS: IqacMomsContent = {
       "academicYear": "AY 2023-24",
       "year": 2023,
       "description": "Minutes of IQAC Meeting and Action Taken Report (ATR) - Quarter 2, 2023 session detailing mid-semester assessment analysis, industry collaborations, and faculty development.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e40799d1de9.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/66e40799d1de9.pdf",
       "openLabel": "Open IQAC Q2-2023",
       "hasFile": true
     },
@@ -147,7 +147,7 @@ export const DEFAULT_IQAC_MOMS: IqacMomsContent = {
       "academicYear": "AY 2022-23",
       "year": 2022,
       "description": "Minutes of IQAC Meeting and Action Taken Report (ATR) - Quarter 4, 2022 session outlining annual academic audits, infrastructure enhancements, and stakeholder feedback actions.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/646ef7b70c5ee.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/646ef7b70c5ee.pdf",
       "openLabel": "Open IQAC Q4-2022",
       "hasFile": true
     },
@@ -157,7 +157,7 @@ export const DEFAULT_IQAC_MOMS: IqacMomsContent = {
       "academicYear": "AY 2022-23",
       "year": 2022,
       "description": "Minutes of IQAC Meeting and Action Taken Report (ATR) - Quarter 3, 2022 session addressing course attainment metrics, library resource expansions, and eco-campus programs.",
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/646ef7999475f.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/646ef7999475f.pdf",
       "openLabel": "Open IQAC Q3-2022",
       "hasFile": true
     }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare, X, Send, GraduationCap, MapPin, BookOpen, Sparkles, ArrowUp, RotateCcw } from "lucide-react";
 import { useLenis } from "../context/LenisContext";
+import { previewToken } from "../hooks/previewToken";
 
 interface Message {
   sender: "bot" | "user";
@@ -23,7 +24,7 @@ const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "
 
 const WELCOME: Message = {
   sender: "bot",
-  text: "👋 Welcome to CKPIPSR! I'm the campus assistant — ask me about admissions, courses, fees, or anything else about the college.",
+  text: "Welcome to CKPIPSR! I'm the campus assistant. Ask me about admissions, courses, fees, or anything else about the college.",
   time: now(),
 };
 
@@ -96,7 +97,7 @@ export default function ChatbotButton() {
   return (
     <>
       {/* Floating Buttons Column */}
-      <div id="chatbot-wrapper" className="fixed bottom-[78px] sm:bottom-[84px] md:bottom-[96px] xl:bottom-10 right-4 sm:right-8 md:right-10 z-50 flex flex-col items-end gap-3">
+      <div id="chatbot-wrapper" className={`fixed ${previewToken() ? "mb-12" : ""} bottom-[76px] sm:bottom-[84px] md:bottom-[96px] xl:bottom-10 right-3 sm:right-8 md:right-10 z-50 flex flex-col items-end gap-3`}>
         {/* Back to top button */}
         <AnimatePresence>
           {showBackToTop && (
@@ -122,7 +123,7 @@ export default function ChatbotButton() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
               transition={{ type: "spring", stiffness: 350, damping: 28 }}
-              className="w-[92vw] sm:w-[380px] h-[420px] sm:h-[520px] max-h-[62vh] sm:max-h-[75vh] bg-white rounded-3xl border border-slate-100 shadow-[0_24px_60px_rgba(12,36,17,0.25)] flex flex-col overflow-hidden"
+              className="w-[calc(100vw-24px)] sm:w-[380px] max-w-[380px] h-[440px] sm:h-[520px] max-h-[70vh] sm:max-h-[75vh] bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-[0_24px_60px_rgba(12,36,17,0.25)] flex flex-col overflow-hidden"
               onWheel={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}
             >

@@ -15,9 +15,14 @@ import BlogsAndMagazine from "./components/BlogsAndMagazine";
 import Admissions from "./components/Admissions";
 import Footer from "./components/Footer";
 import NewsBlogs from "./components/NewsBlogs";
-import ChatbotButton from "./components/ChatbotButton";
-import AdmissionsPopup from "./components/AdmissionsPopup";
+import PreviewBar from "./components/PreviewBar";
+import SubpageShutter from "./components/SubpageShutter";
 import { useAdmissionsPopupContent } from "./hooks/useAdmissionsPopupContent";
+
+// Lazy-loaded dialogs and widgets for optimal initial page load performance
+const ChatbotButton = React.lazy(() => import("./components/ChatbotButton"));
+const ContactLinkDialog = React.lazy(() => import("./components/ContactLinkDialog"));
+const AdmissionsPopup = React.lazy(() => import("./components/AdmissionsPopup"));
 
 // Lazy-loaded Subpages
 const Profile = React.lazy(() => import("./pages/about/Profile"));
@@ -58,6 +63,7 @@ const Scholarships = React.lazy(() => import("./pages/students/Scholarships"));
 const HobbyClub = React.lazy(() => import("./pages/students/HobbyClub"));
 const Alumni = React.lazy(() => import("./pages/students/Alumni"));
 const StudentHelpDesk = React.lazy(() => import("./pages/students/StudentHelpDesk"));
+const AdmissionInquiry = React.lazy(() => import("./pages/admissions/AdmissionInquiry"));
 
 // Lazy-loaded Cells
 const ARC = React.lazy(() => import("./pages/cells/ARC"));
@@ -88,6 +94,8 @@ const AISHE = React.lazy(() => import("./pages/iqac/AISHE"));
 const NIRF = React.lazy(() => import("./pages/iqac/NIRF"));
 const IDP = React.lazy(() => import("./pages/iqac/IDP"));
 const RTI = React.lazy(() => import("./pages/iqac/RTI"));
+const InstitutionDistinctiveness = React.lazy(() => import("./pages/iqac/InstitutionDistinctiveness"));
+const BestPractices = React.lazy(() => import("./pages/iqac/BestPractices"));
 const Placements = React.lazy(() => import("./pages/tnp/Placements"));
 const Visits = React.lazy(() => import("./pages/tnp/Visits"));
 const Committee = React.lazy(() => import("./pages/tnp/Committee"));
@@ -106,6 +114,17 @@ export default function App() {
   const [navbarReady, setNavbarReady] = useState(isSubPage);
   const [showAdmissionsPopup, setShowAdmissionsPopup] = useState(false);
   const hasShownAutoPopupRef = useRef(false);
+
+  // Track navigation from subpages to home so a smooth shutter animation plays
+  const prevPathnameRef = useRef(location.pathname);
+  const [homeShutterActive, setHomeShutterActive] = useState(false);
+
+  if (prevPathnameRef.current !== location.pathname) {
+    if (prevPathnameRef.current !== '/' && location.pathname === '/') {
+      setHomeShutterActive(true);
+    }
+    prevPathnameRef.current = location.pathname;
+  }
 
   // The popup's own settings decide whether it opens at all, so it must wait
   // for the real ones. Acting on the bundled fallback would pop it up on a site
@@ -198,14 +217,24 @@ export default function App() {
       )}
 
       <SmoothScroll>
-        <SEO />
-        <ChatbotButton />
+        {/* Inner pages render their own SEO tags; a second set here would repeat the description. */}
+        {!isSubPage && <SEO />}
+        <React.Suspense fallback={null}>
+          <ChatbotButton />
+          <ContactLinkDialog />
+        </React.Suspense>
 
         {/* Header bar container with animations */}
         <Navbar isReady={navbarReady} onOpenAdmissions={handleOpenAdmissions} />
 
         {!isSubPage ? (
           <>
+            {homeShutterActive && (
+              <SubpageShutter
+                key="home-shutter"
+                onComplete={() => setHomeShutterActive(false)}
+              />
+            )}
             <Hero
               loaded={heroLoaded}
               isSubPage={false}
@@ -225,6 +254,7 @@ export default function App() {
           </>
         ) : (
           <main className="pt-0 min-h-screen bg-[#FCFAF7]">
+            <SubpageShutter key={location.pathname} />
             <React.Suspense fallback={
               <div className="min-h-screen flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#123a1a] border-t-transparent rounded-full animate-spin" />
@@ -239,6 +269,8 @@ export default function App() {
 
                 <Route path="/about/po-peos" element={<POAndPEOs />} />
                 <Route path="/about-us/po-peos" element={<POAndPEOs />} />
+                {/* The scraped menus and search use this older address. */}
+                <Route path="/about-us/po-and-peos" element={<POAndPEOs />} />
 
                 <Route path="/about/founder" element={<Founder />} />
                 <Route path="/about-us/the-founder" element={<Founder />} />
@@ -324,6 +356,10 @@ export default function App() {
                 <Route path="/students/alumni" element={<Alumni />} />
                 <Route path="/students-corner/alumni-association" element={<Alumni />} />
                 <Route path="/students/alumni-association" element={<Alumni />} />
+                <Route path="/admissions/inquiry" element={<AdmissionInquiry />} />
+                {/* The other common spelling, for anyone who types it. */}
+                <Route path="/admissions/enquiry" element={<AdmissionInquiry />} />
+
                 <Route path="/student-help-desk" element={<StudentHelpDesk />} />
                 <Route path="/students-corner/student-help-desk" element={<StudentHelpDesk />} />
                 <Route path="/students/student-help-desk" element={<StudentHelpDesk />} />
@@ -523,6 +559,14 @@ export default function App() {
                 <Route path="/iqac/institutional-development-plan" element={<IDP />} />
                 <Route path="/institutional-development-plan" element={<IDP />} />
 
+                <Route path="/iqac/institution-distinctiveness" element={<InstitutionDistinctiveness />} />
+                <Route path="/iqac/distinctiveness" element={<InstitutionDistinctiveness />} />
+                <Route path="/institution-distinctiveness" element={<InstitutionDistinctiveness />} />
+
+                <Route path="/iqac/best-practices" element={<BestPractices />} />
+                <Route path="/iqac/practices" element={<BestPractices />} />
+                <Route path="/best-practices" element={<BestPractices />} />
+
                 <Route path="/iqac/rti" element={<RTI />} />
                 <Route path="/rti" element={<RTI />} />
                 <Route path="/iqac/right-to-information" element={<RTI />} />
@@ -568,11 +612,15 @@ export default function App() {
         <Footer />
       </SmoothScroll>
 
-      <AdmissionsPopup
-        isOpen={showAdmissionsPopup && !showPreloader}
-        onClose={() => setShowAdmissionsPopup(false)}
-        content={admissionsPopup}
-      />
+      <React.Suspense fallback={null}>
+        <AdmissionsPopup
+          isOpen={showAdmissionsPopup && !showPreloader}
+          onClose={() => setShowAdmissionsPopup(false)}
+          content={admissionsPopup}
+        />
+      </React.Suspense>
+
+      <PreviewBar />
     </>
   );
 }

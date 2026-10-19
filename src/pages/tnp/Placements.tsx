@@ -38,6 +38,7 @@ import {
   Cell
 } from "recharts";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import {
   usePlacementsContent,
   type PlacementYear
@@ -110,7 +111,7 @@ export default function Placements() {
         { name: "Selected", value: totalSelected, color: "#0c2340" },
         { name: "Higher Studies", value: higherStudies, color: "#1e40af" },
         { name: "Entrepreneurs", value: entrepreneurs, color: "#d97706" },
-        { name: "Other / Direct Roles", value: yearTrend?.otherAspirants ?? 0, color: "#94a3b8" }
+        { name: "Other / Not recorded", value: yearTrend?.otherAspirants ?? 0, color: "#94a3b8" }
       ].filter((slice) => slice.value > 0)
     };
   }, [recordsForSelectedYear, activeYear, years]);
@@ -129,13 +130,13 @@ export default function Placements() {
 
   return (
     <SubPageLayout
-      title="Placements"
-      subtitle="Training & Placement Cell – Campus Recruitment Drives & Career Opportunities"
+      title={content.pageTitle}
+      subtitle={content.pageSubtitle}
       category="training-and-placement"
       activeItemLabel="Placements"
       hideDefaultBackBar={true}
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
 
         {/* ── TOP HEADER SUB-BAR (MATCHING ATTACHED DESIGN) ── */}
         <div className="flex flex-wrap items-center justify-between border-b border-slate-100 pb-5 gap-3">
@@ -236,7 +237,7 @@ export default function Placements() {
                 {trend.heading}
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 font-sans mt-0.5">
-                {trend.blurb}
+                <RichText text={trend.blurb} />
               </p>
             </div>
 
@@ -277,7 +278,7 @@ export default function Placements() {
                   tickLine={false}
                   stroke="#94a3b8"
                   fontSize={11}
-                  fontFamily="monospace"
+                  fontFamily="inherit"
                   dy={6}
                 />
                 <YAxis
@@ -286,7 +287,7 @@ export default function Placements() {
                   tickLine={false}
                   stroke="#94a3b8"
                   fontSize={11}
-                  fontFamily="monospace"
+                  fontFamily="inherit"
                   dx={-4}
                 />
                 <Tooltip
@@ -301,15 +302,15 @@ export default function Placements() {
                           </div>
                           <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
                             <div>
-                              <span className="text-slate-400 block text-[9.5px]">Max CTC</span>
+                              <span className="text-slate-400 block text-[9.5px]">{trend.maxLabel}</span>
                               <span className="font-bold text-emerald-400">₹{data.maxCTC} LPA</span>
                             </div>
                             <div>
-                              <span className="text-slate-400 block text-[9.5px]">Avg CTC</span>
+                              <span className="text-slate-400 block text-[9.5px]">{trend.avgLabel}</span>
                               <span className="font-bold text-sky-400">₹{data.avgCTC} LPA</span>
                             </div>
                             <div>
-                              <span className="text-slate-400 block text-[9.5px]">Min CTC</span>
+                              <span className="text-slate-400 block text-[9.5px]">{trend.minLabel}</span>
                               <span className="font-bold text-slate-300">₹{data.minCTC} LPA</span>
                             </div>
                           </div>
@@ -330,7 +331,7 @@ export default function Placements() {
                   fill="url(#ctcRangeGradient)"
                   stroke="#10b981"
                   strokeWidth={2.5}
-                  name="Max CTC"
+                  name={trend.maxLabel}
                   dot={{ r: 4, fill: "#10b981", strokeWidth: 1, stroke: "#ffffff" }}
                   activeDot={{ r: 6 }}
                 />
@@ -340,7 +341,7 @@ export default function Placements() {
                   dataKey="avgCTC"
                   stroke="#1e40af"
                   strokeWidth={2.5}
-                  name="Average CTC"
+                  name={trend.avgLabel}
                   dot={{ r: 4, fill: "#1e40af", strokeWidth: 1, stroke: "#ffffff" }}
                   activeDot={{ r: 6 }}
                 />
@@ -351,7 +352,7 @@ export default function Placements() {
                   stroke="#94a3b8"
                   strokeWidth={1.8}
                   strokeDasharray="4 4"
-                  name="Min CTC"
+                  name={trend.minLabel}
                   dot={{ r: 3, fill: "#94a3b8" }}
                 />
               </ComposedChart>
@@ -393,7 +394,7 @@ export default function Placements() {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h4 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-snug">
-                  {charts.participationTitle.replace("{year}", activeYear)}
+                  {charts.participationTitle.replaceAll("{year}", activeYear)}
                 </h4>
                 <p className="text-xs text-slate-500 font-sans mt-0.5">
                   Total students appeared and selected across recruitment drives
@@ -423,7 +424,7 @@ export default function Placements() {
                       tickLine={false}
                       stroke="#94a3b8"
                       fontSize={10}
-                      fontFamily="sans-serif"
+                      fontFamily="inherit"
                       interval={0}
                       angle={-15}
                       textAnchor="end"
@@ -432,7 +433,7 @@ export default function Placements() {
                       tickLine={false}
                       stroke="#94a3b8"
                       fontSize={11}
-                      fontFamily="monospace"
+                      fontFamily="inherit"
                     />
                     <Tooltip
                       formatter={(val, name) => [`${val} students`, name === "appeared" ? charts.appearedLabel : charts.selectedLabel]}
@@ -455,7 +456,7 @@ export default function Placements() {
           <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
             <div>
               <h4 className="text-base sm:text-lg font-serif font-bold text-slate-900 leading-snug">
-                {charts.rateTitle.replace("{year}", activeYear)}
+                {charts.rateTitle.replaceAll("{year}", activeYear)}
               </h4>
               <p className="text-xs text-slate-500 font-sans mt-0.5">
                 Percentage of appeared students placed (ranked descending)
@@ -478,7 +479,7 @@ export default function Placements() {
                       tickLine={false}
                       stroke="#94a3b8"
                       fontSize={10}
-                      fontFamily="monospace"
+                      fontFamily="inherit"
                     />
                     <YAxis
                       type="category"
@@ -486,7 +487,7 @@ export default function Placements() {
                       tickLine={false}
                       stroke="#475569"
                       fontSize={10}
-                      fontFamily="sans-serif"
+                      fontFamily="inherit"
                       width={90}
                     />
                     <Tooltip
@@ -523,7 +524,7 @@ export default function Placements() {
         <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-2xs space-y-5">
           <div>
             <h4 className="text-lg sm:text-xl font-serif font-bold text-slate-900 leading-snug">
-              {charts.outcomesTitle.replace("{year}", activeYear)}
+              {charts.outcomesTitle.replaceAll("{year}", activeYear)}
             </h4>
             <p className="text-xs sm:text-sm text-slate-500 font-sans mt-0.5">
               Breakdown among Placements, Higher Studies, Entrepreneurship, and Other career trajectories
@@ -622,9 +623,9 @@ export default function Placements() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[500px] text-left border-collapse">
               <thead>
-                <tr className="bg-[#0c2340] text-white text-[11px] font-mono uppercase tracking-wider">
+                <tr className="bg-[#17421f] text-white text-[11px] font-mono uppercase tracking-wider">
                   <th className="py-3.5 px-5 font-semibold">Year</th>
                   <th className="py-3.5 px-5 font-semibold">Minimum CTC</th>
                   <th className="py-3.5 px-5 font-semibold">Average CTC</th>
@@ -654,9 +655,9 @@ export default function Placements() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[680px] text-left border-collapse">
               <thead>
-                <tr className="bg-[#0c2340] text-white text-[11px] font-mono uppercase tracking-wider">
+                <tr className="bg-[#17421f] text-white text-[11px] font-mono uppercase tracking-wider">
                   <th className="py-3.5 px-5 font-semibold">Academic Year</th>
                   <th className="py-3.5 px-5 font-semibold">Total Students</th>
                   <th className="py-3.5 px-5 font-semibold">Appeared</th>
@@ -692,7 +693,7 @@ export default function Placements() {
                 {directory.kicker}
               </span>
               <h4 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-0.5">
-                {directory.heading.replace("{count}", String(filteredDirectory.length))}
+                {directory.heading.replaceAll("{count}", String(filteredDirectory.length))}
               </h4>
             </div>
 
@@ -711,7 +712,7 @@ export default function Placements() {
 
           {/* User Provided Exact Introduction Paragraph */}
           <div className="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
-            {directory.intro}
+            <RichText text={directory.intro} />
           </div>
 
           {/* Drive Records Grid */}
@@ -719,52 +720,52 @@ export default function Placements() {
             <div className="p-12 text-center bg-slate-50/60 rounded-2xl border border-slate-200 space-y-2">
               <Search size={28} className="mx-auto text-slate-300" />
               <h5 className="text-sm font-serif font-bold text-slate-800">{directory.emptyTitle}</h5>
-              <p className="text-xs text-slate-500">{directory.emptyBody}</p>
+              <p className="text-xs text-slate-500"><RichText text={directory.emptyBody} /></p>
             </div>
           ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredDirectory.map((record) => {
-              const rate = record.rate;
-              return (
-                <div
-                  key={record.id}
-                  className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-700 hover:shadow-xs transition-all flex flex-col justify-between space-y-3"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#0c2340]/10 text-[#0c2340]">
-                        {record.year}
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                        <Calendar size={11} /> {record.interviewDate}
-                      </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredDirectory.map((record) => {
+                const rate = record.rate;
+                return (
+                  <div
+                    key={record.id}
+                    className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-700 hover:shadow-xs transition-all flex flex-col justify-between space-y-3"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#0c2340]/10 text-[#0c2340]">
+                          {record.year}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                          <Calendar size={11} /> {record.interviewDate}
+                        </span>
+                      </div>
+                      <h5 className="font-serif font-bold text-slate-900 text-sm sm:text-base leading-snug">
+                        {record.company}
+                      </h5>
+                      {record.isInternship && (
+                        <span className="mt-1.5 inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">
+                          {directory.internshipLabel}
+                        </span>
+                      )}
+                      <div className="mt-2 text-xs font-mono font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 px-2.5 py-1 rounded-lg inline-block">
+                        {record.packageDisplay}
+                      </div>
                     </div>
-                    <h5 className="font-serif font-bold text-slate-900 text-sm sm:text-base leading-snug">
-                      {record.company}
-                    </h5>
-                    {record.isInternship && (
-                      <span className="mt-1.5 inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">
-                        {directory.internshipLabel}
-                      </span>
-                    )}
-                    <div className="mt-2 text-xs font-mono font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 px-2.5 py-1 rounded-lg inline-block">
-                      {record.packageDisplay}
-                    </div>
-                  </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-500">
-                      {charts.appearedLabel}:{' '}
-                      <strong className="text-slate-800">{record.participated}</strong>
-                    </span>
-                    <span className="text-blue-700 font-bold">
-                      {charts.selectedLabel}: {record.recruited} ({rate}%)
-                    </span>
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                      <span className="text-slate-500">
+                        {charts.appearedLabel}:{' '}
+                        <strong className="text-slate-800">{record.participated}</strong>
+                      </span>
+                      <span className="text-blue-700 font-bold">
+                        {charts.selectedLabel}: {record.recruited} ({rate}%)
+                      </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
           )}
 
           {/* Prominent Corporate Recruiters */}
@@ -791,4 +792,3 @@ export default function Placements() {
     </SubPageLayout>
   );
 }
-

@@ -27,6 +27,9 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useTrainingContent } from "../../hooks/useTrainingContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+import { telHref, withIndiaCode } from "../../utils/phone";
 
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
 
@@ -84,10 +87,10 @@ export default function Training() {
     <SubPageLayout
       title={content.pageTitle}
       subtitle={content.pageSubtitle}
-      category="tnp"
+      category="training-and-placement"
       activeItemLabel="Training"
     >
-      <div className="space-y-12 max-w-6xl mx-auto">
+      <div className="space-y-12 w-full">
 
         {/* Section 1: Overview & Vision */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -129,14 +132,14 @@ export default function Training() {
               <span>{overview.vision.kicker}</span>
             </div>
             <p className="text-sm sm:text-base font-sans text-slate-800 leading-relaxed font-normal">
-              {overview.vision.body}
+              <RichText text={overview.vision.body} />
             </p>
           </div>
 
           {/* Visual Highlight Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
             {overview.highlights.map((item, index) => {
-              const IconComp = ICONS[item.icon] ?? Building2;
+              const IconComp = iconFor(item.icon, ICONS, Building2);
               const tone = TONES[item.tone] ?? TONES.emerald;
               return (
                 <div key={index} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
@@ -148,7 +151,7 @@ export default function Training() {
                     {item.title}
                   </strong>
                   <p className="text-xs text-slate-600 font-sans">
-                    {item.body}
+                    <RichText text={item.body} />
                   </p>
                 </div>
               );
@@ -175,7 +178,7 @@ export default function Training() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {objectives.items.map((obj, idx) => {
-              const IconComp = ICONS[obj.icon] ?? Target;
+              const IconComp = iconFor(obj.icon, ICONS, Target);
               return (
                 <motion.div
                   key={idx}
@@ -217,7 +220,7 @@ export default function Training() {
                         {obj.title}
                       </h4>
                       <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed font-normal">
-                        {obj.description}
+                        <RichText text={obj.description} />
                       </p>
                     </div>
                   </div>
@@ -286,7 +289,7 @@ export default function Training() {
                         <img
                           src={
                             member.image ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            `/api/avatar?name=${encodeURIComponent(
                               member.name
                             )}&background=1a5d2e&color=ffffff&size=256`
                           }
@@ -294,7 +297,7 @@ export default function Training() {
                           className="w-full h-full object-cover object-top"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            (e.target as HTMLImageElement).src = `/api/avatar?name=${encodeURIComponent(
                               member.name
                             )}&background=1a5d2e&color=ffffff&size=256`;
                           }}
@@ -326,13 +329,13 @@ export default function Training() {
                         {member.phone && (
                           <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
                             <a
-                              href={`tel:${member.phone}`}
+                              href={telHref(withIndiaCode(member.phone))}
                               className="flex items-center gap-2 text-xs font-mono text-slate-800 hover:text-[#1a5d2e] font-semibold transition-colors"
                             >
                               <div className="w-6 h-6 rounded-md bg-white text-[#1a5d2e] flex items-center justify-center border border-slate-200 shadow-2xs">
                                 <Phone size={12} />
                               </div>
-                              <span>+91 {member.phone}</span>
+                              <span>{withIndiaCode(member.phone)}</span>
                             </a>
                             <button
                               onClick={() => handleCopy(member.phone, phoneId)}
@@ -381,7 +384,7 @@ export default function Training() {
                     )}
                     {member.phone && (
                       <a
-                        href={`tel:${member.phone}`}
+                        href={telHref(withIndiaCode(member.phone))}
                         className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-slate-600 hover:text-[#1a5d2e]"
                       >
                         <span>{committee.callLabel}</span>
@@ -401,7 +404,7 @@ export default function Training() {
             <span>{office.heading}</span>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed">
-            {office.body}
+            <RichText text={office.body} />
           </p>
           {office.notes.length > 0 && (
             <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-600">

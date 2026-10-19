@@ -19,7 +19,7 @@ export type { IdpTone as TnpVisitsTone };
 /** The page as it shipped, and what it falls back to. */
 export const DEFAULT_TNP_VISITS: TnpVisitsContent = {
     "plan": {
-      "url": "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/6475bc9ca8d32.pdf",
+      "url": "/media/trust/app/institutes/102/departments/docs/6475bc9ca8d32.pdf",
       "hint": "Click the button below to view the official PDF document",
       "title": "Industrial Visit 2016-22",
       "kicker": "Official Report Document",

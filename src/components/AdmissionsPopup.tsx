@@ -96,7 +96,7 @@ export default function AdmissionsPopup({ isOpen, onClose, content }: Admissions
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src =
-                    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800";
+                    "/media/unsplash/photo-1541339907198-e08756dedf3f-1b102b.jpg";
                 }}
               />
               {/* Premium dark gradient overlay from bottom to top */}

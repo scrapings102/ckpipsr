@@ -18,7 +18,8 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { cdn } from '../utils/image';
 import { useAboutContent } from '../hooks/useAboutContent';
-import { withEmphasis } from '../utils/emphasis';
+import { RichText } from '../utils/RichText';
+import { iconFor } from '../utils/iconFor';
 
 /**
  * The icons an editor can choose from.
@@ -86,15 +87,15 @@ export const AboutSection = () => {
                   // supporting detail and sit a step quieter, as before.
                   className={index === 0 ? undefined : "text-sm text-[#3B4D3E]"}
                 >
-                  {withEmphasis(paragraph, "text-[#112815] font-semibold")}
+                  <RichText text={paragraph} strongClassName="text-[#112815] font-semibold" />
                 </p>
               ))}
             </div>
 
             {/* Key Value Highlight Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-9">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-9">
               {about.features.map((feature, index) => {
-                const Icon = ICONS[feature.icon] ?? Award;
+                const Icon = iconFor(feature.icon, ICONS, Award);
                 return (
                   <div
                     key={index}
@@ -108,7 +109,7 @@ export const AboutSection = () => {
                         {feature.title}
                       </h4>
                       <p className="font-sans text-[11px] text-[#4F5F51] leading-tight mt-0.5">
-                        {feature.description}
+                        <RichText text={feature.description} />
                       </p>
                     </div>
                   </div>
@@ -117,10 +118,10 @@ export const AboutSection = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
               <button
                 onClick={() => navigate(about.primaryButton.path)}
-                className="px-7 py-3.5 bg-[#112815] text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#0C1E10] transition-all flex items-center gap-2.5 group shadow-lg shadow-[#112815]/20 cursor-pointer select-none active:scale-95"
+                className="w-full sm:w-auto px-7 py-3.5 bg-[#112815] text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#0C1E10] transition-all flex items-center justify-center gap-2.5 group shadow-lg shadow-[#112815]/20 cursor-pointer select-none active:scale-95"
               >
                 <span>{about.primaryButton.label}</span>
                 <ArrowRight size={15} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
@@ -128,7 +129,7 @@ export const AboutSection = () => {
 
               <button
                 onClick={() => navigate(about.secondaryButton.path)}
-                className="px-6 py-3.5 bg-white text-[#112815] border border-[#112815]/20 hover:border-[#112815] rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-white/80 transition-all flex items-center gap-2 cursor-pointer select-none active:scale-95"
+                className="w-full sm:w-auto px-6 py-3.5 bg-white text-[#112815] border border-[#112815]/20 hover:border-[#112815] rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-white/80 transition-all flex items-center justify-center gap-2 cursor-pointer select-none active:scale-95"
               >
                 <Sparkles size={14} className="text-[#C19A20]" />
                 <span>{about.secondaryButton.label}</span>
@@ -171,13 +172,13 @@ export const AboutSection = () => {
             </div>
 
             {/* Floating Badge */}
-            <div className="absolute -top-5 -left-2 sm:top-6 sm:-left-4 z-20 bg-white/95 backdrop-blur-xl border border-[#112815]/15 shadow-xl rounded-2xl p-4 flex items-center gap-3.5 max-w-[240px]">
-              <div className="w-10 h-10 rounded-xl bg-[#112815] text-[#D4AF37] flex items-center justify-center shrink-0 shadow-sm">
-                <Award size={20} />
+            <div className="absolute -top-4 left-3 sm:top-6 sm:-left-4 z-20 bg-white/95 backdrop-blur-xl border border-[#112815]/15 shadow-xl rounded-2xl p-3 sm:p-4 flex items-center gap-3 max-w-[calc(100%-24px)] sm:max-w-[240px]">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#112815] text-[#D4AF37] flex items-center justify-center shrink-0 shadow-sm">
+                <Award size={18} className="sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <p className="font-sans font-bold text-xs text-[#112815] leading-snug">{about.badge.title}</p>
-                <p className="font-sans text-[10px] text-[#4F5F51] leading-tight">{about.badge.subtitle}</p>
+              <div className="min-w-0">
+                <p className="font-sans font-bold text-xs text-[#112815] leading-snug truncate">{about.badge.title}</p>
+                <p className="font-sans text-[10px] text-[#4F5F51] leading-tight truncate">{about.badge.subtitle}</p>
               </div>
             </div>
 

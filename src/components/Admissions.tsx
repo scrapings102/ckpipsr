@@ -1,54 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, ChevronDown, HelpCircle, FileText, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, HelpCircle, FileText, CheckCircle2 } from 'lucide-react';
 import { useClipReveal } from '../hooks/useClipReveal';
+import { useAdmissionsContent } from '../hooks/useAdmissionsContent';
+import { useFooterContent } from '../hooks/useFooterContent';
+import { withPreview } from '../hooks/previewToken';
+import { RichText } from '../utils/RichText';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
-
-interface FAQItem {
-  id: number;
-  question: string;
-  answer: React.ReactNode;
-}
-
-const FAQ_DATA: FAQItem[] = [
-  {
-    id: 1,
-    question: "How do I secure admission to the Pharmacy program?",
-    answer: (
-      <>
-        Admissions to our D.Pharm, B.Pharm and M.Pharm (Pharmaceutics) programs are conducted according to the eligibility criteria, merit guidelines, and centralized admission committee for professional courses (
-        <a
-          href="https://gujacpc.admissions.nic.in/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#D4AF37] underline hover:text-[#f3e098] transition-colors"
-        >
-          ACPC
-        </a>
-        ).
-      </>
-    )
-  },
-  {
-    id: 2,
-    question: "What scholarship assistance schemes are currently available?",
-    answer: "Eligible Pharmacy students can benefit from various government and institutional scholarship schemes, including MYSY (Mukhyamantri Yuva Swavalamban Yojana), Digital Gujarat scholarships, category-based financial assistance, and other applicable merit and need-based scholarship provisions."
-  },
-  {
-    id: 3,
-    question: "Does the college provide hostel or residential facilities?",
-    answer: "Yes, students can access secure residential facilities with essential amenities, hygienic dining options, recreational spaces, safety measures, and a supportive academic environment designed to provide a comfortable campus experience."
-  },
-  {
-    id: 4,
-    question: "Are internships and practical training available for Pharmacy students?",
-    answer: "Yes, students receive hands-on laboratory training along with opportunities for industrial exposure, internships, hospital or community pharmacy experience, and professional learning activities to prepare them for real-world pharmaceutical careers."
-  }
-
-];
 
 interface AdmissionsProps {
   onOpenAdmissions?: () => void;
@@ -57,7 +19,17 @@ interface AdmissionsProps {
 export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const revealRef = useClipReveal();
-  const [openFaqId, setOpenFaqId] = useState<number | null>(1); // default open first item
+  const content = useAdmissionsContent();
+  // Rows saved before the band had its own email show the first one on Contact Us.
+  const contactEmail = useFooterContent().contact?.emails[0] ?? '';
+  const email = content.email || contactEmail;
+  const [openFaqId, setOpenFaqId] = useState<number | null>(0); // default open first item
+  const hasFaqs = content.faqs.length > 0;
+  const prospectusIsExternal = /^https?:\/\//i.test(content.prospectusUrl);
+  const applyUrl = content.applyAction === 'link' ? content.applyUrl ?? '' : '';
+  const applyIsExternal = /^https?:\/\//i.test(applyUrl);
+  const applyClassName =
+    'bg-[#D4AF37] text-[#0c2411] hover:bg-white hover:text-[#0c2411] px-8 py-4 rounded-full text-xs font-bold tracking-widest uppercase shadow-[0_12px_30px_rgba(212,175,55,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-300 w-full sm:w-auto cursor-pointer select-none';
 
   const toggleFaq = (id: number) => {
     setOpenFaqId(openFaqId === id ? null : id);
@@ -74,28 +46,15 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
       id="admissions"
       className="py-24 md:py-36 bg-[#0c2411] text-white relative overflow-hidden border-t border-white/10"
     >
-      {/* Decorative overlay backgrounds */}
-      <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
-        <img
-          src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop"
-          alt="Students walking"
-          className="w-full h-full absolute inset-0 object-cover opacity-5 filter grayscale mix-blend-screen"
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0c2411]/95 via-[#0c2411]/90 to-[#0c2411]" />
-      </div>
-
       {/* Decorative geometric patterns */}
       <div className="absolute top-0 right-0 w-[450px] h-[450px] rounded-full bg-[#D4AF37]/5 border border-[#D4AF37]/10 pointer-events-none" />
       <div className="absolute bottom-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#D4AF37]/5 border border-[#D4AF37]/10 pointer-events-none" />
 
-      <div className="relative z-10 max-w-[1360px] mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-20 items-center">
 
           {/* COLUMN A: Dynamic Call to Actions */}
-          <div className="lg:col-span-12 xl:col-span-5 flex flex-col items-start text-left">
+          <div className={`lg:col-span-12 ${hasFaqs ? 'xl:col-span-5' : 'max-w-3xl'} flex flex-col items-start text-left`}>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -110,75 +69,99 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
               >
                 <span className="w-10 h-[1.5px] bg-[#D4AF37]" />
                 <span className="font-mono text-[9px] md:text-[10px] font-bold tracking-[0.3em] text-[#D4AF37] uppercase">
-                  ADMISSIONS 2026-27
+                  {content.eyebrow} {content.session}
                 </span>
-                <span className="font-sans text-[8.5px] font-bold bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 px-2.5 py-0.5 rounded-full uppercase shadow-2xs">
-                  OPEN
-                </span>
+                {content.isOpen && (
+                  <span className="font-sans text-[8.5px] font-bold bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 px-2.5 py-0.5 rounded-full uppercase shadow-2xs">
+                    OPEN
+                  </span>
+                )}
               </div>
 
               <h2 className="text-4xl md:text-5.5xl font-serif text-white font-bold leading-[1.12] tracking-tight mb-6">
-                Begin your journey to <span className="italic font-light text-[#D4AF37] font-serif block sm:inline">leadership</span>.
+                {content.heading.lead}
+                {content.heading.accent ? (
+                  <>
+                    {' '}
+                    {/* The ending sits inside the phone's own line, so a full stop does not drop below on its own. */}
+                    <span className="block sm:inline">
+                      <span className="italic font-light text-[#D4AF37] font-serif">{content.heading.accent}</span>
+                      {content.heading.end}
+                    </span>
+                  </>
+                ) : (
+                  content.heading.end
+                )}
               </h2>
 
               <p className="text-white/75 leading-relaxed text-[14.5px] md:text-base mb-10 font-sans font-light">
-                Join a legacy of pharmacy professionals, healthcare innovators, researchers, and industry leaders. Admissions through Gujarat Technological University (GTU) centralized admission systems, along with our dedicated institutional assistance desks, are now fully open.
+                <RichText text={content.body} linkClassName="text-[#D4AF37] underline hover:text-[#f3e098] transition-colors" />
               </p>
 
               {/* Action buttons stack */}
               <div className="flex flex-col sm:flex-row items-center gap-5 w-full">
-                <button
-                  onClick={() => {
-                    if (onOpenAdmissions) {
-                      onOpenAdmissions();
-                    }
-                  }}
-                  className="bg-[#D4AF37] text-[#0c2411] hover:bg-white hover:text-[#0c2411] px-8 py-4 rounded-full text-xs font-bold tracking-widest uppercase shadow-[0_12px_30px_rgba(212,175,55,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-300 w-full sm:w-auto cursor-pointer select-none"
-                >
-                  Apply Online Now
-                </button>
+                {/* The editor picks whether the button goes to the admission inquiry
+                    page or to an address. Older rows say 'popup' or nothing, and
+                    go to the page too; the popup still opens from the label above. */}
+                {applyUrl ? (
+                  <a
+                    href={applyUrl}
+                    {...(applyIsExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    className={`${applyClassName} text-center`}
+                  >
+                    {content.applyLabel}
+                  </a>
+                ) : (
+                  <Link to={withPreview('/admissions/inquiry')} className={`${applyClassName} text-center`}>
+                    {content.applyLabel}
+                  </Link>
+                )}
 
-                <button className="flex items-center gap-3.5 text-xs font-bold uppercase tracking-widest text-white hover:text-[#D4AF37] transition-all group w-full sm:w-auto justify-center cursor-pointer select-none">
-                  <span>Download Prospectus</span>
-                  <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-[#D4AF37] group-hover:border-transparent group-hover:text-[#0c2411] transition-all group-hover:scale-105">
-                    <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
+                {/* No address means no prospectus to give, so no button that does nothing. */}
+                {content.prospectusUrl && (
+                  <a
+                    href={content.prospectusUrl}
+                    {...(prospectusIsExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    className="flex items-center gap-3.5 text-xs font-bold uppercase tracking-widest text-white hover:text-[#D4AF37] transition-all group w-full sm:w-auto justify-center cursor-pointer select-none"
+                  >
+                    <span>{content.prospectusLabel}</span>
+                    <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-[#D4AF37] group-hover:border-transparent group-hover:text-[#0c2411] transition-all group-hover:scale-105">
+                      <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </a>
+                )}
               </div>
             </motion.div>
           </div>
 
           {/* COLUMN B: FAQ Accordions Stack */}
+          {hasFaqs && (
           <div className="lg:col-span-12 xl:col-span-7 flex flex-col justify-center">
             <motion.div
               initial={{ opacity: 0, x: 35 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-[#0b1b0e] border border-white/10 rounded-[2.5rem] p-6 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-md relative"
+              className="bg-[#0b1b0e] border border-white/10 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-md relative"
             >
-              {/* Floating micro accent */}
-              <div className="absolute top-6 right-6 flex items-center gap-1.5 opacity-80">
-                <Sparkles size={11} className="text-[#D4AF37]" />
-                <span className="font-mono text-[8px] font-bold uppercase tracking-widest text-[#D4AF37]">FAQ ENGINE</span>
-              </div>
-
               <div className="mb-8 select-none">
                 <h3 className="text-xl md:text-2xl font-serif font-bold text-white mb-2">
-                  Frequently Asked Questions
+                  {content.faqTitle}
                 </h3>
-                <p className="font-sans text-white/60 font-light text-[12.5px] md:text-[13px]">
-                  Find fast, authoritative admissions coordination references gathered directly from university registry advisors.
-                </p>
+                {content.faqIntro && (
+                  <p className="font-sans text-white/60 font-light text-[12.5px] md:text-[13px]">
+                    {content.faqIntro}
+                  </p>
+                )}
               </div>
 
               {/* Accordion loop */}
               <div className="flex flex-col gap-3.5">
-                {FAQ_DATA.map((faq) => {
-                  const isOpen = faq.id === openFaqId;
+                {content.faqs.map((faq, id) => {
+                  const isOpen = id === openFaqId;
                   return (
                     <div
-                      key={faq.id}
+                      key={id}
                       className={`rounded-2xl border transition-all duration-350 relative overflow-hidden select-none ${isOpen
                         ? 'bg-[#112815] border-[#D4AF37]/60 shadow-md ring-1 ring-[#D4AF37]/20'
                         : 'bg-[#112815]/40 border-white/10 hover:border-[#D4AF37]/40 hover:bg-[#112815]/60'
@@ -186,7 +169,7 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                     >
                       {/* Accordion Header */}
                       <button
-                        onClick={() => toggleFaq(faq.id)}
+                        onClick={() => toggleFaq(id)}
                         className="w-full text-left py-4.5 px-5 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
                       >
                         <div className="flex items-center gap-3">
@@ -217,7 +200,7 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
                           >
                             <div className="px-5 pb-5 pt-0 border-t border-white/10 font-sans font-light text-[13px] md:text-[14px] leading-relaxed text-white/80">
                               <p className="mt-3 bg-[#0c2411] p-4 rounded-xl border border-[#D4AF37]/20 text-white/90">
-                                {faq.answer}
+                                <RichText text={faq.answer} linkClassName="text-[#D4AF37] underline hover:text-[#f3e098] transition-colors" />
                               </p>
                             </div>
                           </motion.div>
@@ -230,20 +213,27 @@ export default function Admissions({ onOpenAdmissions }: AdmissionsProps) {
               </div>
 
               {/* Support message */}
-              <div className="mt-8 pt-6 border-t border-white/10 text-center">
-                <span className="font-sans text-[11px] font-light text-white/50">
-                  Have specific queries regarding fee structures or management seats?
-                </span>
-                <a
-                  href="mailto:ckpipsr@gmail.com"
-                  className="font-mono text-[10px] font-bold text-[#D4AF37] hover:underline block mt-1 hover:text-white uppercase tracking-wider"
-                >
-                  Contact Registry Desk — ckpipsr@gmail.com
-                </a>
-              </div>
+              {(content.contactLine || email) && (
+                <div className="mt-8 pt-6 border-t border-white/10 text-center">
+                  {content.contactLine && (
+                    <span className="font-sans text-[11px] font-light text-white/50">
+                      {content.contactLine}
+                    </span>
+                  )}
+                  {email && (
+                    <a
+                      href={`mailto:${email}`}
+                      className="font-mono text-[10px] font-bold text-[#D4AF37] hover:underline block mt-1 hover:text-white uppercase tracking-wider break-words"
+                    >
+                      {content.contactLabel ? `${content.contactLabel}: ${email}` : email}
+                    </a>
+                  )}
+                </div>
+              )}
 
             </motion.div>
           </div>
+          )}
 
         </div>
       </div>

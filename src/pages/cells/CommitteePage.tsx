@@ -26,6 +26,8 @@ import SubPageLayout from "../../components/SubPageLayout";
 import { useCellCommittee, type PublicCommittee } from "../../hooks/useCellCommittee";
 import { useCellsMenu } from "../../hooks/useCellsMenu";
 import { DEFAULT_COMMITTEES } from "../../data/cellsDefaults";
+import { RichText } from "../../utils/RichText";
+import { telHref } from "../../utils/phone";
 import IncidentComplaint from "./IncidentComplaint";
 import GrievanceComplaint from "./GrievanceComplaint";
 import StudentGrievanceComplaint from "./StudentGrievanceComplaint";
@@ -57,8 +59,6 @@ const TAB_META: Record<Tab, { label: string; icon: LucideIcon }> = {
   circulars: { label: "Circulars", icon: FileText },
   complaint: { label: "Complaint", icon: ShieldAlert },
 };
-
-const telHref = (phone: string) => `tel:${phone.replace(/[^0-9]/g, "")}`;
 
 /**
  * An address with no committee behind it. While the first request is still
@@ -138,7 +138,7 @@ function Banner({ banner, onReport }: { banner: PublicCommittee["banner"]; onRep
           )}
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">{banner.heading}</h2>
           {banner.body && (
-            <p className="text-xs sm:text-sm text-white/80 font-sans leading-relaxed">{banner.body}</p>
+            <p className="text-xs sm:text-sm text-white/80 font-sans leading-relaxed"><RichText text={banner.body} /></p>
           )}
         </div>
 
@@ -234,7 +234,7 @@ function Mandate({ mandate }: { mandate: PublicCommittee["mandate"] }) {
           </div>
           <div className="space-y-2">
             <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">{mandate.badge}</span>
-            <p className="text-sm sm:text-base text-slate-800 font-sans leading-relaxed font-medium">{mandate.body}</p>
+            <p className="text-sm sm:text-base text-slate-800 font-sans leading-relaxed font-medium"><RichText text={mandate.body} /></p>
           </div>
         </div>
       </div>
@@ -272,7 +272,7 @@ function Mandate({ mandate }: { mandate: PublicCommittee["mandate"] }) {
           </div>
           <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">{mandate.heading}</h3>
           {mandate.body && (
-            <p className="text-sm sm:text-base text-slate-700 font-sans leading-relaxed font-normal">{mandate.body}</p>
+            <p className="text-sm sm:text-base text-slate-700 font-sans leading-relaxed font-normal"><RichText text={mandate.body} /></p>
           )}
           {points.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2">
@@ -297,7 +297,7 @@ function Mandate({ mandate }: { mandate: PublicCommittee["mandate"] }) {
           <NoteIcon size={20} className="text-[#1a5d2e] shrink-0 mt-0.5" />
           <p className="text-xs sm:text-sm font-sans leading-relaxed">
             {note.label && <strong className="font-semibold text-slate-900">{note.label}: </strong>}
-            {note.body}
+            <RichText text={note.body} />
           </p>
         </div>
       )}
@@ -493,7 +493,7 @@ function Squad({ squad, noEmailText }: { squad: NonNullable<PublicCommittee["squ
                 <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">{squad.badge}</span>
               )}
               {squad.body && (
-                <p className="text-sm sm:text-base text-slate-800 font-sans leading-relaxed font-medium">{squad.body}</p>
+                <p className="text-sm sm:text-base text-slate-800 font-sans leading-relaxed font-medium"><RichText text={squad.body} /></p>
               )}
             </div>
           </div>
@@ -598,7 +598,7 @@ function Circulars({ circulars }: { circulars: PublicCommittee["circulars"] }) {
           <span className="text-xs font-mono font-bold text-[#1a5d2e] uppercase tracking-wider">{circulars.eyebrow}</span>
         )}
         {circulars.heading && <h3 className="text-2xl font-serif font-bold text-slate-900">{circulars.heading}</h3>}
-        {circulars.body && <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed">{circulars.body}</p>}
+        {circulars.body && <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed"><RichText text={circulars.body} /></p>}
       </div>
       <div className={single ? "" : "flex flex-wrap items-center justify-center gap-4 pt-2"}>
         {circulars.links.map((link, idx) => (

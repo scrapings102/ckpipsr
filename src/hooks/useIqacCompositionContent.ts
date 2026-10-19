@@ -4,9 +4,8 @@ import { withPreview } from "./previewToken";
 /**
  * Accreditation & Ranking → IQAC Composition.
  *
- * The constituted committee. A member linked to the Deans and Faculty
- * In-charges page or the Faculties page arrives named from it; the industry
- * directors are on neither and are printed as typed.
+ * The constituted committee. A member linked to the Faculties page arrives
+ * named from it; the industry directors are not on it and are printed as typed.
  *
  * Nothing the page can count is stored. The badge over the grid, the number on
  * every filter pill, the counts in the summary tiles and the numbering on each
@@ -181,7 +180,7 @@ export const DEFAULT_IQAC_COMPOSITION: IqacCompositionContent = {
       "position": 2
     },
     {
-      "name": "Dr. Dhiren Shah",
+      "name": "Dr. Dhiren P. Shah",
       "role": "Principal/Director of the concerned Technical Institution",
       "designation": "Principal",
       "category": "leadership",

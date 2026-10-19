@@ -24,6 +24,9 @@ import {
   useTnpCommitteeContent,
   type PillarTone
 } from "../../hooks/useTnpCommitteeContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
+import { withIndiaCode } from "../../utils/phone";
 
 /** A pillar card's icon tile colour; the panel offers these same names. */
 const PILLAR_TILE: Record<PillarTone, string> = {
@@ -33,6 +36,9 @@ const PILLAR_TILE: Record<PillarTone, string> = {
   purple: "bg-purple-50 text-purple-700",
   rose: "bg-rose-50 text-rose-700",
 };
+
+/** Draws nothing: a name the library does not have leaves the tile empty, as before. */
+const NoIcon = () => null;
 
 /** The icons a pillar card can carry. */
 const PILLAR_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
@@ -60,10 +66,10 @@ export default function Committee() {
     <SubPageLayout
       title={content.pageTitle}
       subtitle={content.pageSubtitle}
-      category="tnp"
+      category="training-and-placement"
       activeItemLabel="Committee"
     >
-      <div className="space-y-10 max-w-5xl mx-auto">
+      <div className="space-y-10 w-full">
         
         {/* Header Introduction Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-9 shadow-xs space-y-6">
@@ -99,14 +105,14 @@ export default function Committee() {
               <span>{intro.objectiveLabel}</span>
             </div>
             <p className="text-sm sm:text-base font-sans text-slate-800 leading-relaxed font-normal">
-              {intro.objective}
+              <RichText text={intro.objective} />
             </p>
           </div>
 
           {/* The highlight cards, as many as the panel lists */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
             {intro.pillars.map((pillar, i) => {
-              const Icon = PILLAR_ICONS[pillar.icon];
+              const Icon = iconFor(pillar.icon, PILLAR_ICONS, NoIcon);
               return (
                 <div
                   key={i}
@@ -119,7 +125,7 @@ export default function Committee() {
                     {pillar.title}
                   </strong>
                   <p className="text-xs text-slate-600 font-sans leading-normal">
-                    {pillar.body}
+                    <RichText text={pillar.body} />
                   </p>
                 </div>
               );
@@ -143,7 +149,7 @@ export default function Committee() {
             <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 space-y-3">
               <Users size={30} className="mx-auto text-slate-300" />
               <h4 className="text-base font-serif font-bold text-slate-800">{roster.emptyTitle}</h4>
-              <p className="text-xs text-slate-500">{roster.emptyBody}</p>
+              <p className="text-xs text-slate-500"><RichText text={roster.emptyBody} /></p>
             </div>
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -189,7 +195,8 @@ export default function Committee() {
 
                     {/* Contact Channels */}
                     <div className="space-y-2.5 pt-2 border-t border-slate-100">
-                      {/* Phone Number */}
+                      {/* Phone Number: a linked member without a Faculties mobile has none. */}
+                      {member.contactNo && (
                       <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
                         <a
                           href={member.telHref}
@@ -198,7 +205,7 @@ export default function Committee() {
                           <div className="w-6 h-6 rounded-md bg-white text-[#1a5d2e] flex items-center justify-center border border-slate-200 shadow-2xs">
                             <Phone size={12} />
                           </div>
-                          <span>+91 {member.contactNo}</span>
+                          <span>{withIndiaCode(member.contactNo)}</span>
                         </a>
                         <button
                           onClick={() => handleCopy(member.contactNo, phoneId)}
@@ -208,6 +215,7 @@ export default function Committee() {
                           {copiedId === phoneId ? <Check size={14} className="text-[#1a5d2e]" /> : <Copy size={14} />}
                         </button>
                       </div>
+                      )}
 
                       {/* Email Address */}
                       <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
@@ -240,12 +248,14 @@ export default function Committee() {
                       <span>{roster.emailLabel}</span>
                       <ExternalLink size={12} />
                     </a>
+                    {member.telHref && (
                     <a
                       href={member.telHref}
                       className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-slate-600 hover:text-[#1a5d2e]"
                     >
                       <span>{roster.callLabel}</span>
                     </a>
+                    )}
                   </div>
                 </motion.div>
               );
@@ -261,7 +271,7 @@ export default function Committee() {
             <span>{office.heading}</span>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed">
-            {office.body}
+            <RichText text={office.body} />
           </p>
           {office.facts.length > 0 && (
             <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-600">

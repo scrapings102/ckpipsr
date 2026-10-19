@@ -75,14 +75,12 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
   /**
    * Which image the carousel should be showing when the loader hands over.
    *
-   * The loader's final photo zooms to fullscreen and the hero takes its place,
-   * so the hero has to already be on that same photo or the zoom lands on one
-   * picture and the homepage shows another. Starting there — rather than always
-   * at index 0 — means any loader selection is seamless, instead of only the
-   * one that happens to end on the hero's first image.
+   * The loader has its own photos, and its final one zooms to fullscreen
+   * before the hero fades in over it. When that photo is also one of the
+   * hero's, the carousel starts on it so the hand-off shows no change at all.
    *
-   * Falls back to 0 when the loader is off, or ends on an image the hero no
-   * longer has.
+   * Otherwise, or when the loader is off, the carousel starts at 0 and the
+   * fade does the hand-off.
    */
   const { content: loaderContent } = usePreloaderContent();
   const seamIndex = useMemo(() => {
@@ -275,7 +273,7 @@ export default function Hero({ loaded = true, onQuotesComplete, onAnimationCompl
           className="w-full max-w-4xl mx-auto flex flex-col items-center select-none pointer-events-none mb-2 sm:mb-4"
         >
           {/* Premium compact styled Tagline container */}
-          <div className="hero-card relative w-full max-w-[76vw] sm:max-w-md md:max-w-lg lg:max-w-xl px-4 sm:px-7 py-2 sm:py-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/8 shadow-[0_12px_40px_rgba(0,0,0,0.55)] opacity-0">
+          <div className="hero-card relative w-full max-w-[92vw] sm:max-w-md md:max-w-lg lg:max-w-xl px-3.5 sm:px-7 py-2 sm:py-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/8 shadow-[0_12px_40px_rgba(0,0,0,0.55)] opacity-0">
             {/* Elegant luxury gold corner accents */}
             <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-[#D4AF37]/45" />
             <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-[#D4AF37]/45" />

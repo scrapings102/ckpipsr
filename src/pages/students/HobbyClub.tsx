@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useHobbyClubContent } from "../../hooks/useHobbyClubContent";
+import { iconFor } from "../../utils/iconFor";
+import { RichText } from "../../utils/RichText";
 
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
 
@@ -71,7 +73,7 @@ export default function HobbyClub() {
       category="students-corner"
       activeItemLabel="Hobby Club"
     >
-      <div className="space-y-8 max-w-7xl mx-auto py-2">
+      <div className="space-y-8 w-full py-2">
         {/* ── TOP THREE-TAB NAVIGATOR ── */}
         <div className="flex justify-center border-b border-slate-200">
           <div className="inline-flex gap-6 sm:gap-12">
@@ -169,7 +171,7 @@ export default function HobbyClub() {
                 </div>
 
                 <p className="text-slate-700 text-sm sm:text-base leading-relaxed text-justify font-sans bg-slate-50/70 p-5 sm:p-6 rounded-2xl border border-slate-100">
-                  {content.about.intro}
+                  <RichText text={content.about.intro} />
                 </p>
 
                 {/* Aims and Objectives Section */}
@@ -203,7 +205,7 @@ export default function HobbyClub() {
                               {item.highlight}
                             </span>
                             <p className="text-xs sm:text-[13.5px] font-medium text-slate-800 leading-snug group-hover:text-slate-900">
-                              {item.text}
+                              <RichText text={item.text} />
                             </p>
                           </div>
                         </div>
@@ -224,7 +226,7 @@ export default function HobbyClub() {
                   {content.about.banner.heading}
                 </h4>
                 <p className="text-white/80 text-xs sm:text-sm max-w-xl">
-                  {content.about.banner.body}
+                  <RichText text={content.about.banner.body} />
                 </p>
               </div>
 
@@ -262,7 +264,7 @@ export default function HobbyClub() {
             {/* 2-Column Professional Card Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {variousClubsData.map((club) => {
-                const IconComp = ICONS[club.icon] ?? Sparkles;
+                const IconComp = iconFor(club.icon, ICONS, Sparkles);
                 return (
                   <div
                     key={club.id}
@@ -307,7 +309,7 @@ export default function HobbyClub() {
                       </div>
 
                       <p className="text-slate-700 text-sm leading-relaxed font-sans text-justify md:text-left flex-1">
-                        {club.description}
+                        <RichText text={club.description} />
                       </p>
                     </div>
 
@@ -352,7 +354,7 @@ export default function HobbyClub() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {rulesAndRegulations.map((item, index) => {
-                  const IconComponent = ICONS[item.icon] ?? ShieldCheck;
+                  const IconComponent = iconFor(item.icon, ICONS, ShieldCheck);
                   return (
                     <div
                       key={index}
@@ -370,7 +372,7 @@ export default function HobbyClub() {
                           <IconComponent size={15} className="text-slate-400 group-hover:text-[#1a5d2e] transition-colors" />
                         </div>
                         <p className="text-xs sm:text-[13.5px] text-slate-800 leading-relaxed font-sans font-medium">
-                          {item.rule}
+                          <RichText text={item.rule} />
                         </p>
                       </div>
                     </div>
@@ -390,13 +392,13 @@ export default function HobbyClub() {
                     {content.rules.support.title}
                   </h5>
                   <p className="text-xs text-slate-600 font-sans">
-                    {content.rules.support.body}
+                    <RichText text={content.rules.support.body} />
                   </p>
                 </div>
               </div>
 
               <div className="text-xs font-mono font-bold text-[#1a5d2e] shrink-0 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
-                Email: {content.rules.support.email}
+                Email: <a href={`mailto:${content.rules.support.email}`} className="hover:underline">{content.rules.support.email}</a>
               </div>
             </div>
           </motion.div>

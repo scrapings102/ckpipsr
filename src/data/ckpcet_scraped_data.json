@@ -12,7 +12,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/admission_26-27.jpg"
+        "/media/ipsr/images/admission_26-27.jpg"
       ],
       "Videos": [],
       "Documents": []
@@ -33,7 +33,7 @@
       "Images": [],
       "Videos": [],
       "Documents": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e2bf456dbbc.pdf"
+        "/media/trust/app/institutes/102/departments/docs/66e2bf456dbbc.pdf"
       ]
     },
     {
@@ -63,7 +63,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/about/founder.jpg"
+        "/media/ipsr/images/about/founder.jpg"
       ],
       "Videos": [
         "https://www.youtube.com/embed/EvKkq81l18k",
@@ -83,12 +83,12 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/about/bhumika-desai.webp",
-        "https://ckpipsr.ac.in/images/about/dhiren-shah.png",
-        "https://ckpipsr.ac.in/images/about/kamlesh-zota.png",
-        "https://ckpipsr.ac.in/images/about/rajesh-patel.jpg",
-        "https://ckpipsr.ac.in/images/about/shailesh-shah.jpg",
-        "https://ckpipsr.ac.in/images/about/vinod-ramani.webp"
+        "/media/ipsr/images/about/bhumika-desai.webp",
+        "/media/ipsr/images/about/dhiren-shah.png",
+        "/media/ipsr/images/about/kamlesh-zota.png",
+        "/media/ipsr/images/about/rajesh-patel.jpg",
+        "/media/ipsr/images/about/shailesh-shah.jpg",
+        "/media/ipsr/images/about/vinod-ramani.webp"
       ],
       "Videos": [],
       "Documents": []
@@ -120,7 +120,7 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/about/dhiren-shah-desk.png"
+        "/media/ipsr/images/about/dhiren-shah-desk.png"
       ],
       "Videos": [],
       "Documents": []
@@ -186,8 +186,8 @@
       "Images": [],
       "Videos": [],
       "Documents": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/63f5f6fb749d2.pdf",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/66e2c74f855a9.pdf"
+        "/media/trust/app/institutes/102/departments/docs/63f5f6fb749d2.pdf",
+        "/media/trust/app/institutes/102/departments/docs/66e2c74f855a9.pdf"
       ]
     },
     {
@@ -313,7 +313,7 @@
       "Images": [],
       "Videos": [],
       "Documents": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/activity/announcements/links/6412afa6db2bc.pdf"
+        "/media/trust/app/institutes/102/activity/announcements/links/6412afa6db2bc.pdf"
       ]
     },
     {
@@ -1013,8 +1013,8 @@
         }
       ],
       "Images": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/staff_members/photos/62d543b19366a.webp"
+        "/media/trust/app/institutes/102/staff_members/photos/6a7d896865a1e.webp",
+        "/media/trust/app/institutes/102/staff_members/photos/62d543b19366a.webp"
       ],
       "Videos": [],
       "Documents": []
@@ -1093,8 +1093,8 @@
         }
       ],
       "Images": [
-        "https://ckpipsr.ac.in/images/students/hobbyclub/arts.jpg",
-        "https://ckpipsr.ac.in/images/students/hobbyclub/charity.png"
+        "/media/ipsr/images/students/hobbyclub/arts.jpg",
+        "/media/ipsr/images/students/hobbyclub/charity.png"
       ],
       "Videos": [],
       "Documents": []
@@ -1130,7 +1130,7 @@
       "Images": [],
       "Videos": [],
       "Documents": [
-        "https://console-navyugtrust-org.s3.ap-south-1.amazonaws.com/app/institutes/102/departments/docs/645df68184c86.pdf"
+        "/media/trust/app/institutes/102/departments/docs/645df68184c86.pdf"
       ]
     }
   ],

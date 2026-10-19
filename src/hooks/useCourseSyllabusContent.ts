@@ -46,6 +46,7 @@ export interface CourseSyllabusContent {
   pageTitle: string;
   /** Arrives with the programme and both totals already in it. */
   pageSubtitle: string;
+  /** The course's menu name, read from Courses Offered; also the tab's label. */
   programme: string;
   intro: string;
   table: { number: string; code: string; name: string; action: string; openLabel: string };
@@ -60,7 +61,7 @@ export interface CourseSyllabusContent {
 /** The page as it shipped, and what it falls back to. */
 export const DEFAULT_COURSE_SYLLABUS: CourseSyllabusContent = {
   "pageTitle": "Course Syllabus",
-  "pageSubtitle": "B.Pharm syllabus, semester by semester — 45 subjects across 8 semesters.",
+  "pageSubtitle": "B.Pharm syllabus, semester by semester: 45 subjects across 8 semesters.",
   "programme": "B.Pharm",
   "intro": "Tap any semester below to view its subjects. Click Open PDF to view or download the detailed syllabus module.",
   "table": {
@@ -402,7 +403,7 @@ export const DEFAULT_BPHARM_SYLLABUS = DEFAULT_COURSE_SYLLABUS;
 
 export const DEFAULT_DPHARM_SYLLABUS: CourseSyllabusContent = {
   "pageTitle": "Course Syllabus",
-  "pageSubtitle": "D.Pharm syllabus, year by year — 21 subjects across 2 years.",
+  "pageSubtitle": "D.Pharm syllabus, year by year: 21 subjects across 2 years.",
   "programme": "D.Pharm",
   "intro": "Tap any year below to view its subjects. Click Open PDF to view or download the detailed syllabus module.",
   "table": {

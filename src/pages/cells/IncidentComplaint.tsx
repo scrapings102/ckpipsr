@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle2, Clock, Eye, EyeOff, Send, ShieldAlert, ShieldCheck, Upload } from "lucide-react";
+import { Select } from "../../components/ui/Select";
 
 /**
  * The anonymous incident-report form, as the Anti Ragging Committee page has
@@ -194,22 +195,24 @@ export default function IncidentComplaint() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-mono font-semibold text-slate-700 uppercase tracking-wider">
+              <label htmlFor="incident-location" className="text-xs font-mono font-semibold text-slate-700 uppercase tracking-wider">
                 Location of Incident *
               </label>
-              <select
+              <Select
+                id="incident-location"
                 value={incidentLocation}
-                onChange={(e) => setIncidentLocation(e.target.value)}
+                onChange={setIncidentLocation}
+                options={[
+                  "Hostel Premise",
+                  "Campus Classrooms / Corridors",
+                  "Laboratories",
+                  "Canteen / Cafeteria",
+                  "Central Library",
+                  "Bus / Transit Route",
+                  "Outside Campus / Online Media",
+                ].map((place) => ({ value: place, label: place }))}
                 className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-hidden focus:border-[#1a5d2e] font-sans"
-              >
-                <option value="Hostel Premise">Hostel Premise</option>
-                <option value="Campus Classrooms / Corridors">Campus Classrooms / Corridors</option>
-                <option value="Laboratories">Laboratories</option>
-                <option value="Canteen / Cafeteria">Canteen / Cafeteria</option>
-                <option value="Central Library">Central Library</option>
-                <option value="Bus / Transit Route">Bus / Transit Route</option>
-                <option value="Outside Campus / Online Media">Outside Campus / Online Media</option>
-              </select>
+              />
             </div>
           </div>
 

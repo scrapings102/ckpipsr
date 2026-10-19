@@ -2,21 +2,22 @@ import React from "react";
 import { Award, Sparkles } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
 import { useFounderContent } from "../../hooks/useFounderContent";
-import { withEmphasis } from "../../utils/emphasis";
+import { RichText, plainText } from "../../utils/RichText";
 
 /**
  * The first paragraph opens on a drop cap. It is only taken when the paragraph
- * starts with a plain character — splitting "**Shri…**" there would break the
- * bold markers and print a stray asterisk.
+ * starts with a plain character. One that opens in bold ("**Shri…**" or
+ * <strong>) is left whole, since splitting it there would break the formatting.
  */
 function Opening({ text }: { text: string }) {
-  if (!/^[\p{L}\p{N}]/u.test(text)) return <p>{withEmphasis(text, "font-bold")}</p>;
+  // A short paragraph cannot wrap around the cap, so it is left whole too.
+  if (!/^[\p{L}\p{N}]/u.test(text) || plainText(text).length < 160) return <p><RichText text={text} strongClassName="font-bold" /></p>;
   return (
     <p>
       <span className="float-left text-6xl font-serif font-bold text-[#D4AF37] mr-3 mt-1 leading-[0.8]">
         {text[0]}
       </span>
-      {withEmphasis(text.slice(1), "font-bold")}
+      <RichText text={text.slice(1)} strongClassName="font-bold" />
     </p>
   );
 }
@@ -39,11 +40,11 @@ export default function Founder() {
           
           {/* Main Portrait Frame - Takes prominent 5 cols with much larger portrait */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="relative p-3 bg-white border-2 border-[#D4AF37]/50 shadow-2xl rounded-3xl group max-w-sm mx-auto lg:max-w-none flex flex-col gap-3">
-              <div className="absolute top-3 left-3 w-10 h-10 border-t-2 border-l-2 border-[#D4AF37] z-20 pointer-events-none" />
-              <div className="absolute bottom-3 right-3 w-10 h-10 border-b-2 border-r-2 border-[#0c2411] z-20 pointer-events-none" />
+            <div className="relative p-3 bg-white border-2 border-[#D4AF37]/50 shadow-2xl rounded-[1.75rem] group max-w-sm mx-auto lg:max-w-none flex flex-col gap-3">
+              <div className="absolute top-3 left-3 w-10 h-10 rounded-tl-2xl border-t-2 border-l-2 border-[#D4AF37] z-20 pointer-events-none" />
+              <div className="absolute bottom-3 right-3 w-10 h-10 rounded-br-2xl border-b-2 border-r-2 border-[#0c2411] z-20 pointer-events-none" />
               
-              <div className="aspect-[3/4] w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+              <div className="aspect-[3/4] w-full rounded-[1.15rem] overflow-hidden bg-slate-100 relative">
                 <img
                   src={content.portrait.image}
                   alt={content.portrait.name}
@@ -54,7 +55,7 @@ export default function Founder() {
               </div>
 
               {/* Title & Role placed below the image */}
-              <div className="p-4 rounded-xl bg-[#0c2411] border border-[#D4AF37]/40 text-center shadow-md">
+              <div className="p-4 rounded-[0.9rem] bg-[#0c2411] border border-[#D4AF37]/40 text-center shadow-md">
                 <span className="font-serif font-bold text-white text-lg block">{content.portrait.name}</span>
                 <span className="font-mono text-xs tracking-widest text-[#D4AF37] uppercase font-bold block mt-1">{content.portrait.role}</span>
               </div>
@@ -82,12 +83,12 @@ export default function Founder() {
             <div className="text-slate-700 leading-relaxed font-sans text-sm sm:text-base space-y-4">
               {opening && <Opening text={opening} />}
               {rest.map((paragraph, idx) => (
-                <p key={idx}>{withEmphasis(paragraph, "font-bold")}</p>
+                <p key={idx}><RichText text={paragraph} strongClassName="font-bold" /></p>
               ))}
             </div>
 
             <div className="border-l-4 border-[#D4AF37] bg-white p-5 rounded-r-2xl italic font-serif text-sm sm:text-base leading-relaxed text-slate-800 shadow-sm">
-              "{content.quote}"
+              "<RichText text={content.quote} />"
             </div>
           </div>
 
@@ -130,7 +131,7 @@ export default function Founder() {
                 <div>
                   <span className="font-serif text-2xl font-bold text-[#D4AF37] block mb-1">{item.year}</span>
                   <h4 className="font-serif font-bold text-slate-800 text-base leading-tight">{item.title}</h4>
-                  <p className="mt-2 text-xs text-slate-600 leading-relaxed font-sans">{item.description}</p>
+                  <p className="mt-2 text-xs text-slate-600 leading-relaxed font-sans"><RichText text={item.description} /></p>
                 </div>
               </div>
             ))}

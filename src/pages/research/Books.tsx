@@ -60,7 +60,7 @@ export default function Books() {
       category="research-and-innovation"
       activeItemLabel="Research - Books"
     >
-      <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="space-y-8 w-full">
         
         {/* Header Introduction & Controls Card */}
         <motion.div

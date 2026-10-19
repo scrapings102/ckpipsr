@@ -11,6 +11,7 @@ import {
   FlaskConical
 } from "lucide-react";
 import SubPageLayout from "../../components/SubPageLayout";
+import { RichText } from "../../utils/RichText";
 import {
   DEFAULT_PG_PROJECTS,
   useResearchPublications,
@@ -32,7 +33,7 @@ export default function PGProjects() {
       category="research-and-innovation"
       activeItemLabel="Research - PG Projects"
     >
-      <div className="space-y-8 max-w-5xl mx-auto">
+      <div className="space-y-8 w-full">
         
         {/* Header Introduction Card */}
         <motion.div
@@ -67,7 +68,7 @@ export default function PGProjects() {
           </div>
 
           <p className="text-slate-600 font-sans text-sm sm:text-base leading-relaxed mt-4">
-            {content.intro.body}
+            <RichText text={content.intro.body} />
           </p>
         </motion.div>
 
@@ -116,7 +117,7 @@ export default function PGProjects() {
 
                   {/* Description */}
                   <p className="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed">
-                    {doc.description}
+                    <RichText text={doc.description} />
                   </p>
                 </div>
 
@@ -152,7 +153,7 @@ export default function PGProjects() {
             {content.note.text && (
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={18} className="text-[#1a5d2e] shrink-0" />
-                <span>{content.note.text}</span>
+                <span><RichText text={content.note.text} /></span>
               </div>
             )}
             {content.note.tagline && (
